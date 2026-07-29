@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Reschedule Appointment') }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card summary-card">
+            <div class="card-header bg-white border-0">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-clock fa-2x text-primary me-3"></i>
+                    <div>
+                        <h4 class="mb-0" data-i18n="reschedule.title">{{ _('Reschedule Appointment') }}</h4>
+                        <p class="text-muted mb-0" data-i18n="reschedule.subtitle">{{ _('Dr. %(name)s - %(specialty)s', name=appointment.doctor_rel.user.name, specialty=appointment.doctor_rel.specialty) }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-light border">
+                    <span data-i18n="reschedule.current_time">{{ _('Current time:') }}</span> <strong>{{ appointment.appointment_time.strftime('%B %d, %Y at %I:%M %p') }}</strong>
+                </div>
+                <form method="POST" class="needs-validation needs-loading" novalidate>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="phone_number" class="form-label" data-i18n="reschedule.phone_label">{{ _('Phone Number') }}</label>
+                            <input type="tel" class="form-control" id="phone_number" name="phone_number" value="{{ appointment.phone_number or current_user.phone_number or '' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="appointment_date" class="form-label" data-i18n="reschedule.new_date">{{ _('New Date') }}</label>
+                            <input type="date" class="form-control" id="appointment_date" name="appointment_date" value="{{ appointment.appointment_time.strftime('%Y-%m-%d') }}" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold" data-i18n="reschedule.choose_date">{{ _('Choose Date') }}</label>
+                        <div class="row g-2">
+                            {% for option in date_options %}
+                            <div class="col-6 col-md-3">
+                                <button type="button" class="date-option p-2 text-center border rounded bg-white w-100" data-date="{{ option.formatted }}">
+                                    <div class="fw-bold">{{ option.display.split(' ')[0] }}</div>
+                                    <div class="text-primary">{{ option.display.split(' ')[1] }}</div>
+                                    <small class="text-muted">{{ option.display.split(' ')[2] }}</small>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold" data-i18n="reschedule.available_slots">{{ _('Available Time Slots') }}</label>
+                        <div id="time-slots" class="d-flex flex-wrap">
+                            <div class="text-muted small" data-i18n="reschedule.loading_slots">{{ _('Loading slots...') }}</div>
+                        </div>
+                        <input type="hidden" id="appointment_time" name="appointment_time" required>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary" data-i18n="reschedule.back_to_dashboard">
+                            <i class="fas fa-arrow-left me-2"></i>{{ _('Back') }}
+                        </a>
+                        <button type="submit" class="btn btn-primary" data-i18n="reschedule.save_new_time">
+                            <i class="fas fa-calendar-check me-2"></i>{{ _('Save New Time') }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const appointmentDate = document.getElementById('appointment_date');
+    const appointmentTime = document.getElementById('appointment_time');
+    const timeSlots = document.getElementById('time-slots');
+    const doctorId = '{{ appointment.doctor_id }}';
+    const appointmentId = '{{ appointment.id }}';
+
+    const rescheduleNoSlotsText = {{ _('No available slots for this date.')|tojson }};
+    const rescheduleLoadingSlotsText = {{ _('Loading slots...')|tojson }};
+
+    function renderSlots(slots) {
+        appointmentTime.value = '';
+        timeSlots.innerHTML = '';
+        if (!slots.length) {
+            const message = document.createElement('div');
+            message.className = 'text-muted small';
+            message.textContent = rescheduleNoSlotsText;
+            timeSlots.appendChild(message);
+            return;
+        }
+        slots.forEach(slot => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'time-slot bg-white';
+            button.dataset.value = slot.value;
+            button.textContent = slot.label;
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                this.classList.add('selected');
+                appointmentTime.value = this.dataset.value;
+            });
+            timeSlots.appendChild(button);
+        });
+    }
+
+    function refreshSlots() {
+        timeSlots.innerHTML = '<div class="text-muted small">Loading slots...</div>';
+        fetch(`{{ url_for('available_slots') }}?doctor_id=${doctorId}&date=${appointmentDate.value}&exclude_appointment_id=${appointmentId}`)
+            .then(response => response.json())
+            .then(data => renderSlots(data.slots || []))
+            .catch(() => {
+                timeSlots.innerHTML = '<div class="text-danger small">Could not load slots. Please try again.</div>';
+            });
+    }
+
+    document.querySelectorAll('.date-option').forEach(option => {
+        option.addEventListener('click', function() {
+            document.querySelectorAll('.date-option').forEach(o => o.classList.remove('bg-primary', 'text-white'));
+            this.classList.add('bg-primary', 'text-white');
+            appointmentDate.value = this.dataset.date;
+            refreshSlots();
+        });
+    });
+    appointmentDate.addEventListener('change', refreshSlots);
+    refreshSlots();
+});
+</script>
+{% endblock %}

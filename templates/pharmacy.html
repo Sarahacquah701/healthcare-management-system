@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Pharmacy - Order Medicines{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <!-- Header -->
+    <div class="mb-4">
+        <h1><i class="fas fa-pills"></i> Online Pharmacy</h1>
+        <p class="text-muted">Order medicines with prescription upload and home delivery</p>
+    </div>
+
+    <div class="row">
+        <!-- Available Medicines -->
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header" style="background-color: var(--primary); color: white;">
+                    <h5 class="mb-0"><i class="fas fa-list"></i> Available Medicines</h5>
+                </div>
+                <div class="card-body">
+                    {% if medicines %}
+                        <div class="row">
+                            {% for medicine in medicines %}
+                            <div class="col-md-6 mb-3">
+                                <div class="border rounded p-3">
+                                    <h6>{{ medicine.name }}</h6>
+                                    {% if medicine.dosage %}
+                                    <p class="text-muted small mb-1"><i class="fas fa-info-circle"></i> {{ medicine.dosage }}</p>
+                                    {% endif %}
+                                    <p class="mb-2">{{ medicine.description or 'High-quality medicine' }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="badge" style="background-color: var(--success);">GHS {{ medicine.price }}</span>
+                                        {% if medicine.requires_prescription %}
+                                        <span class="badge bg-warning">Prescription Required</span>
+                                        {% endif %}
+                                    </div>
+                                    <form method="POST" enctype="multipart/form-data" class="mt-2">
+                                        <input type="hidden" name="medicine_id" value="{{ medicine.id }}">
+                                        <input type="number" name="quantity" value="1" min="1" max="10" class="form-control form-control-sm mb-2" placeholder="Qty">
+                                        <input type="text" name="delivery_address" placeholder="Delivery address" class="form-control form-control-sm mb-2">
+                                        {% if medicine.requires_prescription %}
+                                        <input type="file" name="prescription" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" class="form-control form-control-sm mb-2" required>
+                                        {% endif %}
+                                        <textarea name="notes" placeholder="Special notes (optional)" class="form-control form-control-sm mb-2" rows="2"></textarea>
+                                        <button type="submit" class="btn btn-sm" style="background-color: var(--primary); color: white; width: 100%;">Order Now</button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                    <div class="alert alert-info mb-0"><i class="fas fa-inbox"></i> No medicines in stock at the moment.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Order History -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header" style="background-color: var(--primary); color: white;">
+                    <h5 class="mb-0"><i class="fas fa-history"></i> My Orders</h5>
+                </div>
+                <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                    {% if orders %}
+                        {% for order in orders %}
+                        <div class="border-bottom pb-3 mb-3">
+                            <p class="mb-1"><strong>{{ order.medicine.name }}</strong></p>
+                            <p class="mb-1 text-muted small">Qty: {{ order.quantity }}</p>
+                            <p class="mb-1 text-muted small">{{ order.created_at.strftime('%d %b %Y') }}</p>
+                            <p class="mb-2"><strong>GHS {{ order.total_price }}</strong></p>
+                            <span class="badge {% if order.status == 'delivered' %}bg-success{% elif order.status == 'shipped' %}bg-info{% elif order.status == 'cancelled' %}bg-danger{% else %}bg-warning{% endif %}">
+                                {{ order.status.title() }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <p class="text-muted text-center">No orders yet</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

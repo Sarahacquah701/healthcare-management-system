@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ _('Schedule Follow-up Appointment') }}{% endblock %}
+
+{% block content %}
+<div style="margin-left: 250px; min-height: 100vh; background: var(--bg); padding: 2rem;">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Header -->
+                <div class="mb-4">
+                    <a href="{{ url_for('appointment_details', appointment_id=original_appointment.id) }}" class="btn btn-outline-secondary mb-3" data-i18n="schedule_followup.back_to_appointment">
+                        <i class="fas fa-arrow-left me-2"></i>{{ _('Back to Appointment') }}
+                    </a>
+                    <h2 class="section-title mb-2" data-i18n="schedule_followup.title">{{ _('Schedule Follow-up Appointment') }}</h2>
+                    <p class="section-subtitle" data-i18n="schedule_followup.subtitle">{{ _('Create a follow-up consultation for your patient') }}</p>
+                </div>
+
+                <!-- Original Appointment Info -->
+                <div class="card-soft mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Original Appointment</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <p class="mb-1 text-muted small" data-i18n="schedule_followup.patient_label">{{ _('Patient') }}</p>
+                                <p class="mb-0 fw-bold">{{ original_appointment.patient.name }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1 text-muted small" data-i18n="schedule_followup.date_time_label">{{ _('Date & Time') }}</p>
+                                <p class="mb-0 fw-bold">{{ original_appointment.appointment_time.strftime('%a, %d %b %Y at %I:%M %p') }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1 text-muted small" data-i18n="schedule_followup.status_label">{{ _('Status') }}</p>
+                                <p class="mb-0">
+                                    {% if original_appointment.status == 'completed' %}
+                                    <span class="badge bg-success">{{ _('Completed') }}</span>
+                                    {% elif original_appointment.status == 'scheduled' %}
+                                    <span class="badge bg-primary">{{ _('Scheduled') }}</span>
+                                    {% elif original_appointment.status == 'checked_in' %}
+                                    <span class="badge bg-info">{{ _('Checked In') }}</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ _(original_appointment.status|replace('_', ' ')|title) }}</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1 text-muted small" data-i18n="schedule_followup.consultation_type_label">{{ _('Consultation Type') }}</p>
+                                <p class="mb-0">
+                                    {% if original_appointment.consultation_type == 'virtual' %}
+                                    <i class="fas fa-video me-1" style="color: var(--success);"></i> {{ _('Virtual') }}
+                                    {% else %}
+                                    <i class="fas fa-clinic-medical me-1" style="color: var(--primary);"></i> {{ _('In-Person') }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Follow-up Form -->
+                <div class="card-soft">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Follow-up Details</h5>
+                        <form method="POST" class="needs-validation" novalidate>
+                            <!-- Date Selection -->
+                            <div class="mb-4">
+                                <label for="followup_date" class="form-label fw-bold" data-i18n="schedule_followup.select_date">{{ _('Select Date') }}</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                    <input type="date" class="form-control" id="followup_date" name="followup_date" required>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="row g-2">
+                                        {% for option in date_options %}
+                                        <div class="col-6 col-md-3">
+                                            <div class="date-option p-2 text-center border rounded" data-date="{{ option.formatted }}">
+                                                <div class="fw-bold">{{ option.display.split(' ')[0] }}</div>
+                                                <div class="text-primary">{{ option.display.split(' ')[1] }}</div>
+                                                <small class="text-muted">{{ option.display.split(' ')[2] }}</small>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Time Slots -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold" data-i18n="schedule_followup.available_time_slots">{{ _('Available Time Slots') }}</label>
+                                <div id="time-slots" class="d-flex flex-wrap">
+                                    <div class="text-muted small" data-i18n="schedule_followup.select_date_slots">{{ _('Select a date to see available slots.') }}</div>
+                                </div>
+                                <input type="hidden" id="followup_time" name="followup_time" required>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg px-5 py-3" data-i18n="schedule_followup.schedule_followup">
+                                    <i class="fas fa-calendar-check me-2"></i>{{ _('Schedule Follow-up') }}
+                                </button>
+                                <a href="{{ url_for('appointment_details', appointment_id=original_appointment.id) }}" class="btn btn-outline-secondary btn-lg px-5 py-3 ms-2" data-i18n="schedule_followup.cancel">
+                                    <i class="fas fa-times me-2"></i>{{ _('Cancel') }}
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const followupDate = document.getElementById('followup_date');
+    const followupTime = document.getElementById('followup_time');
+    const timeSlots = document.getElementById('time-slots');
+    const doctorId = {{ original_appointment.doctor_id }};
+
+    const followupNoSlotsText = {{ _('No available slots for this date.')|tojson }};
+    const followupLoadingText = {{ _('Loading slots...')|tojson }};
+
+    function renderSlots(slots) {
+        followupTime.value = '';
+        timeSlots.innerHTML = '';
+        if (!slots.length) {
+            const message = document.createElement('div');
+            message.className = 'text-muted small';
+            message.textContent = followupNoSlotsText;
+            timeSlots.appendChild(message);
+            return;
+        }
+        slots.forEach(slot => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'time-slot bg-white';
+            button.dataset.value = slot.value;
+            button.textContent = slot.label;
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                this.classList.add('selected');
+                followupTime.value = this.dataset.value;
+            });
+            timeSlots.appendChild(button);
+        });
+    }
+
+    function refreshSlots() {
+        const date = followupDate.value;
+        if (!date) {
+            renderSlots([]);
+            return;
+        }
+        timeSlots.innerHTML = `<div class="text-muted small">${followupLoadingText}</div>`;
+        fetch(`{{ url_for('available_slots') }}?doctor_id=${doctorId}&date=${date}`)
+            .then(response => response.json())
+            .then(data => renderSlots(data.slots || []))
+            .catch(() => {
+                timeSlots.innerHTML = '<div class="text-danger small">Could not load slots. Please try again.</div>';
+            });
+    }
+
+    // Date selection
+    document.querySelectorAll('.date-option').forEach(option => {
+        option.addEventListener('click', function() {
+            document.querySelectorAll('.date-option').forEach(o => o.classList.remove('bg-primary', 'text-white'));
+            this.classList.add('bg-primary', 'text-white');
+            followupDate.value = this.dataset.date;
+            refreshSlots();
+        });
+    });
+
+    followupDate.addEventListener('change', refreshSlots);
+
+    // Set default date to 7 days from now
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 7);
+    followupDate.value = tomorrow.toISOString().split('T')[0];
+    refreshSlots();
+});
+</script>
+{% endblock %}

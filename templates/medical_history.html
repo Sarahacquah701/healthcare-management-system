@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% block title %}My Medical History{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-11">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                <div>
+                    <h3 class="mb-1">My Medical History</h3>
+                    <p class="text-muted mb-0">Appointments, queue visits, and recent care history.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('reminders') }}" class="btn btn-outline-warning">
+                        <i class="fas fa-bell me-2"></i>Reminders
+                    </a>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="card summary-card h-100">
+                        <div class="card-body">
+                            <small class="text-muted d-block">Total Appointments</small>
+                            <h3 class="text-primary mb-0">{{ appointments|length }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card summary-card h-100">
+                        <div class="card-body">
+                            <small class="text-muted d-block">Completed</small>
+                            <h3 class="text-success mb-0">{{ completed_appointments|length }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card summary-card h-100">
+                        <div class="card-body">
+                            <small class="text-muted d-block">Upcoming</small>
+                            <h3 class="text-warning mb-0">{{ upcoming_appointments|length }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card summary-card h-100">
+                        <div class="card-body">
+                            <small class="text-muted d-block">Queue Visits</small>
+                            <h3 class="text-info mb-0">{{ queue_records|length }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card summary-card mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0 text-primary"><i class="fas fa-user-md me-2"></i>Recent Care Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Latest Appointment</small>
+                            <div>{{ recent_appointment.appointment_time.strftime('%b %d, %Y %I:%M %p') if recent_appointment else 'No appointments yet' }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Last Completed Visit</small>
+                            <div>
+                                {% if last_completed %}
+                                    Dr. {{ last_completed.doctor_rel.user.name }} on {{ last_completed.appointment_time.strftime('%b %d, %Y') }}
+                                {% else %}
+                                    No completed visits yet
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Medical Notes</small>
+                            <div>{{ current_user.medical_conditions or 'No conditions recorded' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card summary-card mb-4">
+                <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-primary"><i class="fas fa-notes-medical me-2"></i>Medical Profile</h5>
+                    <a href="{{ url_for('profile') }}" class="btn btn-sm btn-outline-primary">Update Profile</a>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <small class="text-muted d-block">Allergies</small>
+                            <div>{{ current_user.allergies or 'Not provided' }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted d-block">Medical Conditions</small>
+                            <div>{{ current_user.medical_conditions or 'Not provided' }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Blood Group</small>
+                            <div>{{ current_user.blood_group or 'Not provided' }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Emergency Contact</small>
+                            <div>{{ current_user.emergency_contact or 'Not provided' }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Date of Birth</small>
+                            <div>{{ current_user.date_of_birth.strftime('%b %d, %Y') if current_user.date_of_birth else 'Not provided' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card summary-card mb-4">
+                <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-primary"><i class="fas fa-calendar-check me-2"></i>Appointment History</h5>
+                    <a href="{{ url_for('book_appointment') }}" class="btn btn-sm btn-primary">Book Another Visit</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0 ps-4">Date & Time</th>
+                                    <th class="border-0">Doctor</th>
+                                    <th class="border-0">Specialty</th>
+                                    <th class="border-0">Type</th>
+                                    <th class="border-0">Status</th>
+                                    <th class="border-0">Summary</th>
+                                    <th class="border-0 pe-4">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in appointments %}
+                                <tr>
+                                    <td class="ps-4">{{ appointment.appointment_time.strftime('%b %d, %Y %I:%M %p') }}</td>
+                                    <td>Dr. {{ appointment.doctor_rel.user.name }}</td>
+                                    <td>{{ appointment.doctor_rel.specialty }}</td>
+                                    <td>{{ 'Virtual' if appointment.consultation_type == 'virtual' else 'In-Person' }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if appointment.status == 'scheduled' %}primary{% elif appointment.status == 'completed' %}success{% elif appointment.status == 'checked_in' %}info{% elif appointment.status == 'missed' %}danger{% elif appointment.status == 'cancelled' %}secondary{% else %}warning{% endif %}">
+                                            {{ appointment.status|title }}
+                                        </span>
+                                    </td>
+                                    <td>{{ appointment.diagnosis or appointment.follow_up_advice or appointment.notes or 'No notes' }}</td>
+                                    <td class="pe-4">
+                                        <a href="{{ url_for('appointment_details', appointment_id=appointment.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">No appointment history for this patient.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card summary-card">
+                <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-primary"><i class="fas fa-list-ol me-2"></i>Queue History</h5>
+                    <a href="{{ url_for('reminders') }}" class="btn btn-sm btn-outline-warning">View Queue Alerts</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0 ps-4">Queued On</th>
+                                    <th class="border-0">Doctor</th>
+                                    <th class="border-0">Queue #</th>
+                                    <th class="border-0">Priority</th>
+                                    <th class="border-0 pe-4">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in queue_records %}
+                                <tr>
+                                    <td class="ps-4">{{ record.created_at.strftime('%b %d, %Y %I:%M %p') }}</td>
+                                    <td>Dr. {{ record.doctor_rel.user.name }}</td>
+                                    <td>{{ record.queue_number }}</td>
+                                    <td>{{ record.priority|title }}</td>
+                                    <td class="pe-4">
+                                        <span class="badge bg-{% if record.status == 'completed' %}success{% elif record.status == 'waiting' %}warning{% elif record.status == 'in_consultation' %}info{% else %}secondary{% endif %}">
+                                            {{ record.status|replace('_', ' ')|title }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">No queue history for this patient.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

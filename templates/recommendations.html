@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}Smart Recommendations{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card summary-card mb-4">
+                <div class="card-body">
+                    <h3 class="mb-1">Smart Health Recommendations</h3>
+                    <p class="text-muted mb-0">Personalized health tips based on your latest saved data.</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="card summary-card h-100">
+                        <div class="card-header bg-white border-0"><h5 class="mb-0 text-primary">Personalized Tips</h5></div>
+                        <div class="card-body">
+                            {% for recommendation in recommendations %}
+                            <div class="alert alert-info py-2">{{ recommendation }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card summary-card h-100">
+                        <div class="card-header bg-white border-0"><h5 class="mb-0 text-primary">Exercise & Nutrition Suggestions</h5></div>
+                        <div class="card-body">
+                            {% for suggestion in suggestions %}
+                            <div class="alert alert-success py-2">{{ suggestion }}</div>
+                            {% endfor %}
+                            <hr>
+                            <h6 class="text-primary">Latest Wellness Snapshot</h6>
+                            {% if latest_metric %}
+                            <div class="small text-muted">BMI: {{ latest_metric.bmi or 'N/A' }}</div>
+                            <div class="small text-muted">Blood pressure: {{ latest_metric.blood_pressure_systolic or 'N/A' }}/{{ latest_metric.blood_pressure_diastolic or 'N/A' }}</div>
+                            {% else %}
+                            <p class="text-muted mb-0">No wellness metrics recorded yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="card summary-card">
+                        <div class="card-header bg-white border-0"><h5 class="mb-0 text-primary">Recent Vaccines</h5></div>
+                        <div class="card-body">
+                            {% if latest_vaccinations %}
+                                <div class="row g-3">
+                                    {% for vaccine in latest_vaccinations %}
+                                    <div class="col-md-4">
+                                        <div class="border rounded p-3 bg-white">
+                                            <strong>{{ vaccine.vaccine_name }}</strong>
+                                            <div class="small text-muted">Next due: {{ vaccine.next_due_date.strftime('%b %d, %Y') if vaccine.next_due_date else 'Not set' }}</div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-muted mb-0">No vaccine history yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: HealthFlow\n"
+"POT-Creation-Date: 2026-07-05 00:00+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Home"
+msgstr "首页"
+
+msgid "Book Appointment"
+msgstr "预约挂号"
+
+msgid "Doctors"
+msgstr "医生"
+
+msgid "Symptom Checker"
+msgstr "症状检查"
+
+msgid "Support"
+msgstr "支持"
+
+msgid "Contact"
+msgstr "联系"
+
+msgid "Language"
+msgstr "语言"
+
+msgid "Dashboard"
+msgstr "仪表盘"
+
+msgid "Logout"
+msgstr "登出"
+
+msgid "Login"
+msgstr "登录"
+
+msgid "Register"
+msgstr "注册"
+
+msgid "HealthFlow — modern hospital booking and queue management"
+msgstr "HealthFlow — 现代化医院预约与排队管理"
+
+msgid "Need help? Call us at (555) 123-4567 or email support@healthflow.com"
+msgstr "需要帮助？请致电 (555) 123-4567 或发送邮件至 support@healthflow.com"

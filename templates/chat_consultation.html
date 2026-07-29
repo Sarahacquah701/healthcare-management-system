@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Chat Consultation{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-comments"></i> Start a Chat Consultation</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Reason for consultation</label>
+                            <input type="text" name="topic" class="form-control" placeholder="Describe your concern" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Preferred doctor (optional)</label>
+                            <select name="doctor_id" class="form-select">
+                                <option value="">Any available doctor</option>
+                                {% for doctor in doctors %}
+                                <option value="{{ doctor.id }}">Dr. {{ doctor.user.name }} - {{ doctor.specialty }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Request Consultation</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-history"></i> My Consultation Requests</h5>
+                </div>
+                <div class="card-body">
+                    {% if consultations %}
+                        <div class="list-group">
+                            {% for consultation in consultations %}
+                            <a href="{{ url_for('view_chat_consultation', consultation_id=consultation.id) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex justify-content-between">
+                                    <strong>{{ consultation.topic }}</strong>
+                                    <span class="badge bg-{{ 'success' if consultation.status == 'active' else 'warning' if consultation.status == 'waiting_response' else 'secondary' }}">{{ consultation.status.replace('_', ' ').title() }}</span>
+                                </div>
+                                <p class="mb-1 text-muted small">Requested {{ consultation.created_at.strftime('%d %b %Y %I:%M %p') }}</p>
+                                {% if consultation.doctor_rel %}
+                                <p class="mb-0 small">Assigned Doctor: Dr. {{ consultation.doctor_rel.user.name }}</p>
+                                {% endif %}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                    <p class="text-muted">No chat consultations yet. Submit a request to get guidance from a doctor.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-lightbulb"></i> How Chat Works</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">Create a chat consultation request and a doctor will review it shortly.</p>
+                    <p class="mb-2">You can continue the conversation inside each consultation thread.</p>
+                    <p class="mb-0">Use chat for non-emergency questions, follow-ups, or prescription guidance.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

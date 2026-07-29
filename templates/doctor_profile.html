@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}Dr. {{ doctor.user.name }} - Hospital Queue System{% endblock %}
+
+{% block content %}
+<div style="margin-left: 250px; min-height: 100vh; background: var(--bg); padding: 2rem;">
+    <div class="container-fluid">
+        <!-- Back Button -->
+        <a href="{{ url_for('doctors_directory') }}" class="btn btn-outline-secondary mb-4">
+            <i class="fas fa-arrow-left me-2"></i> Back to Doctors
+        </a>
+
+        <div class="row">
+            <!-- Doctor Info Card -->
+            <div class="col-lg-4 mb-4">
+                <div class="card-soft">
+                    <div class="card-body text-center">
+                        <!-- Doctor Image -->
+                        {% if doctor.photo_url %}
+                            <img src="{{ doctor.photo_url }}" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                                 style="width: 150px; height: 150px; background: var(--primary-soft); color: var(--primary);">
+                                <i class="fas fa-user-md" style="font-size: 4rem;"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <h3>{{ doctor.user.name }}</h3>
+                        <p class="text-muted">{{ doctor.specialty }}</p>
+                        
+                        <!-- Rating/Stats -->
+                        <div class="d-flex justify-content-around my-3 py-3 border-top border-bottom">
+                            <div>
+                                <p class="mb-0" style="font-size: 1.5rem; color: var(--primary); font-weight: 700;">{{ completed_appointments }}</p>
+                                <p class="text-muted small">Consultations</p>
+                            </div>
+                            <div>
+                                <p class="mb-0" style="font-size: 1.5rem; color: var(--primary); font-weight: 700;">{{ doctor.consultation_time }}</p>
+                                <p class="text-muted small">Min/Session</p>
+                            </div>
+                            <div>
+                                <p class="mb-0" style="font-size: 1.5rem; color: var(--primary); font-weight: 700;">₹{{ '%.2f'|format(doctor.consultation_fee or 0.0) }}</p>
+                                <p class="text-muted small">Fee</p>
+                            </div>
+                            {% if doctor.experience_years %}
+                            <div>
+                                <p class="mb-0" style="font-size: 1.5rem; color: var(--primary); font-weight: 700;">{{ doctor.experience_years }}+</p>
+                                <p class="text-muted small">Years Exp.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Consultation Types -->
+                        <div class="mt-3">
+                            <p class="form-label mb-2">Available Consultation Types:</p>
+                            <span class="badge bg-primary mb-2">
+                                <i class="fas fa-clinic-medical me-1"></i> In-Person
+                            </span>
+                            {% if doctor.allows_telemedicine %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-video me-1"></i> Virtual
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Book Appointment Button -->
+                        {% if current_user.is_authenticated and current_user.role == 'patient' %}
+                        <a href="{{ url_for('book_appointment') }}?doctor_id={{ doctor.id }}" class="btn btn-primary w-100 mt-4">
+                            <i class="fas fa-calendar-check me-2"></i> Book Appointment
+                        </a>
+                        {% elif not current_user.is_authenticated %}
+                        <a href="{{ url_for('login') }}" class="btn btn-primary w-100 mt-4">
+                            <i class="fas fa-sign-in-alt me-2"></i> Login to Book
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Doctor Details -->
+            <div class="col-lg-8">
+                <!-- Bio Section -->
+                {% if doctor.bio %}
+                <div class="card-soft mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="fas fa-align-left me-2" style="color: var(--primary);"></i> About
+                        </h5>
+                        <p>{{ doctor.bio }}</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Qualifications Section -->
+                {% if doctor.qualifications %}
+                <div class="card-soft mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="fas fa-certificate me-2" style="color: var(--success);"></i> Qualifications
+                        </h5>
+                        <p>{{ doctor.qualifications }}</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Experience Section -->
+                {% if doctor.experience_years %}
+                <div class="card-soft mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="fas fa-briefcase me-2" style="color: var(--success);"></i> Experience
+                        </h5>
+                        <p>{{ doctor.experience_years }} years of clinical experience in {{ doctor.specialty }}</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Contributions Section -->
+                {% if doctor.contributions %}
+                <div class="card-soft mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="fas fa-star me-2" style="color: var(--primary);"></i> Contributions
+                        </h5>
+                        <p>{{ doctor.contributions }}</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Consultation Info -->
+                <div class="card-soft">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="fas fa-info-circle me-2" style="color: var(--primary);"></i> Consultation Details
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-2">
+                                    <strong>Specialty:</strong> {{ doctor.specialty }}
+                                </p>
+                                <p class="mb-0">
+                                    <strong>Session Duration:</strong> {{ doctor.consultation_time }} minutes
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-2">
+                                    <strong>Consultation Types:</strong>
+                                    {% if doctor.allows_telemedicine %}
+                                    In-Person &amp; Virtual
+                                    {% else %}
+                                    In-Person Only
+                                    {% endif %}
+                                </p>
+                                <p class="mb-0"><strong>Standard Fee:</strong> ₹{{ '%.2f'|format(doctor.consultation_fee or 0.0) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Availability Calendar -->
+                <div class="card-soft mt-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="fas fa-calendar-day me-2" style="color: var(--primary);"></i> Availability - Next 7 Days
+                        </h5>
+                        <div class="row g-3">
+                            {% for day in availability_calendar %}
+                            <div class="col-md-6">
+                                <div class="p-3 rounded border h-100" style="background: rgba(255,255,255,0.7);">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <strong>{{ day.display }}</strong>
+                                        <span class="badge {% if day.slots %}bg-success{% else %}bg-secondary{% endif %}">
+                                            {% if day.slots %}Open{% else %}Full{% endif %}
+                                        </span>
+                                    </div>
+                                    {% if day.slots %}
+                                        <div class="d-flex flex-wrap gap-2">
+                                            {% for slot in day.slots %}
+                                                <span class="badge bg-light text-dark border">{{ slot }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <p class="text-muted small mb-0">No open slots currently.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <p class="text-muted small mb-0 mt-3">Next available: {{ next_available_label }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

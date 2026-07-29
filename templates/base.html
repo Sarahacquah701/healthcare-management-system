@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang or session.get('lang', 'en') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#1d6fa5">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='hospital.svg') }}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>{% block title %}Hospital Queue System{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #eff7f1;
+            --surface: #ffffff;
+            --surface-soft: #f3fbf5;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --primary: #1d6fa5;
+            --primary-soft: #d9eef8;
+            --success: #1f8b69;
+            --border: #dbe7e1;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+        .navbar { background: rgba(255,255,255,0.96); backdrop-filter: blur(12px); }
+        .navbar .nav-link { color: var(--text); }
+        .navbar .nav-link:hover,
+        .navbar .nav-link.active { color: var(--primary); }
+        .navbar-brand { font-weight: 700; color: var(--primary); }
+        .hero {
+            background: linear-gradient(135deg, #f4fbff 0%, #eaf7ef 100%);
+            border-radius: 28px;
+            padding: 3rem;
+            box-shadow: 0 24px 60px rgba(36, 91, 116, 0.12);
+        }
+        .hero .display-5 { color: #0f172a; }
+        .section-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 1rem; }
+        .section-subtitle { color: var(--muted); }
+        .card-soft { background: var(--surface-soft); border: 1px solid rgba(34, 112, 98, 0.08); border-radius: 24px; }
+        .card-soft .card-body { padding: 2rem; }
+        .doctor-card, .stats-card { border-radius: 24px; transition: transform .25s ease, box-shadow .25s ease; }
+        .doctor-card:hover, .stats-card:hover { transform: translateY(-3px); box-shadow: 0 18px 40px rgba(31, 74, 109, 0.12); }
+        .feature-card, .doctor-card { background: var(--surface); border: none; }
+        .btn-primary { background: linear-gradient(135deg, #1d6fa5, #2d98d1); border: none; }
+        .btn-primary:hover { background: linear-gradient(135deg, #1b5d92, #227cb9); }
+        .form-control, .form-select { border-radius: 14px; border: 1px solid var(--border); padding: 1rem 1rem; }
+        .form-control:focus, .form-select:focus { border-color: #4fa9df; box-shadow: 0 0 0 0.15rem rgba(29,111,165,.12); }
+        .form-label { font-weight: 600; color: #334155; }
+        .input-group-text { border-radius: 14px; background: var(--surface); border: 1px solid var(--border); color: var(--primary); }
+        .btn-outline-primary { color: var(--primary); border-color: rgba(29,111,165,.24); }
+        .btn-outline-primary:hover { background: rgba(29,111,165,.08); }
+        .footer { font-size: .9rem; color: var(--muted); }
+        .fade-in { animation: fadeInUp .6s ease both; }
+        .btn-loading { position: relative; opacity: 0.9; }
+        .btn-loading::after { content: ''; position: absolute; right: 1rem; top: 50%; width: 1rem; height: 1rem; border: 2px solid rgba(255,255,255,.8); border-top-color: #fff; border-radius: 50%; transform: translateY(-50%); animation: spin .8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 767px) { .hero { padding: 2rem 1.25rem; } .card-soft .card-body { padding: 1.5rem; } }
+        /* Homepage specific styles */
+        .hero-bg { background: linear-gradient(135deg, rgba(29,111,165,0.8), rgba(34,124,185,0.8)), url('https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat; }
+        .card-modern { border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card-modern:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+        .doctor-card { cursor: pointer; }
+        .service-card { cursor: pointer; }
+        .img-hover { transition: transform 0.3s ease; }
+        .img-hover:hover { transform: scale(1.05); }
+        .btn-modern { transition: all 0.3s ease; }
+        .btn-modern:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .fade-in-section { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .fade-in-section.in-view { opacity: 1; transform: translateY(0); }
+        /* Dashboard specific styles */
+        .dashboard-sidebar { background: var(--surface); border-right: 1px solid var(--border); min-height: 100vh; position: fixed; left: 0; top: 0; width: 250px; z-index: 1000; transition: transform 0.3s ease; }
+        .dashboard-sidebar .nav-link { color: var(--text); padding: 0.75rem 1.5rem; border-radius: 8px; margin: 0.25rem 1rem; transition: all 0.2s ease; }
+        .dashboard-sidebar .nav-link:hover, .dashboard-sidebar .nav-link.active { background: var(--primary-soft); color: var(--primary); }
+        .dashboard-sidebar .nav-link i { width: 20px; margin-right: 0.75rem; }
+        .dashboard-main { margin-left: 250px; min-height: 100vh; }
+        .dashboard-topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1rem 2rem; position: sticky; top: 0; z-index: 999; }
+        .dashboard-topbar .profile-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .summary-card { background: linear-gradient(135deg, var(--surface) 0%, var(--surface-soft) 100%); border: none; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .summary-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
+        .summary-card .card-icon { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1rem; }
+        .appointment-table img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 0.75rem; }
+        .schedule-card { border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: transform 0.2s ease; }
+        .schedule-card:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .doctor-select-card { border: 2px solid transparent; border-radius: 12px; transition: all 0.3s ease; cursor: pointer; }
+        .doctor-select-card.selected { border-color: var(--primary); background: var(--primary-soft); }
+        .doctor-select-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .time-slot { border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 1rem; margin: 0.25rem; display: inline-block; cursor: pointer; transition: all 0.2s ease; }
+        .time-slot:hover, .time-slot.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        @media (max-width: 768px) { .dashboard-sidebar { transform: translateX(-100%); } .dashboard-main { margin-left: 0; } .dashboard-sidebar.show { transform: translateX(0); } }
+        /* Date options styling */
+        .date-option { cursor: pointer; transition: all 0.3s ease; border: 2px solid var(--border); }
+        .date-option:hover { border-color: var(--primary); background: var(--primary-soft); }
+        .date-option.bg-primary { color: white !important; border-color: var(--primary); }
+        .chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1050;
+            width: 370px;
+            max-width: calc(100% - 40px);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.14);
+            border-radius: 24px;
+            overflow: hidden;
+            background: white;
+            display: none;
+        }
+        .chat-widget.show {
+            display: block;
+        }
+        .chat-widget-header {
+            background: linear-gradient(135deg, #1d6fa5, #2d98d1);
+            color: white;
+            padding: 1rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .chat-widget-body {
+            max-height: 420px;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f8fafc;
+        }
+        .chat-message {
+            margin-bottom: 1rem;
+        }
+        .chat-message.user .message-bubble {
+            background: #1d6fa5;
+            color: white;
+            margin-left: auto;
+            border-radius: 18px 18px 4px 18px;
+        }
+        .chat-message.assistant .message-bubble {
+            background: #eef7ff;
+            color: #0f172a;
+            border-radius: 18px 18px 18px 4px;
+        }
+        .message-bubble {
+            display: inline-block;
+            padding: 0.85rem 1rem;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            max-width: 100%;
+        }
+        .chat-widget-footer {
+            padding: 0.75rem 1rem;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+        }
+        .chat-widget-footer input {
+            border-radius: 999px;
+            border: 1px solid #cbd5e1;
+            padding: 0.75rem 1rem;
+            width: 100%;
+        }
+        .chat-toggle-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1051;
+            border-radius: 50%;
+            width: 62px;
+            height: 62px;
+            background: linear-gradient(135deg, #1d6fa5, #2d98d1);
+            color: white;
+            border: none;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18);
+            cursor: pointer;
+        }
+        .chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1050;
+            width: 370px;
+            max-width: calc(100% - 40px);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.14);
+            border-radius: 24px;
+            overflow: hidden;
+            background: white;
+            display: none;
+        }
+        .chat-widget.show {
+            display: block;
+        }
+        .chat-widget-header {
+            background: linear-gradient(135deg, #1d6fa5, #2d98d1);
+            color: white;
+            padding: 1rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .chat-widget-body {
+            max-height: 420px;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f8fafc;
+        }
+        .chat-message { margin-bottom: 1rem; }
+        .chat-message.user .message-bubble {
+            background: #1d6fa5;
+            color: white;
+            margin-left: auto;
+            border-radius: 18px 18px 4px 18px;
+        }
+        .chat-message.assistant .message-bubble {
+            background: #eef7ff;
+            color: #0f172a;
+            border-radius: 18px 18px 18px 4px;
+        }
+        .message-bubble {
+            display: inline-block;
+            padding: 0.85rem 1rem;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            max-width: 100%;
+        }
+        .chat-widget-footer {
+            padding: 0.75rem 1rem;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+        }
+        .chat-widget-footer input {
+            border-radius: 999px;
+            border: 1px solid #cbd5e1;
+            padding: 0.75rem 1rem;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light shadow-sm sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('home') }}">HealthFlow</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" data-i18n="nav.home" href="{{ url_for('home') }}">{{ _('Home') }}</a></li>
+                <li class="nav-item"><a class="nav-link" data-i18n="nav.book" href="{{ url_for('book_appointment') }}">{{ _('Book Appointment') }}</a></li>
+                <li class="nav-item"><a class="nav-link" data-i18n="nav.doctors" href="{{ url_for('doctors_directory') }}">{{ _('Doctors') }}</a></li>
+                <li class="nav-item"><a class="nav-link" data-i18n="nav.symptom" href="{{ url_for('symptom_checker') }}">{{ _('Symptom Checker') }}</a></li>
+                <li class="nav-item"><a class="nav-link" data-i18n="nav.support" href="{{ url_for('support') }}">{{ _('Support') }}</a></li>
+                <li class="nav-item"><a class="nav-link" data-i18n="nav.contact" href="{{ url_for('home') }}#contact">{{ _('Contact') }}</a></li>
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-i18n="nav.language">{{ _('Language') }}</a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
+                            <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='en') }}" data-lang="en">English</a></li>
+                            <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='fr') }}" data-lang="fr">Français</a></li>
+                            <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='es') }}" data-lang="es">Español</a></li>
+                            <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='hi') }}" data-lang="hi">हिन्दी</a></li>
+                            <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='zh') }}" data-lang="zh">中文</a></li>
+                            <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='ko') }}" data-lang="ko">한국어</a></li>
+                            <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='tw') }}" data-lang="tw">Twi</a></li>
+                            <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='ha') }}" data-lang="ha">Hausa</a></li>
+                        </ul>
+                    </li>
+                {% if current_user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" data-i18n="nav.patient_tools" href="{{ url_for('patient_tools') }}">{{ _('Patient Tools') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" data-i18n="nav.reminders" href="{{ url_for('reminders') }}">{{ _('Reminders') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" data-i18n="nav.health_records" href="{{ url_for('health_records') }}">{{ _('Health Records') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" data-i18n="nav.lab_tests" href="{{ url_for('lab_tests') }}">{{ _('Lab Tests') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" data-i18n="nav.insurance" href="{{ url_for('insurance') }}">{{ _('Insurance') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" data-i18n="nav.billing" href="{{ url_for('billing') }}">{{ _('Billing') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" data-i18n="nav.emergency_sos" href="{{ url_for('emergency_sos') }}">{{ _('Emergency SOS') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" data-i18n="nav.family_members" href="{{ url_for('family_members') }}">{{ _('Family Members') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" data-i18n="nav.dashboard" href="{{ url_for('dashboard') }}">{{ _('Dashboard') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" data-i18n="nav.logout" href="{{ url_for('logout') }}">{{ _('Logout') }}</a></li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" data-i18n="nav.login" href="{{ url_for('login') }}">{{ _('Login') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" data-i18n="nav.register" href="{{ url_for('register') }}">{{ _('Register') }}</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container py-5">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm" role="alert">
+                {{ messages[0] }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</div>
+
+{% set chat_messages = chat_history if chat_history is defined and chat_history else session.get('support_chat_history', []) %}
+{% set chat_endpoint = url_for('ai_chat') if current_user.is_authenticated and current_user.role == 'patient' else url_for('support_chat_api') %}
+{% set chat_title = 'HealthFlow Assistant' if current_user.is_authenticated and current_user.role == 'patient' else '24/7 Support' %}
+{% set chat_subtitle = 'Ask about bookings, doctors, or payments' if current_user.is_authenticated and current_user.role == 'patient' else 'Ask about bookings, billing, doctors, and services' %}
+<button class="chat-toggle-btn" id="openChatBtn" title="{{ _('Open AI Assistant') }}" data-i18n-title="Open AI Assistant">
+    <i class="fas fa-comments fa-lg"></i>
+</button>
+
+<div class="chat-widget" id="chatWidget">
+    <div class="chat-widget-header">
+        <div>
+            <strong>{{ _(chat_title) }}</strong>
+            <div class="small">{{ _(chat_subtitle) }}</div>
+        </div>
+        <button class="btn btn-sm btn-light" id="closeChatBtn" type="button"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="chat-widget-body" id="chatMessages">
+        {% if chat_messages %}
+            {% for entry in chat_messages %}
+            <div class="chat-message user">
+                <div class="message-bubble">{{ entry.user }}</div>
+            </div>
+            <div class="chat-message assistant">
+                <div class="message-bubble">{{ entry.assistant }}</div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="chat-message assistant">
+                <div class="message-bubble">{{ _('Hello! I am here to help with appointments, doctors, billing, reminders, or general support.') }}</div>
+            </div>
+        {% endif %}
+    </div>
+    <div class="chat-widget-footer">
+        <form id="chatForm">
+            <input id="chatInput" type="text" placeholder="{{ _('Type your question...') }}" data-i18n-placeholder="Type your question..." autocomplete="off" required>
+        </form>
+    </div>
+</div>
+
+<footer class="footer bg-white border-top py-4 mt-5">
+    <div class="container text-center">
+        <p class="mb-1" data-i18n="footer.tag">{{ _('HealthFlow — modern hospital booking and queue management') }}</p>
+        <p class="mb-0 text-muted" data-i18n="footer.help">{{ _('Need help? Call us at (555) 123-4567 or email support@healthflow.com') }}</p>
+    </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/i18next@23.16.8/dist/umd/i18next.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('form.needs-loading').forEach(function(form) {
+            form.addEventListener('submit', function() {
+                var button = form.querySelector('button[type="submit"]');
+                if (button) {
+                    button.disabled = true;
+                    button.classList.add('btn-loading');
+                }
+            });
+        });
+
+        document.querySelectorAll('form.needs-validation').forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+
+        // Fade-in animation on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-in-section').forEach(section => {
+            observer.observe(section);
+        });
+
+        const chatWidget = document.getElementById('chatWidget');
+        const openChatBtn = document.getElementById('openChatBtn');
+        const closeChatBtn = document.getElementById('closeChatBtn');
+        const chatForm = document.getElementById('chatForm');
+        const chatInput = document.getElementById('chatInput');
+        const chatMessages = document.getElementById('chatMessages');
+
+        if (chatWidget && openChatBtn && closeChatBtn && chatForm && chatInput && chatMessages) {
+            openChatBtn.addEventListener('click', function () {
+                chatWidget.classList.add('show');
+                openChatBtn.style.display = 'none';
+                chatInput.focus();
+            });
+
+            closeChatBtn.addEventListener('click', function () {
+                chatWidget.classList.remove('show');
+                openChatBtn.style.display = 'block';
+            });
+
+            function scrollChatToBottom() {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            chatForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+                const message = chatInput.value.trim();
+                if (!message) return;
+
+                const userBubble = document.createElement('div');
+                userBubble.className = 'chat-message user';
+                userBubble.innerHTML = `<div class="message-bubble"></div>`;
+                userBubble.querySelector('.message-bubble').textContent = message;
+                chatMessages.appendChild(userBubble);
+                scrollChatToBottom();
+                chatInput.value = '';
+                chatInput.disabled = true;
+
+                fetch('{{ chat_endpoint }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        const errorBubble = document.createElement('div');
+                        errorBubble.className = 'chat-message assistant';
+                        errorBubble.innerHTML = `<div class="message-bubble"></div>`;
+                        errorBubble.querySelector('.message-bubble').textContent = window.HealthFlowI18n ? window.HealthFlowI18n.t(data.error) : data.error;
+                        chatMessages.appendChild(errorBubble);
+                    } else {
+                        const assistantBubble = document.createElement('div');
+                        assistantBubble.className = 'chat-message assistant';
+                        assistantBubble.innerHTML = `<div class="message-bubble"></div>`;
+                        assistantBubble.querySelector('.message-bubble').textContent = window.HealthFlowI18n ? window.HealthFlowI18n.t(data.message) : data.message;
+                        chatMessages.appendChild(assistantBubble);
+                    }
+                })
+                .catch(() => {
+                    const errorBubble = document.createElement('div');
+                    errorBubble.className = 'chat-message assistant';
+                    const unavailableMessage = {{ _('Sorry, the assistant is unavailable right now. Please try again in a moment.')|tojson }};
+                    errorBubble.innerHTML = `<div class="message-bubble">${unavailableMessage}</div>`;
+                    chatMessages.appendChild(errorBubble);
+                })
+                .finally(() => {
+                    chatInput.disabled = false;
+                    chatInput.focus();
+                    scrollChatToBottom();
+                });
+            });
+
+            scrollChatToBottom();
+        }
+    });
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('{{ url_for('static', filename='service-worker.js') }}')
+                .then(() => console.log('Service Worker registered.'))
+                .catch(err => console.warn('Service Worker registration failed:', err));
+        });
+    }
+</script>
+<script>
+    // Client-side i18n: load translations and apply to elements with data-i18n or exact text nodes
+    (function(){
+        const supported = {{ supported_locales | tojson }};
+        let current = "{{ current_lang }}";
+        let currentTranslations = {};
+        const savedLang = localStorage.getItem('lang');
+        if (savedLang && supported.includes(savedLang) && savedLang !== current) {
+            current = savedLang;
+        }
+
+        function applyTranslations(trans){
+            if (!trans) return;
+            document.documentElement.lang = current;
+            if (trans[document.title.trim()]) {
+                document.title = trans[document.title.trim()];
+            }
+            document.querySelectorAll('[data-i18n]').forEach(el=>{
+                const key = el.getAttribute('data-i18n');
+                if (trans[key]) {
+                    if (el.hasAttribute('data-i18n-html')) {
+                        el.innerHTML = trans[key];
+                    } else {
+                        el.textContent = trans[key];
+                    }
+                }
+            });
+
+            ['placeholder', 'title', 'aria-label', 'value'].forEach(attr => {
+                document.querySelectorAll(`[data-i18n-${attr}]`).forEach(el => {
+                    const key = el.getAttribute(`data-i18n-${attr}`);
+                    if (trans[key]) el.setAttribute(attr, trans[key]);
+                });
+                document.querySelectorAll(`[${attr}]`).forEach(el => {
+                    const original = el.getAttribute(attr);
+                    if (original && trans[original.trim()]) el.setAttribute(attr, trans[original.trim()]);
+                });
+            });
+
+            applyTextNodeTranslations(trans);
+        }
+
+        function applyTextNodeTranslations(trans){
+            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+                acceptNode(node) {
+                    if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+                    const parent = node.parentNode;
+                    if (!parent || ['SCRIPT','STYLE','NOSCRIPT','TEXTAREA','CODE','PRE'].includes(parent.nodeName)) return NodeFilter.FILTER_REJECT;
+                    if (parent.closest('[data-i18n]')) return NodeFilter.FILTER_REJECT;
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            });
+            const nodes = [];
+            while (walker.nextNode()) nodes.push(walker.currentNode);
+            nodes.forEach(node => {
+                const original = node.nodeValue;
+                const trimmed = original.trim();
+                    if (trimmed && trans[trimmed]) {
+                        node.nodeValue = original.replace(trimmed, trans[trimmed]);
+                    }
+                });
+        }
+
+        function loadAndApply(lang){
+            fetch(`/static/i18n/${lang}.json`).then(r=>{
+                if (!r.ok) throw new Error('no translations');
+                return r.json();
+            }).then(trans=> {
+                current = lang;
+                currentTranslations = trans;
+                if (window.i18next) {
+                    window.i18next.init({
+                        lng: lang,
+                        fallbackLng: 'en',
+                        resources: {
+                            [lang]: { translation: trans }
+                        }
+                    }).then(() => applyTranslations(trans));
+                } else {
+                    applyTranslations(trans);
+                }
+                localStorage.setItem('lang', lang);
+            }).catch(()=>console.warn('Translations not found for', lang));
+        }
+
+        document.querySelectorAll('.lang-select').forEach(a=>{
+            a.addEventListener('click', function(e){
+                const lang = this.getAttribute('data-lang');
+                if (!supported.includes(lang)) {
+                    e.preventDefault();
+                    return;
+                }
+                e.preventDefault();
+                localStorage.setItem('lang', lang);
+                fetch(this.href, {headers: {'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json'}})
+                    .catch(()=>{});
+                loadAndApply(lang);
+            });
+        });
+
+        if (current) loadAndApply(current);
+        window.HealthFlowI18n = {
+            t: function(text) {
+                if (!text) return text;
+                if (window.i18next && window.i18next.isInitialized) {
+                    const translated = window.i18next.t(text);
+                    if (translated !== text) return translated;
+                }
+                return currentTranslations[text] || currentTranslations[String(text).trim()] || text;
+            },
+            apply: applyTranslations,
+            load: loadAndApply
+        };
+    })();
+</script>
+</body>
+</html>

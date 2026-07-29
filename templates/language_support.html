@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Language Support') }}{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card summary-card">
+                <div class="card-header bg-white border-0"><h4 class="mb-0 text-primary">{{ _('Multi-Language Support') }}</h4></div>
+                <div class="card-body">
+                    <form method="POST" class="needs-loading">
+                        <div class="mb-3">
+                            <label class="form-label">{{ _('Preferred Language') }}</label>
+                            <select class="form-select" name="preferred_language">
+                                {% for language in languages %}
+                                <option value="{{ language.code }}" {% if current_lang == language.code %}selected{% endif %}>{{ language.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="voice_assistance_enabled" name="voice_assistance_enabled" {% if preference and preference.voice_assistance_enabled %}checked{% endif %}>
+                            <label class="form-check-label" for="voice_assistance_enabled">{{ _('Enable voice assistance for elderly users') }}</label>
+                        </div>
+                        <button class="btn btn-primary" type="submit">{{ _('Save Preference') }}</button>
+                    </form>
+                    <hr>
+                    <p class="text-muted mb-0">{{ _('Supported languages currently include English, French, Spanish, Hindi, Chinese, Korean, Twi, and Hausa.') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

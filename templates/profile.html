@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block title %}My Profile{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card summary-card">
+            <div class="card-header bg-white border-0">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-user-cog fa-2x text-primary me-3"></i>
+                    <div>
+                        <h4 class="mb-0">My Profile</h4>
+                        <p class="text-muted mb-0">Keep your contact details up to date.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="POST" class="needs-validation needs-loading" novalidate>
+                    <div class="row g-3">
+                        <div class="card summary-card mb-4">
+                            <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                                <div>
+                                    <h6 class="mb-1 text-primary"><i class="fas fa-file-medical me-2"></i>Medical Records</h6>
+                                    <p class="text-muted mb-0">Review your appointments, queue visits, and health profile.</p>
+                                </div>
+                                <a href="{{ url_for('medical_history') }}" class="btn btn-outline-primary">View Medical History</a>
+                            </div>
+                        </div>
+                            <div class="card summary-card mb-4">
+                                <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                                    <div>
+                                        <h6 class="mb-1 text-primary"><i class="fas fa-users me-2"></i>Family Members</h6>
+                                        <p class="text-muted mb-0">Add dependents you can book appointments for.</p>
+                                    </div>
+                                    <a href="{{ url_for('family_members') }}" class="btn btn-outline-primary">Manage Family Members</a>
+                                </div>
+                            </div>
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ current_user.name }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email }}" required>
+                        </div>
+                        <div class="col-12">
+                            <label for="phone_number" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone_number" name="phone_number" value="{{ current_user.phone_number or '' }}">
+                        </div>
+                        {% if current_user.role == 'patient' %}
+                        <div class="col-md-4">
+                            <label for="date_of_birth" class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" value="{{ current_user.date_of_birth.strftime('%Y-%m-%d') if current_user.date_of_birth else '' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="gender" class="form-label">Gender</label>
+                            <select class="form-select" id="gender" name="gender">
+                                <option value="">Select</option>
+                                <option value="female" {% if current_user.gender == 'female' %}selected{% endif %}>Female</option>
+                                <option value="male" {% if current_user.gender == 'male' %}selected{% endif %}>Male</option>
+                                <option value="other" {% if current_user.gender == 'other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="blood_group" class="form-label">Blood Group</label>
+                            <input type="text" class="form-control" id="blood_group" name="blood_group" value="{{ current_user.blood_group or '' }}" placeholder="O+, A-, B+">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="allergies" class="form-label">Allergies</label>
+                            <textarea class="form-control" id="allergies" name="allergies" rows="3">{{ current_user.allergies or '' }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="medical_conditions" class="form-label">Medical Conditions</label>
+                            <textarea class="form-control" id="medical_conditions" name="medical_conditions" rows="3">{{ current_user.medical_conditions or '' }}</textarea>
+                        </div>
+                        <div class="col-12">
+                            <label for="emergency_contact" class="form-label">Emergency Contact</label>
+                            <input type="text" class="form-control" id="emergency_contact" name="emergency_contact" value="{{ current_user.emergency_contact or '' }}" placeholder="Name and phone number">
+                        </div>
+                        {% endif %}
+                        <div class="col-md-6">
+                            <label for="new_password" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" autocomplete="new-password">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="confirm_password" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" autocomplete="new-password">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Back
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

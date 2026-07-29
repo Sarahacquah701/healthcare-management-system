@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Doctor Availability Predictor{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-11">
+            <div class="card summary-card mb-4">
+                <div class="card-body">
+                    <h3 class="mb-1">Doctor Availability Predictor</h3>
+                    <p class="text-muted mb-0">See less busy times and doctors with shorter estimated waits.</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                {% for item in predictions %}
+                <div class="col-md-6 col-xl-4">
+                    <div class="card summary-card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="mb-1">Dr. {{ item.doctor.user.name }}</h5>
+                                    <div class="text-muted">{{ item.doctor.specialty }}</div>
+                                </div>
+                                <span class="badge bg-{% if item.busy_level == 'Low' %}success{% elif item.busy_level == 'Medium' %}warning{% else %}danger{% endif %}">{{ item.busy_level }} Busy</span>
+                            </div>
+                            <div class="small text-muted mb-1">Estimated wait: {{ item.estimated_wait }} minutes</div>
+                            <div class="small text-muted mb-1">Next open slot: {{ item.next_slot }}</div>
+                            <div class="small text-muted mb-1">Virtual consults: {{ 'Yes' if item.telemedicine else 'No' }}</div>
+                            <div class="small text-muted">Open bookings: {{ item.scheduled_count }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

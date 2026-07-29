@@ -1,0 +1,12 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="300" fill="#e3f2fd"/>
+  <rect x="50" y="100" width="300" height="150" fill="#ffffff" stroke="#1976d2" stroke-width="2"/>
+  <rect x="70" y="120" width="80" height="60" fill="#42a5f5"/>
+  <rect x="170" y="120" width="80" height="60" fill="#42a5f5"/>
+  <rect x="270" y="120" width="60" height="60" fill="#42a5f5"/>
+  <polygon points="200,50 180,100 220,100" fill="#1976d2"/>
+  <circle cx="100" cy="160" r="8" fill="#ffffff"/>
+  <circle cx="200" cy="160" r="8" fill="#ffffff"/>
+  <circle cx="300" cy="160" r="8" fill="#ffffff"/>
+  <text x="200" y="280" text-anchor="middle" fill="#1976d2" font-family="Arial" font-size="16">Hospital</text>
+</svg>

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Patient Tools{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-11">
+            <div class="mb-4">
+                <h3 class="mb-1">Patient Tools</h3>
+                <p class="text-muted mb-0">Access the extra healthcare features from one place.</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4"><a class="text-decoration-none text-dark" href="{{ url_for('wellness_dashboard') }}"><div class="card card-modern h-100"><div class="card-body"><h5>Wellness Dashboard</h5><p class="mb-0">Track weight, blood pressure, blood sugar, and BMI.</p></div></div></a></div>
+                <div class="col-md-4"><a class="text-decoration-none text-dark" href="{{ url_for('blood_donation') }}"><div class="card card-modern h-100"><div class="card-body"><h5>Blood Donation Network</h5><p class="mb-0">Search donors and create emergency blood requests.</p></div></div></a></div>
+                <div class="col-md-4"><a class="text-decoration-none text-dark" href="{{ url_for('hospital_navigation') }}"><div class="card card-modern h-100"><div class="card-body"><h5>Hospital Navigation</h5><p class="mb-0">Find departments and get directions around the hospital.</p></div></div></a></div>
+                <div class="col-md-4"><a class="text-decoration-none text-dark" href="{{ url_for('language_support') }}"><div class="card card-modern h-100"><div class="card-body"><h5>Multi-Language Support</h5><p class="mb-0">Set your language and voice support preference.</p></div></div></a></div>
+                <div class="col-md-4"><a class="text-decoration-none text-dark" href="{{ url_for('vaccinations') }}"><div class="card card-modern h-100"><div class="card-body"><h5>Vaccination Tracker</h5><p class="mb-0">Record immunizations and upcoming vaccine reminders.</p></div></div></a></div>
+                <div class="col-md-4"><a class="text-decoration-none text-dark" href="{{ url_for('recommendations') }}"><div class="card card-modern h-100"><div class="card-body"><h5>Smart Recommendations</h5><p class="mb-0">See personalized health tips from your recent data.</p></div></div></a></div>
+                <div class="col-md-4"><a class="text-decoration-none text-dark" href="{{ url_for('dashboard') }}"><div class="card card-modern h-100"><div class="card-body"><h5>Telemedicine Video Calls</h5><p class="mb-0">Open a virtual appointment from your appointment details page.</p></div></div></a></div>
+                <div class="col-md-4"><a class="text-decoration-none text-dark" href="{{ url_for('doctor_availability_predictor') }}"><div class="card card-modern h-100"><div class="card-body"><h5>Availability Predictor</h5><p class="mb-0">Find less busy doctors and better booking windows.</p></div></div></a></div>
+                <div class="col-md-4"><a class="text-decoration-none text-dark" href="{{ url_for('pharmacy') }}"><div class="card card-modern h-100"><div class="card-body"><h5>Online Pharmacy</h5><p class="mb-0">Order medications with prescription upload and delivery.</p></div></div></a></div>
+                <div class="col-md-4"><a class="text-decoration-none text-dark" href="{{ url_for('chat_consultation') }}"><div class="card card-modern h-100"><div class="card-body"><h5>Chat Consultation</h5><p class="mb-0">Send a health question and continue the discussion with a doctor.</p></div></div></a></div>
+                <div class="col-md-4"><a class="text-decoration-none text-dark" href="{{ url_for('forum') }}"><div class="card card-modern h-100"><div class="card-body"><h5>Health Community Forum</h5><p class="mb-0">Discuss experiences in a moderated patient space.</p></div></div></a></div>
+                <div class="col-md-4"><a class="text-decoration-none text-dark" href="{{ url_for('wearables') }}"><div class="card card-modern h-100"><div class="card-body"><h5>Wearable Integration</h5><p class="mb-0">Sync smartwatch or fitness tracker data manually.</p></div></div></a></div>
+                <div class="col-md-4"><a class="text-decoration-none text-dark" href="{{ url_for('insurance') }}"><div class="card card-modern h-100"><div class="card-body"><h5>Health Insurance</h5><p class="mb-0">Save coverage information before you book care.</p></div></div></a></div>
+                <div class="col-md-4"><a class="text-decoration-none text-dark" href="{{ url_for('family_members') }}"><div class="card card-modern h-100"><div class="card-body"><h5>Caregiver Access</h5><p class="mb-0">Manage family members and book for dependents.</p></div></div></a></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

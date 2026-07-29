@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}Billing{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-11">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                <div>
+                    <h3 class="mb-1">Billing & Receipts</h3>
+                    <p class="text-muted mb-0">Track payments, pending balances, and payment receipts.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('medical_history') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-file-medical me-2"></i>Medical History
+                    </a>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="card summary-card h-100">
+                        <div class="card-body">
+                            <small class="text-muted d-block">Amount Paid</small>
+                            <h3 class="text-success mb-0">₹{{ '%.2f'|format(total_paid) }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card summary-card h-100">
+                        <div class="card-body">
+                            <small class="text-muted d-block">Amount Due</small>
+                            <h3 class="text-danger mb-0">₹{{ '%.2f'|format(total_due) }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card summary-card h-100">
+                        <div class="card-body">
+                            <small class="text-muted d-block">Outstanding Items</small>
+                            <h3 class="text-primary mb-0">{{ pending_count }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card summary-card">
+                <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-primary"><i class="fas fa-receipt me-2"></i>Payment History</h5>
+                    <span class="text-muted small">Receipts are available for paid appointments.</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0 ps-4">Date</th>
+                                    <th class="border-0">Doctor</th>
+                                    <th class="border-0">Service</th>
+                                    <th class="border-0">Amount</th>
+                                    <th class="border-0">Status</th>
+                                    <th class="border-0">Reference</th>
+                                    <th class="border-0 pe-4">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in billing_items %}
+                                <tr>
+                                    <td class="ps-4">{{ appointment.appointment_time.strftime('%b %d, %Y') }}</td>
+                                    <td>Dr. {{ appointment.doctor_rel.user.name }}</td>
+                                    <td>{{ 'Virtual Consultation' if appointment.consultation_type == 'virtual' else 'Appointment' }}</td>
+                                    <td>₹{{ '%.2f'|format(appointment.amount_due or 0.0) }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if appointment.payment_status == 'paid' %}success{% elif appointment.payment_status == 'failed' %}danger{% else %}warning{% endif %}">
+                                            {{ appointment.payment_status|title }}
+                                        </span>
+                                    </td>
+                                    <td>{{ appointment.payment_reference or 'Pending' }}</td>
+                                    <td class="pe-4">
+                                        {% if appointment.payment_status == 'paid' %}
+                                        <a href="{{ url_for('receipt', appointment_id=appointment.id) }}" class="btn btn-sm btn-outline-primary">View Receipt</a>
+                                        {% elif appointment.status == 'scheduled' %}
+                                        <a href="{{ url_for('appointment_details', appointment_id=appointment.id) }}" class="btn btn-sm btn-outline-success">Pay Now</a>
+                                        {% else %}
+                                        <a href="{{ url_for('appointment_details', appointment_id=appointment.id) }}" class="btn btn-sm btn-outline-secondary">View</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">No billing records available yet.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

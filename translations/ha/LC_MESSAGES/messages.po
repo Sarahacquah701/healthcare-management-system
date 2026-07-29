@@ -1,0 +1,46 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: HealthFlow\n"
+"POT-Creation-Date: 2026-07-05 00:00+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Home"
+msgstr "Gida"
+
+msgid "Book Appointment"
+msgstr "Yi Ajanda"
+
+msgid "Doctors"
+msgstr "Likitoci"
+
+msgid "Symptom Checker"
+msgstr "Binciken Alamun"
+
+msgid "Support"
+msgstr "Taimako"
+
+msgid "Contact"
+msgstr "Tuntuɓa"
+
+msgid "Language"
+msgstr "Harshe"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Logout"
+msgstr "Fita"
+
+msgid "Login"
+msgstr "Shiga"
+
+msgid "Register"
+msgstr "Rajista"
+
+msgid "HealthFlow — modern hospital booking and queue management"
+msgstr "HealthFlow — zamani tsarin ajiyar asibiti da tsarin layi"
+
+msgid "Need help? Call us at (555) 123-4567 or email support@healthflow.com"
+msgstr "Bukatar taimako? Kira (555) 123-4567 ko imel support@healthflow.com"

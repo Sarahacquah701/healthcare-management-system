@@ -1,0 +1,301 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Hospital Queue Management System') }}{% endblock %}
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-bg text-white rounded-4 p-5 mb-5 fade-in-section">
+    <div class="row align-items-center">
+        <div class="col-lg-8">
+            <h1 class="display-4 fw-bold mb-3" data-i18n="home.hero.title">Book Your Appointment Easily</h1>
+            <p class="lead mb-4" data-i18n="home.hero.subtitle">Experience seamless healthcare booking with our modern digital platform. Schedule appointments, join queues, and get the care you need when you need it.</p>
+            <a href="{{ url_for('book_appointment') }}" class="btn btn-light btn-lg btn-modern px-4 py-3">{{ _('Book Now') }} <i class="fas fa-arrow-right ms-2"></i></a>
+        </div>
+        <div class="col-lg-4 text-center mt-4 mt-lg-0">
+            <img src="https://images.unsplash.com/photo-1551190822-a9333d879b1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Healthcare professional" class="img-fluid rounded-4 shadow-lg img-hover">
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section class="mb-5 fade-in-section">
+    <div class="text-center mb-5">
+        <h2 class="section-title text-primary">{{ _('Our Services') }}</h2>
+        <p class="section-subtitle">{{ _('Comprehensive healthcare solutions designed for your convenience') }}</p>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card card-modern h-100 text-center">
+                <div class="card-body">
+                    <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Appointment booking" class="img-fluid rounded-3 mb-3 img-hover">
+                    <h5 class="card-title">{{ _('Appointment Booking') }}</h5>
+                    <p class="card-text">{{ _('Schedule appointments with your preferred doctors at your convenience.') }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-modern h-100 text-center">
+                <div class="card-body">
+                    <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Queue management" class="img-fluid rounded-3 mb-3 img-hover">
+                    <h5 class="card-title">{{ _('Queue Management') }}</h5>
+                    <p class="card-text">{{ _('Efficient queue system with real-time updates and wait time estimation.') }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-modern h-100 text-center">
+                <div class="card-body">
+                    <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Emergency care" class="img-fluid rounded-3 mb-3 img-hover">
+                    <h5 class="card-title">{{ _('Emergency Care') }}</h5>
+                    <p class="card-text">{{ _('Walk-in services for urgent medical needs with priority queue handling.') }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <a href="{{ url_for('symptom_checker') }}" class="text-decoration-none text-dark">
+                <div class="card card-modern h-100 text-center service-card">
+                    <div class="card-body">
+                        <img src="https://images.unsplash.com/photo-1584634731339-2520f0f5b5b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Symptom checker" class="img-fluid rounded-3 mb-3 img-hover">
+                        <h5 class="card-title">{{ _('AI Symptom Checker') }}</h5>
+                        <p class="card-text">{{ _('Get guided next-step advice based on your symptoms before booking.') }}</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{{ url_for('support') }}" class="text-decoration-none text-dark">
+                <div class="card card-modern h-100 text-center service-card">
+                    <div class="card-body">
+                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Support chat" class="img-fluid rounded-3 mb-3 img-hover">
+                        <h5 class="card-title">{{ _('24/7 Support Chat') }}</h5>
+                        <p class="card-text">{{ _('Ask about bookings, billing, reminders, and hospital services anytime.') }}</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Extra Features Section -->
+<section class="mb-5 fade-in-section">
+    <div class="text-center mb-5">
+        <h2 class="section-title text-primary">{{ _('Extra Features') }}</h2>
+        <p class="section-subtitle">{{ _('Practical tools for urgent care, records, labs, and coverage') }}</p>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-3">
+            <a href="{{ url_for('emergency_sos') }}" class="text-decoration-none text-dark">
+                <div class="card card-modern h-100 text-center service-card border-danger">
+                    <div class="card-body">
+                        <img src="https://images.unsplash.com/photo-1516549655169-df83a0774514?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Emergency SOS" class="img-fluid rounded-3 mb-3 img-hover">
+                        <h5 class="card-title">{{ _('Emergency SOS') }}</h5>
+                        <p class="card-text">{{ _('One-tap emergency alert with location sharing and ambulance call access.') }}</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('health_records') }}" class="text-decoration-none text-dark">
+                <div class="card card-modern h-100 text-center service-card">
+                    <div class="card-body">
+                        <img src="https://images.unsplash.com/photo-1583912267550-d96d7f9c0b35?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Health records" class="img-fluid rounded-3 mb-3 img-hover">
+                        <h5 class="card-title">{{ _('Health Records') }}</h5>
+                        <p class="card-text">{{ _('Store reports, prescriptions, and medical history in one secure place.') }}</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('lab_tests') }}" class="text-decoration-none text-dark">
+                <div class="card card-modern h-100 text-center service-card">
+                    <div class="card-body">
+                        <img src="https://images.unsplash.com/photo-1530026405186-ed1f139313f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Lab booking" class="img-fluid rounded-3 mb-3 img-hover">
+                        <h5 class="card-title">{{ _('Lab Test Booking') }}</h5>
+                        <p class="card-text">{{ _('Schedule lab tests and keep the request history in the app.') }}</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('insurance') }}" class="text-decoration-none text-dark">
+                <div class="card card-modern h-100 text-center service-card">
+                    <div class="card-body">
+                        <img src="https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Insurance" class="img-fluid rounded-3 mb-3 img-hover">
+                        <h5 class="card-title">{{ _('Insurance') }}</h5>
+                        <p class="card-text">{{ _('Save policy details and keep your coverage information ready before booking.') }}</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="mb-5 fade-in-section">
+    <div class="text-center">
+        <a href="{{ url_for('patient_tools') }}" class="btn btn-primary btn-lg px-4 py-3">{{ _('Explore Patient Tools') }} <i class="fas fa-arrow-right ms-2"></i></a>
+    </div>
+</section>
+
+<!-- Doctors Section -->
+<section id="doctors" class="mb-5 fade-in-section">
+    <div class="text-center mb-5">
+        <h2 class="section-title text-primary">{{ _('Meet Our Doctors') }}</h2>
+        <p class="section-subtitle">{{ _('Experienced healthcare professionals dedicated to your well-being') }}</p>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card card-modern text-center">
+                <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" class="card-img-top rounded-top img-hover" alt="Dr. Sarah Johnson">
+                <div class="card-body">
+                    <h5 class="card-title">Dr. Sarah Johnson</h5>
+                    <p class="card-text text-muted">Cardiologist</p>
+                    <p class="card-text">Specializing in heart health with over 15 years of experience.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-modern text-center">
+                <img src="https://images.unsplash.com/photo-1594824804732-ca8db723f8fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" class="card-img-top rounded-top img-hover" alt="Dr. Michael Chen">
+                <div class="card-body">
+                    <h5 class="card-title">Dr. Michael Chen</h5>
+                    <p class="card-text text-muted">Neurologist</p>
+                    <p class="card-text">Expert in neurological disorders and brain health.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-modern text-center">
+                <img src="https://picsum.photos/id/102/300/200" class="card-img-top rounded-top img-hover" alt="Dr. Emily Rodriguez">
+                <div class="card-body">
+                    <h5 class="card-title">Dr. Emily Rodriguez</h5>
+                    <p class="card-text text-muted">Pediatrician</p>
+                    <p class="card-text">Dedicated to children's health and development.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="mb-5 fade-in-section">
+    <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+            <img src="https://images.unsplash.com/photo-1551190822-a9333d879b1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Modern hospital facility" class="img-fluid rounded-4 shadow-lg img-hover">
+        </div>
+        <div class="col-lg-6">
+            <h2 class="section-title text-primary mb-4">{{ _('About HealthFlow') }}</h2>
+            <p class="lead mb-3">{{ _('Revolutionizing healthcare management with technology') }}</p>
+            <p>{{ _('HealthFlow is a comprehensive hospital queue and appointment management system designed to streamline healthcare operations. Our platform connects patients, doctors, and administrators in a seamless digital ecosystem that prioritizes efficiency, accessibility, and patient care.') }}</p>
+            <p>{{ _('With features like real-time queue updates, appointment scheduling, and integrated walk-in management, we ensure that every patient receives timely care while optimizing hospital resources.') }}</p>
+            <div class="mt-4">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="text-center">
+                            <h4 class="text-primary fw-bold">10,000+</h4>
+                            <p class="text-muted mb-0">{{ _('Patients Served') }}</p>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center">
+                            <h4 class="text-primary fw-bold">50+</h4>
+                            <p class="text-muted mb-0">{{ _('Expert Doctors') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="mb-5 fade-in-section">
+    <div class="text-center mb-5">
+        <h2 class="section-title text-primary">{{ _('What Our Patients Say') }}</h2>
+        <p class="section-subtitle">{{ _('Real experiences from our valued patients') }}</p>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card card-modern">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="John Smith" class="rounded-circle me-3" style="width: 50px; height: 50px;">
+                        <div>
+                            <h6 class="mb-0">John Smith</h6>
+                            <small class="text-muted">Patient</small>
+                        </div>
+                    </div>
+                    <p class="card-text">{{ _('"The appointment booking system is incredibly user-friendly. I was able to schedule my visit in minutes and the queue updates kept me informed throughout my wait."') }}</p>
+                    <div class="text-warning">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-modern">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Maria Garcia" class="rounded-circle me-3" style="width: 50px; height: 50px;">
+                        <div>
+                            <h6 class="mb-0">Maria Garcia</h6>
+                            <small class="text-muted">Patient</small>
+                        </div>
+                    </div>
+                    <p class="card-text">{{ _('"As a busy professional, the ability to book appointments online and track my position in the queue has saved me so much time. Excellent service!"') }}</p>
+                    <div class="text-warning">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-modern">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="David Wilson" class="rounded-circle me-3" style="width: 50px; height: 50px;">
+                        <div>
+                            <h6 class="mb-0">David Wilson</h6>
+                            <small class="text-muted">Patient</small>
+                        </div>
+                    </div>
+                    <p class="card-text">{{ _('"The doctors are amazing and the system makes everything so smooth. No more long waits or confusion. Highly recommend HealthFlow!"') }}</p>
+                    <div class="text-warning">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="fade-in-section">
+    <div class="text-center mb-5">
+        <h2 class="section-title text-primary">{{ _('Get In Touch') }}</h2>
+        <p class="section-subtitle">{{ _('We\'re here to help with any questions or concerns') }}</p>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card card-modern">
+                <div class="card-body text-center">
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <i class="fas fa-phone fa-2x text-primary mb-3"></i>
+                            <h5>{{ _('Call Us') }}</h5>
+                            <p class="mb-0">{{ _('(555) 123-4567') }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-envelope fa-2x text-primary mb-3"></i>
+                            <h5>{{ _('Email Us') }}</h5>
+                            <p class="mb-0"><a href="mailto:support@healthflow.com" class="text-decoration-none">{{ _('support@healthflow.com') }}</a></p>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-clock fa-2x text-primary mb-3"></i>
+                            <h5>{{ _('Hours') }}</h5>
+                            <p class="mb-0">{{ _('Mon-Fri: 8AM-8PM') }}<br>{{ _('Sat-Sun: 9AM-5PM') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

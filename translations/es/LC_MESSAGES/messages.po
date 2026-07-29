@@ -1,0 +1,46 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: HealthFlow\n"
+"POT-Creation-Date: 2026-07-05 00:00+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Home"
+msgstr "Inicio"
+
+msgid "Book Appointment"
+msgstr "Reservar cita"
+
+msgid "Doctors"
+msgstr "Doctores"
+
+msgid "Symptom Checker"
+msgstr "Chequeo de síntomas"
+
+msgid "Support"
+msgstr "Soporte"
+
+msgid "Contact"
+msgstr "Contacto"
+
+msgid "Language"
+msgstr "Idioma"
+
+msgid "Dashboard"
+msgstr "Panel"
+
+msgid "Logout"
+msgstr "Cerrar sesión"
+
+msgid "Login"
+msgstr "Iniciar sesión"
+
+msgid "Register"
+msgstr "Registrarse"
+
+msgid "HealthFlow — modern hospital booking and queue management"
+msgstr "HealthFlow — gestión moderna de reservas y colas hospitalarias"
+
+msgid "Need help? Call us at (555) 123-4567 or email support@healthflow.com"
+msgstr "¿Necesita ayuda? Llame al (555) 123-4567 o envíe un correo a support@healthflow.com"

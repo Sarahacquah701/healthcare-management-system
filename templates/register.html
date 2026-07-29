@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Register') }} - Hospital Queue System{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h2 class="mb-4" data-i18n="register.title">{{ _('Register') }}</h2>
+                <form method="POST">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="username" class="form-label" data-i18n="register.username_label">{{ _('Username') }}</label>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="{{ _('Choose a username') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label" data-i18n="register.email_label">{{ _('Email') }}</label>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="{{ _('Enter your email') }}" required>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-6">
+                            <label for="password" class="form-label" data-i18n="register.password_label">{{ _('Password') }}</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="{{ _('Create a password') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="name" class="form-label" data-i18n="register.fullname_label">{{ _('Full Name') }}</label>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="{{ _('Enter your full name') }}" required>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-6">
+                            <label for="phone_number" class="form-label" data-i18n="register.phone_label">{{ _('Phone Number') }}</label>
+                            <input type="tel" class="form-control" id="phone_number" name="phone_number" placeholder="{{ _('(555) 123-4567') }}">
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-6">
+                            <label for="role" class="form-label" data-i18n="register.role_label">{{ _('Role') }}</label>
+                            <select class="form-select" id="role" name="role" onchange="toggleDoctorFields()" required>
+                                <option value="patient">{{ _('Patient') }}</option>
+                                <option value="doctor">{{ _('Doctor') }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6" id="doctorFields" style="display:none;">
+                            <label for="specialty" class="form-label" data-i18n="register.specialty_label">{{ _('Specialty') }}</label>
+                            <input type="text" class="form-control" id="specialty" name="specialty" placeholder="{{ _('Enter your specialty') }}">
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-3" id="doctorTime" style="display:none;">
+                        <div class="col-md-6">
+                            <label for="consultation_time" class="form-label" data-i18n="register.consultation_time_label">{{ _('Consultation Time (minutes)') }}</label>
+                            <input type="number" class="form-control" id="consultation_time" name="consultation_time" value="15">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-4" data-i18n="register.submit">{{ _('Register') }}</button>
+                </form>
+                <p class="mt-3 mb-0"><span data-i18n="register.have_account">{{ _('Already have an account?') }}</span> <a href="{{ url_for('login') }}" data-i18n="register.login_link">{{ _('Login here') }}</a>.</p>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function toggleDoctorFields() {
+        var role = document.getElementById('role').value;
+        var doctorFields = document.getElementById('doctorFields');
+        var doctorTime = document.getElementById('doctorTime');
+        if (role === 'doctor') {
+            doctorFields.style.display = 'block';
+            doctorTime.style.display = 'block';
+        } else {
+            doctorFields.style.display = 'none';
+            doctorTime.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

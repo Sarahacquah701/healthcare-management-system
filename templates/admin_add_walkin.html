@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Add Walk-in Patient{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h2 class="mb-4">Add Walk-in Patient</h2>
+                <p>Register a walk-in patient and add them directly to the selected doctor's queue.</p>
+                <form method="POST">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone_number" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone_number" name="phone_number" placeholder="(555) 123-4567" required>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-6">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label for="doctor_id" class="form-label">Select Doctor</label>
+                        <select class="form-select" id="doctor_id" name="doctor_id" required>
+                            {% for doctor in doctors %}
+                            <option value="{{ doctor.id }}">{{ doctor.user.name }} - {{ doctor.specialty }} ({{ doctor.consultation_time }} min)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mt-3">
+                        <label for="priority" class="form-label">Priority Level</label>
+                        <select class="form-select" id="priority" name="priority" required>
+                            <option value="normal">Normal</option>
+                            <option value="priority">Priority</option>
+                            <option value="emergency">Emergency</option>
+                        </select>
+                        <div class="form-text">Emergency patients will be served first, priority patients second.</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-4">Add Walk-in Patient</button>
+                </form>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-link mt-3">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,19 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="300" fill="#f3e5f5"/>
+  <circle cx="100" cy="120" r="30" fill="#7b1fa2"/>
+  <circle cx="100" cy="110" r="25" fill="#ba68c8"/>
+  <circle cx="200" cy="120" r="30" fill="#1976d2"/>
+  <circle cx="200" cy="110" r="25" fill="#42a5f5"/>
+  <circle cx="300" cy="120" r="30" fill="#388e3c"/>
+  <circle cx="300" cy="110" r="25" fill="#66bb6a"/>
+  <rect x="85" y="140" width="30" height="40" fill="#7b1fa2"/>
+  <rect x="185" y="140" width="30" height="40" fill="#1976d2"/>
+  <rect x="285" y="140" width="30" height="40" fill="#388e3c"/>
+  <text x="200" y="220" text-anchor="middle" fill="#333" font-family="Arial" font-size="14">Medical Team</text>
+  <circle cx="90" cy="100" r="3" fill="#ffffff"/>
+  <circle cx="110" cy="100" r="3" fill="#ffffff"/>
+  <circle cx="190" cy="100" r="3" fill="#ffffff"/>
+  <circle cx="210" cy="100" r="3" fill="#ffffff"/>
+  <circle cx="290" cy="100" r="3" fill="#ffffff"/>
+  <circle cx="310" cy="100" r="3" fill="#ffffff"/>
+</svg>

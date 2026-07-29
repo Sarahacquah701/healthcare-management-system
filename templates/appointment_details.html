@@ -1,0 +1,353 @@
+{% extends 'base.html' %}
+{% block title %}Appointment Details{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header -->
+            <div class="card summary-card mb-4">
+                <div class="card-header bg-white border-0">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-calendar-check fa-2x text-primary me-3"></i>
+                            <div>
+                                <h4 class="mb-0">Appointment Details</h4>
+                                <p class="text-muted mb-0">Appointment Code: {{ appointment.appointment_code }}</p>
+                            </div>
+                        </div>
+                        <span class="badge bg-{% if appointment.status == 'scheduled' %}primary{% elif appointment.status == 'completed' %}success{% elif appointment.status == 'checked_in' %}info{% elif appointment.status == 'missed' %}danger{% elif appointment.status == 'cancelled' %}secondary{% else %}warning{% endif %} fs-6 px-3 py-2">
+                            {{ appointment.status.title() }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Patient Information -->
+                <div class="col-lg-6">
+                    <div class="card summary-card h-100">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="mb-0 text-primary"><i class="fas fa-user me-2"></i>Patient Information</h5>
+                                <div class="col-sm-6">
+                                    <small class="text-muted d-block">Booked For</small>
+                                    <span>{{ appointment.family_member.name if appointment.family_member else 'Patient self' }}</span>
+                                </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Patient" class="rounded-circle me-3" style="width: 60px; height: 60px;">
+                                <div>
+                                    <h6 class="mb-1">{{ appointment.patient.name }}</h6>
+                                    <p class="text-muted mb-0">Patient ID: {{ appointment.patient.id }}</p>
+                                </div>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <small class="text-muted d-block">Email</small>
+                                    <span>{{ appointment.patient.email }}</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <small class="text-muted d-block">Phone</small>
+                                    <span>{{ appointment.patient.phone_number or 'Not provided' }}</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <small class="text-muted d-block">Date of Birth</small>
+                                    <span>{{ appointment.patient.date_of_birth.strftime('%B %d, %Y') if appointment.patient.date_of_birth else 'Not provided' }}</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <small class="text-muted d-block">Gender</small>
+                                    <span>{{ appointment.patient.gender.title() if appointment.patient.gender else 'Not provided' }}</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <small class="text-muted d-block">Blood Group</small>
+                                    <span>{{ appointment.patient.blood_group or 'Not provided' }}</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <small class="text-muted d-block">Emergency Contact</small>
+                                    <span>{{ appointment.patient.emergency_contact or 'Not provided' }}</span>
+                                </div>
+                                <div class="col-12">
+                                    <small class="text-muted d-block">Allergies</small>
+                                    <span>{{ appointment.patient.allergies or 'Not provided' }}</span>
+                                </div>
+                                <div class="col-12">
+                                    <small class="text-muted d-block">Medical Conditions</small>
+                                    <span>{{ appointment.patient.medical_conditions or 'Not provided' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Doctor Information -->
+                <div class="col-lg-6">
+                    <div class="card summary-card h-100">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="mb-0 text-primary"><i class="fas fa-user-md me-2"></i>Doctor Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="{{ appointment.doctor_rel.photo_url or 'https://picsum.photos/id/' + appointment.doctor_rel.id|string + '/60/60' }}" alt="Doctor" class="rounded-circle me-3" style="width: 60px; height: 60px;">
+                                <div>
+                                    <h6 class="mb-1">Dr. {{ appointment.doctor_rel.user.name }}</h6>
+                                    <p class="text-muted mb-0">{{ appointment.doctor_rel.specialty }}</p>
+                                </div>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <small class="text-muted d-block">Email</small>
+                                    <span>{{ appointment.doctor_rel.user.email }}</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <small class="text-muted d-block">Consultation Time</small>
+                                    <span>{{ appointment.doctor_rel.consultation_time }} minutes</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appointment Details -->
+                <div class="col-12">
+                    <div class="card summary-card">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="mb-0 text-primary"><i class="fas fa-calendar-alt me-2"></i>Appointment Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="border-start border-primary border-4 ps-3">
+                                        <small class="text-muted d-block">Appointment Date</small>
+                                        <h6 class="mb-0">{{ appointment.appointment_time.strftime('%B %d, %Y') }}</h6>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="border-start border-success border-4 ps-3">
+                                        <small class="text-muted d-block">Appointment Time</small>
+                                        <h6 class="mb-0">{{ appointment.appointment_time.strftime('%I:%M %p') }}</h6>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="border-start border-info border-4 ps-3">
+                                        <small class="text-muted d-block">Created On</small>
+                                        <h6 class="mb-0">{{ appointment.created_at.strftime('%B %d, %Y at %I:%M %p') }}</h6>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="border-start border-warning border-4 ps-3">
+                                        <small class="text-muted d-block">Last Updated</small>
+                                        <h6 class="mb-0">{{ appointment.updated_at.strftime('%B %d, %Y at %I:%M %p') if appointment.updated_at else 'Not updated' }}</h6>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="border-start border-dark border-4 ps-3">
+                                        <small class="text-muted d-block">Payment</small>
+                                        <h6 class="mb-0">{{ '₹' ~ '{:.2f}'.format(appointment.amount_due) }}</h6>
+                                        <small class="text-muted">Status: {{ appointment.payment_status|title }}</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="border-start border-danger border-4 ps-3">
+                                        <small class="text-muted d-block">Consultation Type</small>
+                                        <h6 class="mb-0">
+                                            {% if appointment.consultation_type == 'virtual' %}
+                                            Virtual (Online)
+                                            {% else %}
+                                            In-Person
+                                            {% endif %}
+                                        </h6>
+                                        <small class="text-muted">{% if appointment.doctor_rel.allows_telemedicine %}Telemedicine supported{% else %}Telemedicine not available{% endif %}</small>
+                                    </div>
+                                </div>
+                                {% if appointment.is_emergency %}
+                                <div class="col-md-6">
+                                    <div class="border-start border-danger border-4 ps-3">
+                                        <small class="text-muted d-block">Priority</small>
+                                        <h6 class="mb-0 text-danger">Emergency Request</h6>
+                                        <small class="text-muted">Queued with priority handling</small>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            {% if appointment.notes or appointment.diagnosis or appointment.prescription or appointment.follow_up_advice %}
+                            <div class="mt-4">
+                                <h6 class="text-primary mb-2"><i class="fas fa-sticky-note me-2"></i>Consultation Notes</h6>
+                                <div class="bg-light p-3 rounded">
+                                    {% if appointment.diagnosis %}<p><strong>Diagnosis:</strong> {{ appointment.diagnosis }}</p>{% endif %}
+                                    {% if appointment.prescription %}<p><strong>Prescription:</strong> {{ appointment.prescription }}</p>{% endif %}
+                                    {% if appointment.follow_up_advice %}<p><strong>Follow-up:</strong> {{ appointment.follow_up_advice }}</p>{% endif %}
+                                    {% if appointment.notes %}<p class="mb-0"><strong>Notes:</strong> {{ appointment.notes }}</p>{% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if current_user.role == 'doctor' %}
+                <div class="col-12">
+                    <div class="card summary-card">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="mb-0 text-primary"><i class="fas fa-notes-medical me-2"></i>Doctor Notes</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('appointment_notes', appointment_id=appointment.id) }}" class="needs-loading">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="diagnosis">Diagnosis</label>
+                                        <textarea class="form-control" id="diagnosis" name="diagnosis" rows="3">{{ appointment.diagnosis or '' }}</textarea>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="prescription">Prescription</label>
+                                        <textarea class="form-control" id="prescription" name="prescription" rows="3">{{ appointment.prescription or '' }}</textarea>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="follow_up_advice">Follow-up Advice</label>
+                                        <textarea class="form-control" id="follow_up_advice" name="follow_up_advice" rows="3">{{ appointment.follow_up_advice or '' }}</textarea>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="notes">Private Notes</label>
+                                        <textarea class="form-control" id="notes" name="notes" rows="3">{{ appointment.notes or '' }}</textarea>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-3">
+                                    <i class="fas fa-save me-2"></i>Save Notes
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Actions -->
+                <div class="col-12">
+                    <div class="card summary-card">
+                        <div class="card-body text-center">
+                            <div class="row g-3">
+                                {% if current_user.role == 'doctor' and appointment.status == 'scheduled' %}
+                                <div class="col-md-3">
+                                    <button class="btn btn-success btn-lg w-100" onclick="updateAppointmentStatus({{ appointment.id }}, 'completed')">
+                                        <i class="fas fa-check me-2"></i>Mark as Completed
+                                    </button>
+                                </div>
+                                <div class="col-md-3">
+                                    <a href="{{ url_for('schedule_followup', appointment_id=appointment.id) }}" class="btn btn-info btn-lg w-100">
+                                        <i class="fas fa-repeat me-2"></i>Schedule Follow-up
+                                    </a>
+                                </div>
+                                <div class="col-md-3">
+                                    <button class="btn btn-warning btn-lg w-100" onclick="updateAppointmentStatus({{ appointment.id }}, 'cancelled')">
+                                        <i class="fas fa-times me-2"></i>Cancel Appointment
+                                    </button>
+                                </div>
+                                <div class="col-md-3">
+                                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary btn-lg w-100">
+                                        <i class="fas fa-arrow-left me-2"></i>Back
+                                    </a>
+                                </div>
+                                {% elif current_user.role == 'doctor' and appointment.status == 'completed' %}
+                                <div class="col-md-6">
+                                    <a href="{{ url_for('schedule_followup', appointment_id=appointment.id) }}" class="btn btn-info btn-lg w-100">
+                                        <i class="fas fa-repeat me-2"></i>Schedule Follow-up
+                                    </a>
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary btn-lg w-100">
+                                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                                    </a>
+                                </div>
+                                {% elif current_user.role == 'patient' and appointment.status == 'scheduled' %}
+                                <div class="col-md-4">
+                                    <button class="btn btn-success btn-lg w-100" onclick="payAppointment({{ appointment.id }})" {% if appointment.payment_status == 'paid' %}disabled{% endif %}>
+                                        <i class="fas fa-credit-card me-2"></i>{% if appointment.payment_status == 'paid' %}Paid{% else %}Pay Now{% endif %}
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <button class="btn btn-warning btn-lg w-100" onclick="updateAppointmentStatus({{ appointment.id }}, 'cancelled')">
+                                        <i class="fas fa-times me-2"></i>Cancel Appointment
+                                    </button>
+                                </div>
+                                {% if appointment.consultation_type == 'virtual' %}
+                                <div class="col-md-4">
+                                    <a href="{{ url_for('telemedicine_call', appointment_id=appointment.id) }}" class="btn btn-primary btn-lg w-100">
+                                        <i class="fas fa-video me-2"></i>Join Video Call
+                                    </a>
+                                </div>
+                                {% else %}
+                                <div class="col-md-4">
+                                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary btn-lg w-100">
+                                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                                    </a>
+                                </div>
+                                {% endif %}
+                                {% else %}
+                                <div class="col-12">
+                                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary btn-lg w-100">
+                                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function consultationLabel(type) {
+    return type === 'virtual' ? 'virtual consultation' : 'in-person appointment';
+}
+
+function updateAppointmentStatus(appointmentId, status) {
+    if (confirm(`Are you sure you want to ${status} this appointment?`)) {
+        fetch(`/update_appointment_status/${appointmentId}/${status}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message || 'Error updating appointment status');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error updating appointment status');
+        });
+    }
+}
+
+function payAppointment(appointmentId) {
+    if (!confirm('Proceed to pay for this appointment?')) {
+        return;
+    }
+    fetch(`/pay_appointment/${appointmentId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Payment completed successfully.');
+            location.reload();
+        } else {
+            alert(data.message || 'Payment failed.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Payment failed. Please try again.');
+    });
+}
+</script>
+{% endblock %}

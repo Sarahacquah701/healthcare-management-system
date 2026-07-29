@@ -1,0 +1,46 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: HealthFlow\n"
+"POT-Creation-Date: 2026-07-05 00:00+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Home"
+msgstr "홈"
+
+msgid "Book Appointment"
+msgstr "예약하기"
+
+msgid "Doctors"
+msgstr "의사"
+
+msgid "Symptom Checker"
+msgstr "증상체크"
+
+msgid "Support"
+msgstr "지원"
+
+msgid "Contact"
+msgstr "문의"
+
+msgid "Language"
+msgstr "언어"
+
+msgid "Dashboard"
+msgstr "대시보드"
+
+msgid "Logout"
+msgstr "로그아웃"
+
+msgid "Login"
+msgstr "로그인"
+
+msgid "Register"
+msgstr "회원가입"
+
+msgid "HealthFlow — modern hospital booking and queue management"
+msgstr "HealthFlow — 현대적인 병원 예약 및 대기열 관리"
+
+msgid "Need help? Call us at (555) 123-4567 or email support@healthflow.com"
+msgstr "도움이 필요하신가요? (555) 123-4567로 전화하거나 support@healthflow.com으로 이메일을 보내주세요"

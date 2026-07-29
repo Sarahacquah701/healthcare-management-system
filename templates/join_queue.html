@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Join Queue{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h2 class="mb-4">Join Queue</h2>
+                <p>Choose a doctor to join the current walk-in queue.</p>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="doctor_id" class="form-label">Select Doctor</label>
+                        <select class="form-select" id="doctor_id" name="doctor_id" required>
+                            {% for doctor in doctors %}
+                            <option value="{{ doctor.id }}">{{ doctor.user.name }} - {{ doctor.specialty }} ({{ doctor.consultation_time }} min)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Join Queue</button>
+                </form>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-link mt-3">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Hospital Navigation{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-11">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="mb-1">Hospital Navigation</h3>
+                    <p class="text-muted mb-0">Find departments and plan the easiest route around the hospital.</p>
+                </div>
+                <a href="{{ url_for('patient_tools') }}" class="btn btn-outline-primary">Patient Tools</a>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-7">
+                    <div class="card summary-card h-100 overflow-hidden">
+                        <div class="card-header bg-white border-0"><h5 class="mb-0 text-primary">Interactive Hospital Map</h5></div>
+                        <div class="card-body p-0">
+                            <div class="ratio ratio-16x9">
+                                <iframe src="https://www.google.com/maps?q=hospital&output=embed" title="Hospital map" style="border:0;" allowfullscreen loading="lazy"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="card summary-card h-100">
+                        <div class="card-header bg-white border-0"><h5 class="mb-0 text-primary">Departments</h5></div>
+                        <div class="card-body">
+                            {% for department in departments %}
+                            <div class="border rounded p-3 mb-3 bg-white">
+                                <strong>{{ department.name }}</strong>
+                                <div class="small text-muted">{{ department.description }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

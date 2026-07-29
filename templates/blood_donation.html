@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}Blood Donation Network{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-11">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="mb-1">Blood Donation Network</h3>
+                    <p class="text-muted mb-0">Search donors, create emergency blood requests, and manage donor notifications.</p>
+                </div>
+                <a href="{{ url_for('patient_tools') }}" class="btn btn-outline-primary">Patient Tools</a>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="card summary-card h-100">
+                        <div class="card-header bg-white border-0"><h5 class="mb-0 text-primary">Search Donors</h5></div>
+                        <div class="card-body">
+                            <form method="GET" class="mb-4">
+                                <div class="mb-3"><label class="form-label">Blood Group</label><input type="text" class="form-control" name="blood_group" value="{{ blood_group }}" placeholder="A+, O-, AB+"></div>
+                                <div class="mb-3"><label class="form-label">City</label><input type="text" class="form-control" name="city" value="{{ city or '' }}"></div>
+                                <button class="btn btn-primary w-100" type="submit">Search</button>
+                            </form>
+                            <hr>
+                            <h6 class="text-primary">Emergency Blood Request</h6>
+                            <form method="POST">
+                                <input type="hidden" name="action" value="request">
+                                <div class="mb-3"><label class="form-label">Blood Group</label><input type="text" class="form-control" name="blood_group" required></div>
+                                <div class="mb-3"><label class="form-label">Hospital Name</label><input type="text" class="form-control" name="hospital_name" required></div>
+                                <div class="mb-3"><label class="form-label">Urgency</label><select class="form-select" name="urgency_level"><option>normal</option><option>urgent</option><option>critical</option></select></div>
+                                <div class="mb-3"><label class="form-label">Message</label><textarea class="form-control" name="message" rows="3"></textarea></div>
+                                <button class="btn btn-danger w-100" type="submit">Create Blood Request</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card summary-card h-100">
+                        <div class="card-header bg-white border-0"><h5 class="mb-0 text-primary">Donor Matches</h5></div>
+                        <div class="card-body">
+                            {% if donors %}
+                                {% for donor in donors %}
+                                <div class="border rounded p-3 mb-3 bg-white">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <strong>{{ donor.name }}</strong><span class="badge bg-success">{{ donor.blood_group }}</span>
+                                    </div>
+                                    <div class="small text-muted">{{ donor.phone_number or 'No phone' }}</div>
+                                    <div class="small text-muted">{{ donor.city or 'No city listed' }}</div>
+                                    <div class="small text-muted">{{ donor.notes or 'Available donor' }}</div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted mb-0">No donors found for this search.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card summary-card h-100">
+                        <div class="card-header bg-white border-0"><h5 class="mb-0 text-primary">Recent Requests</h5></div>
+                        <div class="card-body">
+                            {% if requests_log %}
+                                {% for item in requests_log %}
+                                <div class="border rounded p-3 mb-3 bg-white">
+                                    <strong>{{ item.blood_group }}</strong>
+                                    <div class="small text-muted">{{ item.hospital_name }}</div>
+                                    <div class="small text-muted">{{ item.urgency_level|title }}</div>
+                                    <div class="small text-muted">{{ item.created_at.strftime('%b %d, %Y') }}</div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted mb-0">No requests yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card summary-card mt-4">
+                <div class="card-body">
+                    <h6 class="text-primary mb-3">Donor notifications</h6>
+                    <p class="mb-0 text-muted">When you create a request, the app surfaces matching donors here for follow-up and outreach by staff.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

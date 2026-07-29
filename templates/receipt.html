@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Receipt{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card summary-card mb-4">
+                <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                    <div>
+                        <h3 class="mb-1 text-primary"><i class="fas fa-receipt me-2"></i>Payment Receipt</h3>
+                        <p class="text-muted mb-0">Receipt for appointment {{ appointment.appointment_code }}</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('billing') }}" class="btn btn-outline-secondary">Back to Billing</a>
+                        <button class="btn btn-primary" onclick="window.print()">Print Receipt</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card summary-card">
+                <div class="card-body p-4 p-md-5">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <small class="text-muted d-block">Patient</small>
+                            <h5 class="mb-1">{{ appointment.patient.name }}</h5>
+                            <div>{{ appointment.patient.email }}</div>
+                            <div>{{ appointment.patient.phone_number or 'Not provided' }}</div>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <small class="text-muted d-block">Receipt Status</small>
+                            <h5 class="mb-1 text-success">{{ appointment.payment_status|title }}</h5>
+                            <div>Reference: {{ appointment.payment_reference or 'Not generated yet' }}</div>
+                            <div>Paid at: {{ appointment.paid_at.strftime('%b %d, %Y %I:%M %p') if appointment.paid_at else 'Not paid' }}</div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <small class="text-muted d-block">Doctor</small>
+                            <h5 class="mb-1">Dr. {{ appointment.doctor_rel.user.name }}</h5>
+                            <div>{{ appointment.doctor_rel.specialty }}</div>
+                            <div>{{ 'Virtual Consultation' if appointment.consultation_type == 'virtual' else 'In-Person Visit' }}</div>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <small class="text-muted d-block">Appointment</small>
+                            <h5 class="mb-1">{{ appointment.appointment_time.strftime('%b %d, %Y %I:%M %p') }}</h5>
+                            <div>Code: {{ appointment.appointment_code }}</div>
+                            <div>Status: {{ appointment.status|title }}</div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Service Fee</small>
+                            <div class="fs-5">₹{{ '%.2f'|format(appointment.amount_due or 0.0) }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Payment Method</small>
+                            <div class="fs-5">{{ appointment.payment_method|replace('_', ' ')|title if appointment.payment_method else 'Not available' }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Priority</small>
+                            <div class="fs-5">{{ 'Emergency' if appointment.is_emergency else 'Standard' }}</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 rounded" style="background: var(--surface-soft);">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong>Total Paid</strong>
+                            <span class="fs-4 text-success">₹{{ '%.2f'|format(appointment.amount_due or 0.0) }}</span>
+                        </div>
+                        <p class="text-muted small mb-0 mt-2">This receipt confirms payment for the appointment above. Keep it for your records or reimbursement.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

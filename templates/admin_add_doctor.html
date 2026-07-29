@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Add Doctor{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h2 class="mb-4">Add Doctor</h2>
+                <p>Admin users can create doctor accounts directly from this panel.</p>
+                <form method="POST">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-6">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-6">
+                            <label for="specialty" class="form-label">Specialty</label>
+                            <input type="text" class="form-control" id="specialty" name="specialty" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="consultation_time" class="form-label">Consultation Time (minutes)</label>
+                            <input type="number" class="form-control" id="consultation_time" name="consultation_time" value="15" required>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-3">
+                        <div class="col-12">
+                            <label for="photo_url" class="form-label">Doctor Photo URL</label>
+                            <input type="url" class="form-control" id="photo_url" name="photo_url" placeholder="https://example.com/photo.jpg">
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-3">
+                        <div class="col-12">
+                            <label for="bio" class="form-label">Biography</label>
+                            <textarea class="form-control" id="bio" name="bio" rows="3" placeholder="Dr. Jane Doe is a expert in..."></textarea>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-3">
+                        <div class="col-12">
+                            <label for="contributions" class="form-label">Contributions / Achievements</label>
+                            <textarea class="form-control" id="contributions" name="contributions" rows="2" placeholder="Award-winning clinical research, patient care initiatives, community outreach..."></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-4">Add Doctor</button>
+                </form>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-link mt-3">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

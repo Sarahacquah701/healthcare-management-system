@@ -1,0 +1,498 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+3 0 obj
+<< /Length 3652 >>
+stream
+BT
+/F2 22 Tf
+58 720 Td
+(Project Proposal) Tj
+-58 -720 Td
+/F2 18 Tf
+58 692 Td
+(Hospital Queue and Appointment Management System) Tj
+-58 -692 Td
+/F1 11 Tf
+58 656 Td
+(Prepared on: June 11, 2026) Tj
+-58 -656 Td
+/F1 11 Tf
+58 642 Td
+(Prepared for: Academic / Mini Project Submission) Tj
+-58 -642 Td
+/F1 11 Tf
+58 610 Td
+(This proposal presents a proposed hospital web platform that will begin with queue and) Tj
+-58 -610 Td
+/F1 11 Tf
+58 596 Td
+(appointment management and later expand into a broader digital patient services system.) Tj
+-58 -596 Td
+/F1 11 Tf
+58 582 Td
+(The aim is to create a structured, modern, and scalable website that improves access to) Tj
+-58 -582 Td
+/F1 11 Tf
+58 568 Td
+(care, reduces manual coordination, and supports both patients and hospital staff through) Tj
+-58 -568 Td
+/F1 11 Tf
+58 554 Td
+(a single online platform.) Tj
+-58 -554 Td
+/F2 15 Tf
+58 526 Td
+(1. Project Topic / Title) Tj
+-58 -526 Td
+/F1 11 Tf
+58 506 Td
+(Hospital Queue and Appointment Management System with Extended Patient Services) Tj
+-58 -506 Td
+/F2 15 Tf
+58 478 Td
+(2. Introduction) Tj
+-58 -478 Td
+/F1 11 Tf
+58 458 Td
+(Hospitals increasingly need digital systems that can organize appointments, simplify) Tj
+-58 -458 Td
+/F1 11 Tf
+58 444 Td
+(patient support, and provide clear access to services without overloading front-desk) Tj
+-58 -444 Td
+/F1 11 Tf
+58 430 Td
+(staff. In many facilities, patients still rely on phone calls, paper records, and) Tj
+-58 -430 Td
+/F1 11 Tf
+58 416 Td
+(physical queues to request care. This proposal outlines a website that will digitize the) Tj
+-58 -416 Td
+/F1 11 Tf
+58 402 Td
+(core hospital booking process and later support a wider range of patient-facing services) Tj
+-58 -402 Td
+/F1 11 Tf
+58 388 Td
+(such as consultations, medical tests, reminders, payments, and support tools.) Tj
+-58 -388 Td
+/F2 15 Tf
+58 360 Td
+(3. Aim of the Project) Tj
+-58 -360 Td
+/F1 11 Tf
+58 340 Td
+(The main aim of this project is to design and develop a hospital website that makes it) Tj
+-58 -340 Td
+/F1 11 Tf
+58 326 Td
+(easier for patients to book services, communicate with hospital staff, and manage their) Tj
+-58 -326 Td
+/F1 11 Tf
+58 312 Td
+(healthcare needs online while helping the hospital organize appointments, records, and) Tj
+-58 -312 Td
+/F1 11 Tf
+58 298 Td
+(service requests in a more efficient and transparent way.) Tj
+-58 -298 Td
+/F2 15 Tf
+58 270 Td
+(4. Specific Objectives of the Project) Tj
+-58 -270 Td
+/F1 11 Tf
+58 250 Td
+(- Provide an online platform for doctor appointment booking, follow-up scheduling, and) Tj
+-58 -250 Td
+/F1 11 Tf
+58 236 Td
+(  appointment cancellation or rescheduling.) Tj
+-58 -236 Td
+/F1 11 Tf
+58 220 Td
+(- Support specialist consultations, nurse consultation booking, and future) Tj
+-58 -220 Td
+/F1 11 Tf
+58 206 Td
+(  telemedicine or virtual consultation requests.) Tj
+-58 -206 Td
+/F1 11 Tf
+58 190 Td
+(- Allow patients to search doctors by specialty and review doctor profiles with) Tj
+-58 -190 Td
+/F1 11 Tf
+58 176 Td
+(  photos, qualifications, and experience.) Tj
+-58 -176 Td
+/F1 11 Tf
+58 160 Td
+(- Offer medical service booking for laboratory tests, blood tests, imaging,) Tj
+-58 -160 Td
+/F1 11 Tf
+58 146 Td
+(  vaccinations, check-up packages, and health assessments.) Tj
+-58 -146 Td
+/F1 11 Tf
+58 130 Td
+(- Enable patient support features such as registration, medical history access,) Tj
+-58 -130 Td
+/F1 11 Tf
+58 116 Td
+(  reminders, notifications, ambulance requests, and hospital directions.) Tj
+-58 -116 Td
+/F1 11 Tf
+58 100 Td
+(- Prepare the website for payment services, insurance support, billing history,) Tj
+-58 -100 Td
+/F1 11 Tf
+58 86 Td
+(  receipts, and estimated treatment costs.) Tj
+-58 -86 Td
+ET
+endstream
+endobj
+4 0 obj
+<< /Length 4263 >>
+stream
+BT
+/F1 11 Tf
+58 720 Td
+(- Create a foundation for future modern features such as symptom checking, live chat,) Tj
+-58 -720 Td
+/F1 11 Tf
+58 706 Td
+(  patient ratings, health articles, chatbot support, and family account management.) Tj
+-58 -706 Td
+/F2 15 Tf
+58 682 Td
+(5. Problem Statement) Tj
+-58 -682 Td
+/F1 11 Tf
+58 662 Td
+(Many hospital services are still fragmented across phone calls, paper forms, and in-) Tj
+-58 -662 Td
+/F1 11 Tf
+58 648 Td
+(person visits. This often leads to long waiting times, missed appointments, poor) Tj
+-58 -648 Td
+/F1 11 Tf
+58 634 Td
+(visibility of doctor availability, weak communication with patients, and difficulty) Tj
+-58 -634 Td
+/F1 11 Tf
+58 620 Td
+(accessing support services quickly. Patients may struggle to find the right doctor,) Tj
+-58 -620 Td
+/F1 11 Tf
+58 606 Td
+(understand available times, or keep track of reminders and records. A unified online) Tj
+-58 -606 Td
+/F1 11 Tf
+58 592 Td
+(hospital system is needed to make service access simpler, faster, and more reliable.) Tj
+-58 -592 Td
+/F2 15 Tf
+58 564 Td
+(6. Project Scope) Tj
+-58 -564 Td
+/F1 11 Tf
+58 544 Td
+(- Core booking services: doctor appointment booking, specialist consultations,) Tj
+-58 -544 Td
+/F1 11 Tf
+58 530 Td
+(  online/virtual consultations, emergency appointment requests, follow-up) Tj
+-58 -530 Td
+/F1 11 Tf
+58 516 Td
+(  appointments, and booking changes.) Tj
+-58 -516 Td
+/F1 11 Tf
+58 500 Td
+(- Doctor and staff services: doctor profiles, availability calendar, doctor search by) Tj
+-58 -500 Td
+/F1 11 Tf
+58 486 Td
+(  specialty, location, availability or fees, and nurse consultation booking.) Tj
+-58 -486 Td
+/F1 11 Tf
+58 470 Td
+(- Medical services: laboratory test booking, medical check-up packages, health) Tj
+-58 -470 Td
+/F1 11 Tf
+58 456 Td
+(  screening, blood tests, X-ray and imaging bookings, vaccination appointments, and) Tj
+-58 -456 Td
+/F1 11 Tf
+58 442 Td
+(  assessment packages.) Tj
+-58 -442 Td
+/F1 11 Tf
+58 426 Td
+(- Patient support services: ambulance request, hospital map/directions, insurance) Tj
+-58 -426 Td
+/F1 11 Tf
+58 412 Td
+(  information, registration, medical history records, patient dashboard, reminders,) Tj
+-58 -412 Td
+/F1 11 Tf
+58 398 Td
+(  and notifications.) Tj
+-58 -398 Td
+/F1 11 Tf
+58 382 Td
+(- Payment services: online payment, insurance claim support, billing history,) Tj
+-58 -382 Td
+/F1 11 Tf
+58 368 Td
+(  receipts, and estimated treatment costs.) Tj
+-58 -368 Td
+/F1 11 Tf
+58 352 Td
+(- Extra modern features: AI symptom checker, live chat, patient reviews and ratings,) Tj
+-58 -352 Td
+/F1 11 Tf
+58 338 Td
+(  health blog, language selection, 24/7 chatbot support, and family account) Tj
+-58 -338 Td
+/F1 11 Tf
+58 324 Td
+(  management.) Tj
+-58 -324 Td
+/F2 15 Tf
+58 300 Td
+(7. Motivation of the Project) Tj
+-58 -300 Td
+/F1 11 Tf
+58 280 Td
+(The motivation behind this project is the growing need for a hospital platform that) Tj
+-58 -280 Td
+/F1 11 Tf
+58 266 Td
+(feels modern, convenient, and easy to use. Patients expect faster digital access to) Tj
+-58 -266 Td
+/F1 11 Tf
+58 252 Td
+(healthcare information and services, while hospitals need tools that reduce manual) Tj
+-58 -252 Td
+/F1 11 Tf
+58 238 Td
+(workload and improve organization. By starting with a booking and queue management) Tj
+-58 -238 Td
+/F1 11 Tf
+58 224 Td
+(system and expanding it into a multi-service portal, the project can address real) Tj
+-58 -224 Td
+/F1 11 Tf
+58 210 Td
+(service gaps and provide a practical base for future digital growth.) Tj
+-58 -210 Td
+/F2 15 Tf
+58 182 Td
+(8. Justification of the Project) Tj
+-58 -182 Td
+/F1 11 Tf
+58 162 Td
+(This project is justified because it directly addresses common problems in hospital) Tj
+-58 -162 Td
+/F1 11 Tf
+58 148 Td
+(service delivery, including long queues, scattered records, limited appointment) Tj
+-58 -148 Td
+/F1 11 Tf
+58 134 Td
+(visibility, and weak communication between patients and service providers. A digital) Tj
+-58 -134 Td
+/F1 11 Tf
+58 120 Td
+(system improves efficiency, supports better patient experience, and creates a foundation) Tj
+-58 -120 Td
+/F1 11 Tf
+58 106 Td
+(for future automation. The proposed features are also realistic for gradual) Tj
+-58 -106 Td
+/F1 11 Tf
+58 92 Td
+(implementation, allowing the website to grow in phases rather than being built all at) Tj
+-58 -92 Td
+ET
+endstream
+endobj
+5 0 obj
+<< /Length 2982 >>
+stream
+BT
+/F1 11 Tf
+58 720 Td
+(once.) Tj
+-58 -720 Td
+/F2 15 Tf
+58 692 Td
+(9. Project Methodology) Tj
+-58 -692 Td
+/F2 15 Tf
+58 664 Td
+(9.1 Project Approach) Tj
+-58 -664 Td
+/F1 11 Tf
+58 644 Td
+(- Phase 1: build the core booking, queue, and account management system.) Tj
+-58 -644 Td
+/F1 11 Tf
+58 628 Td
+(- Phase 2: extend the platform with doctor profiles, specialist search, medical) Tj
+-58 -628 Td
+/F1 11 Tf
+58 614 Td
+(  services, and support features.) Tj
+-58 -614 Td
+/F1 11 Tf
+58 598 Td
+(- Phase 3: add payment tools, notifications, chatbot support, reviews, language) Tj
+-58 -598 Td
+/F1 11 Tf
+58 584 Td
+(  options, and other advanced services.) Tj
+-58 -584 Td
+/F1 11 Tf
+58 568 Td
+(- Phase 4: test the complete system, refine usability, and prepare for deployment and) Tj
+-58 -568 Td
+/F1 11 Tf
+58 554 Td
+(  documentation.) Tj
+-58 -554 Td
+/F2 15 Tf
+58 530 Td
+(9.2 Development Tools) Tj
+-58 -530 Td
+/F1 11 Tf
+58 510 Td
+(- Frontend: HTML templates, CSS, Bootstrap, and JavaScript for responsive user) Tj
+-58 -510 Td
+/F1 11 Tf
+58 496 Td
+(  interfaces.) Tj
+-58 -496 Td
+/F1 11 Tf
+58 480 Td
+(- Backend: Python Flask for routing, validation, and application logic.) Tj
+-58 -480 Td
+/F1 11 Tf
+58 464 Td
+(- Database: SQLite with SQLAlchemy for structured data storage and relationships.) Tj
+-58 -464 Td
+/F1 11 Tf
+58 448 Td
+(- Authentication: Flask-Login and Werkzeug password hashing.) Tj
+-58 -448 Td
+/F1 11 Tf
+58 432 Td
+(- Document production: Python-based PDF generation for proposal and project) Tj
+-58 -432 Td
+/F1 11 Tf
+58 418 Td
+(  documentation.) Tj
+-58 -418 Td
+/F2 15 Tf
+58 394 Td
+(10. Project Deliverables) Tj
+-58 -394 Td
+/F1 11 Tf
+58 374 Td
+(- A well-structured proposal document in PDF form.) Tj
+-58 -374 Td
+/F1 11 Tf
+58 358 Td
+(- A working hospital website prototype with appointment and queue management.) Tj
+-58 -358 Td
+/F1 11 Tf
+58 342 Td
+(- Responsive web pages for patient, doctor, and administrator use.) Tj
+-58 -342 Td
+/F1 11 Tf
+58 326 Td
+(- Database models and backend logic for user accounts, doctors, bookings, and service) Tj
+-58 -326 Td
+/F1 11 Tf
+58 312 Td
+(  requests.) Tj
+-58 -312 Td
+/F1 11 Tf
+58 296 Td
+(- A phased roadmap for adding the remaining advanced features after the initial) Tj
+-58 -296 Td
+/F1 11 Tf
+58 282 Td
+(  version is completed.) Tj
+-58 -282 Td
+/F2 15 Tf
+58 258 Td
+(11. Conclusion) Tj
+-58 -258 Td
+/F1 11 Tf
+58 238 Td
+(In conclusion, this project proposes a modern hospital web platform that begins with) Tj
+-58 -238 Td
+/F1 11 Tf
+58 224 Td
+(practical appointment and queue management and expands toward a broader digital) Tj
+-58 -224 Td
+/F1 11 Tf
+58 210 Td
+(healthcare service portal. The proposal provides a clear direction for building the) Tj
+-58 -210 Td
+/F1 11 Tf
+58 196 Td
+(system in stages, starting with essential functions and later adding the wider set of) Tj
+-58 -196 Td
+/F1 11 Tf
+58 182 Td
+(patient support, medical, and payment features that will make the website more complete) Tj
+-58 -182 Td
+/F1 11 Tf
+58 168 Td
+(and useful.) Tj
+-58 -168 Td
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 9 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 3 0 R >>
+endobj
+7 0 obj
+<< /Type /Page /Parent 9 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 4 0 R >>
+endobj
+8 0 obj
+<< /Type /Page /Parent 9 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 5 0 R >>
+endobj
+9 0 obj
+<< /Type /Pages /Kids [6 0 R 7 0 R 8 0 R] /Count 3 >>
+endobj
+10 0 obj
+<< /Type /Catalog /Pages 9 0 R >>
+endobj
+xref
+0 11
+0000000000 65535 f 
+0000000015 00000 n 
+0000000085 00000 n 
+0000000160 00000 n 
+0000003864 00000 n 
+0000008179 00000 n 
+0000011213 00000 n 
+0000011349 00000 n 
+0000011485 00000 n 
+0000011621 00000 n 
+0000011690 00000 n 
+trailer
+<< /Size 11 /Root 10 0 R >>
+startxref
+11740
+%%EOF

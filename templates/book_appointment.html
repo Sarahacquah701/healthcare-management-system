@@ -1,0 +1,319 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Book Appointment') }}{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center g-4">
+        <!-- Main Booking Form -->
+        <div class="col-lg-8">
+            <div class="card summary-card">
+                <div class="card-header bg-white border-0">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-calendar-plus fa-2x text-primary me-3"></i>
+                        <div>
+                            <h4 class="mb-0" data-i18n="book_appointment.title">{{ _('Book Your Appointment') }}</h4>
+                            <p class="text-muted mb-0" data-i18n="book_appointment.subtitle">{{ _('Schedule a visit with your preferred doctor') }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if emergency_default %}
+                    <div class="alert alert-danger border-0 mb-4" role="alert">
+                        <strong data-i18n="book_appointment.emergency_enabled">{{ _('Emergency booking mode is enabled.') }}</strong> {{ _('Your appointment will be prioritized in the queue after booking.') }}
+                    </div>
+                    {% endif %}
+                    {% if telemedicine_default %}
+                    <div class="alert alert-info border-0 mb-4" role="alert">
+                        <strong data-i18n="book_appointment.virtual_enabled">{{ _('Virtual consultation mode is enabled.') }}</strong> {{ _('Choose a doctor who supports telemedicine to continue.') }}
+                    </div>
+                    {% endif %}
+                    {% if insurance_profile %}
+                    <div class="alert alert-success border-0 mb-4" role="alert">
+                        <strong data-i18n="book_appointment.insurance_on_file">{{ _('Insurance on file:') }}</strong> {{ insurance_profile.provider_name }} ({{ _('Policy') }} {{ insurance_profile.policy_number }})
+                    </div>
+                    {% else %}
+                    <div class="alert alert-light border mb-4" role="alert">
+                        <strong data-i18n="book_appointment.no_insurance">{{ _('No insurance profile saved yet.') }}</strong> {{ _('You can add one from the Insurance page before booking.') }}
+                    </div>
+                    {% endif %}
+                    <form method="POST" class="needs-loading needs-validation" novalidate>
+                        <!-- Patient Info -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="patient_name" class="form-label fw-bold" data-i18n="book_appointment.patient_name">{{ _('Patient Name') }}</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control" id="patient_name" name="patient_name" value="{{ current_user.name }}" readonly required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone_number" class="form-label fw-bold" data-i18n="book_appointment.phone_number">{{ _('Phone Number') }}</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    <input type="tel" class="form-control" id="phone_number" name="phone_number" value="{{ current_user.phone_number or '' }}" placeholder="{{ _('(555) 123-4567') }}" required>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label for="family_member_id" class="form-label fw-bold" data-i18n="book_appointment.booking_for">{{ _('Booking For') }}</label>
+                                <select class="form-select" id="family_member_id" name="family_member_id">
+                                    <option value="">{{ _('Myself') }}</option>
+                                    {% for member in family_members %}
+                                    <option value="{{ member.id }}">{{ member.name }} ({{ member.relationship|title }})</option>
+                                    {% endfor %}
+                                </select>
+                                <small class="text-muted" data-i18n="book_appointment.booking_for_hint">{{ _('Choose a saved family member if this appointment is for a dependent.') }}</small>
+                            </div>
+                        </div>
+
+                        <!-- Doctor Selection -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold mb-3" data-i18n="book_appointment.select_doctor">{{ _('Select Doctor') }}</label>
+                            <div class="row g-3">
+                                {% for doctor in doctors %}
+                                <div class="col-md-6">
+                                    <div class="doctor-select-card p-3 {% if selected_doctor_id == doctor.id %}selected{% endif %}" data-doctor-id="{{ doctor.id }}" data-allows-telemedicine="{{ 'true' if doctor.allows_telemedicine else 'false' }}">
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ doctor.photo_url or 'https://picsum.photos/id/' + doctor.id|string + '/80/80' }}" alt="{{ _('Dr.') }} {{ doctor.user.name }}" class="rounded-circle me-3" style="width: 60px; height: 60px;">
+                                            <div>
+                                                <h6 class="mb-1">{{ _('Dr.') }} {{ doctor.user.name }}</h6>
+                                                <p class="text-muted mb-1">{{ doctor.specialty }}</p>
+                                                <p class="text-muted small mb-1">{{ _('Fee:') }} ₹{{ '%.2f'|format(doctor.consultation_fee or 0.0) }}</p>
+                                                <small class="text-primary">
+                                                    <i class="fas fa-star me-1"></i>4.8 (120 {{ _('reviews') }})
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="radio" class="d-none" id="doctor_{{ doctor.id }}" name="doctor_id" value="{{ doctor.id }}" {% if selected_doctor_id == doctor.id %}checked{% endif %} required>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Date Selection -->
+                        <div class="mb-4">
+                            <label for="appointment_date" class="form-label fw-bold" data-i18n="book_appointment.select_date">{{ _('Select Date') }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                <input type="date" class="form-control" id="appointment_date" name="appointment_date" required>
+                            </div>
+                            <div class="mt-3">
+                                <div class="row g-2">
+                                    {% for option in date_options %}
+                                    <div class="col-6 col-md-3">
+                                        <div class="date-option p-2 text-center border rounded" data-date="{{ option.formatted }}">
+                                            <div class="fw-bold">{{ option.display.split(' ')[0] }}</div>
+                                            <div class="text-primary">{{ option.display.split(' ')[1] }}</div>
+                                            <small class="text-muted">{{ option.display.split(' ')[2] }}</small>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Time Slots -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold" data-i18n="book_appointment.time_slots">{{ _('Available Time Slots') }}</label>
+                            <div id="time-slots" class="d-flex flex-wrap">
+                                <div class="text-muted small" data-i18n="book_appointment.time_slots_hint">{{ _('Select a doctor and date to see available slots.') }}</div>
+                            </div>
+                            <input type="hidden" id="appointment_time" name="appointment_time" required>
+                        </div>
+
+                        <!-- Consultation Type -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold" data-i18n="book_appointment.consultation_type">{{ _('Consultation Type') }}</label>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-check border rounded p-3">
+                                        <input class="form-check-input" type="radio" name="consultation_type" id="inperson" value="in-person" {% if not telemedicine_default %}checked{% endif %} required>
+                                        <label class="form-check-label w-100" for="inperson">
+                                            <strong data-i18n="book_appointment.in_person">{{ _('In-Person') }}</strong>
+                                            <p class="text-muted small mb-0" data-i18n="book_appointment.in_person_hint">{{ _('Visit the hospital for your consultation') }}</p>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check border rounded p-3" id="virtualOptionCard">
+                                        <input class="form-check-input" type="radio" name="consultation_type" id="virtual" value="virtual" {% if telemedicine_default %}checked{% endif %} required>
+                                        <label class="form-check-label w-100" for="virtual">
+                                            <strong data-i18n="book_appointment.virtual_online">{{ _('Virtual (Online)') }}</strong>
+                                            <p class="text-muted small mb-0" data-i18n="book_appointment.virtual_online_hint">{{ _('Consult online via video call') }}</p>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Emergency Appointment -->
+                        <div class="mb-4">
+                            <div class="form-check border rounded p-3 bg-light">
+                                <input class="form-check-input" type="checkbox" id="emergency" name="is_emergency" {% if emergency_default %}checked{% endif %}>
+                                <label class="form-check-label w-100" for="emergency">
+                                    <i class="fas fa-exclamation-circle text-danger me-2"></i>
+                                    <strong class="text-danger" data-i18n="book_appointment.emergency_label">{{ _('Mark as Emergency Appointment') }}</strong>
+                                    <p class="text-muted small mb-0 ms-4" data-i18n="book_appointment.emergency_hint">{{ _('This will prioritize your appointment in the queue. Only check if it\'s urgent.') }}</p>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg px-5 py-3" data-i18n="book_appointment.confirm_booking">{{ _('Confirm Booking') }}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Side Panel -->
+        <div class="col-lg-4">
+            <div class="card summary-card mb-4">
+                <div class="card-body text-center">
+                    <img src="https://images.unsplash.com/photo-1551190822-a9333d879b1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Healthcare" class="img-fluid rounded mb-3">
+                    <h5 class="text-primary" data-i18n="book_appointment.why_choose">{{ _('Why Choose HealthFlow?') }}</h5>
+                    <ul class="list-unstyled text-start mt-3">
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>{{ _('Expert doctors') }}</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>{{ _('Modern facilities') }}</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>{{ _('Quick appointments') }}</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>{{ _('24/7 support') }}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card summary-card">
+                <div class="card-body">
+                    <h6 class="text-primary mb-3"><i class="fas fa-info-circle me-2"></i><span data-i18n="book_appointment.booking_tips">{{ _('Booking Tips') }}</span></h6>
+                    <div class="alert alert-light border">
+                        <small>
+                            <i class="fas fa-lightbulb text-warning me-2"></i>
+                            {{ _('Book appointments in advance for your preferred time slots.') }}
+                            {{ _('You can reschedule or cancel up to 24 hours before your appointment.') }}
+                        </small>
+                    </div>
+                    <div class="alert alert-warning border-0">
+                        <small>
+                            <i class="fas fa-triangle-exclamation me-2"></i>
+                            {{ _('For urgent cases, use emergency booking so your request is prioritized immediately.') }}
+                        </small>
+                    </div>
+                    <div class="mt-3">
+                        <h6 class="text-primary mb-2" data-i18n="book_appointment.need_help">{{ _('Need Help?') }}</h6>
+                        <p class="small text-muted mb-2"><span data-i18n="book_appointment.call_us">{{ _('Call us:') }}</span> (555) 123-4567</p>
+                        <p class="small text-muted mb-0"><span data-i18n="book_appointment.email_us">{{ _('Email:') }}</span> support@healthflow.com</p>
+                        <p class="small text-muted mb-0 mt-2"><a href="{{ url_for('insurance') }}" data-i18n="book_appointment.manage_insurance">{{ _('Manage insurance coverage') }}</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const appointmentDate = document.getElementById('appointment_date');
+    const appointmentTime = document.getElementById('appointment_time');
+    const timeSlots = document.getElementById('time-slots');
+
+    function selectedDoctorId() {
+        const checked = document.querySelector('input[name="doctor_id"]:checked');
+        return checked ? checked.value : null;
+    }
+
+    const noSlotsText = {{ _('No available slots for this date.')|tojson }};
+    const loadingSlotsText = {{ _('Loading slots...')|tojson }};
+
+    function renderSlots(slots) {
+        appointmentTime.value = '';
+        timeSlots.innerHTML = '';
+        if (!slots.length) {
+            const message = document.createElement('div');
+            message.className = 'text-muted small';
+            message.textContent = noSlotsText;
+            timeSlots.appendChild(message);
+            return;
+        }
+        slots.forEach(slot => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'time-slot bg-white';
+            button.dataset.value = slot.value;
+            button.textContent = slot.label;
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                this.classList.add('selected');
+                appointmentTime.value = this.dataset.value;
+            });
+            timeSlots.appendChild(button);
+        });
+    }
+
+    function updateConsultationOptions() {
+        const doctorId = selectedDoctorId();
+        const selectedCard = document.querySelector(`.doctor-select-card[data-doctor-id="${doctorId}"]`);
+        const virtualInput = document.getElementById('virtual');
+        const virtualCard = document.getElementById('virtualOptionCard');
+        if (!selectedCard) {
+            virtualInput.disabled = true;
+            virtualCard.classList.add('opacity-50');
+            return;
+        }
+        const allowsVirtual = selectedCard.dataset.allowsTelemedicine === 'true';
+        virtualInput.disabled = !allowsVirtual;
+        virtualCard.classList.toggle('opacity-50', !allowsVirtual);
+        if (!allowsVirtual) {
+            document.getElementById('inperson').checked = true;
+        }
+    }
+
+    function refreshSlots() {
+        updateConsultationOptions();
+        const doctorId = selectedDoctorId();
+        const date = appointmentDate.value;
+        if (!doctorId || !date) {
+            renderSlots([]);
+            return;
+        }
+        timeSlots.innerHTML = '<div class="text-muted small">Loading slots...</div>';
+        fetch(`{{ url_for('available_slots') }}?doctor_id=${doctorId}&date=${date}`)
+            .then(response => response.json())
+            .then(data => renderSlots(data.slots || []))
+            .catch(() => {
+                timeSlots.innerHTML = '<div class="text-danger small">Could not load slots. Please try again.</div>';
+            });
+    }
+
+    // Doctor selection
+    document.querySelectorAll('.doctor-select-card').forEach(card => {
+        card.addEventListener('click', function() {
+            document.querySelectorAll('.doctor-select-card').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+            const doctorId = this.dataset.doctorId;
+            document.querySelector(`#doctor_${doctorId}`).checked = true;
+            refreshSlots();
+        });
+    });
+
+    // Date selection
+    document.querySelectorAll('.date-option').forEach(option => {
+        option.addEventListener('click', function() {
+            document.querySelectorAll('.date-option').forEach(o => o.classList.remove('bg-primary', 'text-white'));
+            this.classList.add('bg-primary', 'text-white');
+            appointmentDate.value = this.dataset.date;
+            refreshSlots();
+        });
+    });
+
+    // Set default date to today
+    const today = new Date().toISOString().split('T')[0];
+    appointmentDate.value = today;
+    {% if emergency_default %}
+    document.getElementById('emergency').checked = true;
+    {% endif %}
+    {% if telemedicine_default %}
+    document.getElementById('virtual').checked = true;
+    {% endif %}
+    appointmentDate.addEventListener('change', refreshSlots);
+});
+</script>
+{% endblock %}

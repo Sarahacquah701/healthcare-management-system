@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %}Analytics Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>Analytics Dashboard</h2>
+        <p class="text-muted">Hospital performance metrics and statistics</p>
+    </div>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center">
+                <h3 class="text-primary">{{ total_patients_today }}</h3>
+                <p class="mb-0">Total Patients Today</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center">
+                <h3 class="text-success">{{ completed_today }}</h3>
+                <p class="mb-0">Completed Consultations</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center">
+                <h3 class="text-warning">{{ waiting_now }}</h3>
+                <p class="mb-0">Currently Waiting</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center">
+                <h3 class="text-info">{{ avg_wait_time }}</h3>
+                <p class="mb-0">Avg Wait Time (min)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center">
+                <h3 class="text-danger">{{ missed_today }}</h3>
+                <p class="mb-0">Missed Today</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center">
+                <h3 class="text-danger">{{ missed_week }}</h3>
+                <p class="mb-0">Missed Last 7 Days</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header">
+                <h5>Doctor Performance Today</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Doctor</th>
+                            <th>Specialty</th>
+                            <th>Completed Consultations</th>
+                            <th>Missed Appointments</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stat in doctor_stats %}
+                        <tr>
+                            <td>{{ stat.name }}</td>
+                            <td>{{ stat.specialty }}</td>
+                            <td><span class="badge bg-success">{{ stat.completed_today }}</span></td>
+                            <td><span class="badge bg-danger">{{ stat.missed_today }}</span></td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="text-muted">No data available</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header">
+                <h5>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('admin_add_walkin') }}" class="btn btn-primary">Add Walk-in Patient</a>
+                    <a href="{{ url_for('admin_add_doctor') }}" class="btn btn-secondary">Add Doctor</a>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">View Queue</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

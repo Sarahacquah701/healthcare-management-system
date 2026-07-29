@@ -1,0 +1,594 @@
+{% extends 'base.html' %}
+{% block title %}Doctor Dashboard{% endblock %}
+{% block content %}
+<!-- Sidebar -->
+<div class="dashboard-sidebar">
+    <div class="p-4 border-bottom">
+        <h5 class="mb-0 text-primary fw-bold">HealthFlow</h5>
+        <small class="text-muted">Doctor Portal</small>
+    </div>
+    <nav class="nav flex-column py-3">
+        <a class="nav-link active" href="#" data-section="dashboard" onclick="switchSection(event, 'dashboard')">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a class="nav-link" href="#" data-section="appointments" onclick="switchSection(event, 'appointments')">
+            <i class="fas fa-calendar-check"></i> Appointments
+        </a>
+        <a class="nav-link" href="#" data-section="patients" onclick="switchSection(event, 'patients')">
+            <i class="fas fa-users"></i> Patients
+        </a>
+        <a class="nav-link" href="#" data-section="schedule" onclick="switchSection(event, 'schedule')">
+            <i class="fas fa-clock"></i> Schedule
+        </a>
+        <a class="nav-link" href="#" data-section="settings" onclick="switchSection(event, 'settings')">
+            <i class="fas fa-cog"></i> Settings
+        </a>
+    </nav>
+</div>
+
+<!-- Main Content -->
+<div class="dashboard-main">
+    <!-- Top Bar -->
+    <div class="dashboard-topbar">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h4 class="mb-0" id="page-title">Dashboard</h4>
+            </div>
+            <div class="d-flex align-items-center">
+                <i class="fas fa-bell text-muted me-3" style="font-size: 1.2rem;"></i>
+                <img src="{{ current_user.doctor.photo_url or 'https://picsum.photos/id/' + current_user.doctor.id|string + '/40/40' }}" alt="Doctor Profile" class="profile-img me-2">
+                <div>
+                    <div class="fw-bold small">Dr. {{ current_user.name }}</div>
+                    <div class="text-muted small">{{ current_user.doctor.specialty }}</div>
+                </div>
+            </div>
+
+            <div class="card summary-card mt-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0 text-primary"><i class="fas fa-list-ol me-2"></i>Waiting Queue</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0 ps-4">Queue #</th>
+                                    <th class="border-0">Patient</th>
+                                    <th class="border-0">Priority</th>
+                                    <th class="border-0">Wait</th>
+                                    <th class="border-0 pe-4">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in queue %}
+                                <tr>
+                                    <td class="ps-4">{{ record.queue_number }}</td>
+                                    <td>{{ record.patient.name }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if record.priority == 'emergency' %}danger{% elif record.priority == 'priority' %}warning{% else %}secondary{% endif %}">
+                                            {{ record.priority|title }}
+                                        </span>
+                                    </td>
+                                    <td>{{ record.estimated_wait }} min</td>
+                                    <td class="pe-4">
+                                        <a href="{{ url_for('update_queue', queue_id=record.id, action='start') }}" class="btn btn-sm btn-outline-success">Start</a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">No patients waiting</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid py-4">
+        <!-- Dashboard Section -->
+        <div id="section-dashboard" class="section-content">
+            <!-- Summary Cards -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="card summary-card h-100">
+                        <div class="card-body text-center">
+                            <div class="card-icon bg-primary text-white mx-auto">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <h3 class="text-primary mb-1">{{ upcoming_appointments|length }}</h3>
+                            <p class="text-muted mb-0">Upcoming Appointments</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card summary-card h-100">
+                        <div class="card-body text-center">
+                            <div class="card-icon bg-success text-white mx-auto">
+                                <i class="fas fa-calendar-day"></i>
+                            </div>
+                            <h3 class="text-success mb-1">{{ today_appointments|length }}</h3>
+                            <p class="text-muted mb-0">Today's Appointments</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card summary-card h-100">
+                        <div class="card-body text-center">
+                            <div class="card-icon bg-warning text-white mx-auto">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
+                            <h3 class="text-warning mb-1">{{ waiting_count }}</h3>
+                            <p class="text-muted mb-0">Patients Waiting</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="card summary-card h-100">
+                        <div class="card-body text-center">
+                            <div class="card-icon bg-info text-white mx-auto">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <h3 class="text-info mb-1">{{ chat_consultations_assigned|length }}</h3>
+                            <p class="text-muted mb-0">Assigned Chat Consultations</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card summary-card h-100">
+                        <div class="card-body text-center">
+                            <div class="card-icon bg-warning text-white mx-auto">
+                                <i class="fas fa-user-clock"></i>
+                            </div>
+                            <h3 class="text-warning mb-1">{{ unassigned_consultations|length }}</h3>
+                            <p class="text-muted mb-0">Waiting Chat Requests</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card summary-card h-100">
+                        <div class="card-body text-center">
+                            <div class="card-icon bg-secondary text-white mx-auto">
+                                <i class="fas fa-video"></i>
+                            </div>
+                            <h3 class="text-secondary mb-1">{{ virtual_appointments|length }}</h3>
+                            <p class="text-muted mb-0">Virtual Appointments</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Upcoming Appointments -->
+                <div class="col-lg-8">
+                    <div class="card summary-card">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="mb-0 text-primary"><i class="fas fa-calendar-check me-2"></i>Upcoming Appointments</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="border-0 ps-4">Patient</th>
+                                            <th class="border-0">Time</th>
+                                            <th class="border-0">Status</th>
+                                            <th class="border-0 pe-4">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for appointment in upcoming_appointments[:5] %}
+                                        <tr>
+                                            <td class="ps-4">
+                                                <div class="d-flex align-items-center">
+                                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Patient">
+                                                    <div class="ms-3">
+                                                        <div class="fw-bold">{{ appointment.patient.name }}</div>
+                                                        <small class="text-muted">{{ appointment.patient.phone_number }}</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{{ appointment.appointment_time.strftime('%m/%d %H:%M') }}</td>
+                                            <td>
+                                                <span class="badge bg-{% if appointment.status == 'scheduled' %}primary{% elif appointment.status == 'completed' %}success{% elif appointment.status == 'missed' %}danger{% else %}warning{% endif %}">
+                                                    {{ appointment.status }}
+                                                </span>
+                                            </td>
+                                            <td class="pe-4">
+                                                {% if appointment.status == 'scheduled' %}
+                                                <a href="{{ url_for('appointment_details', appointment_id=appointment.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted py-4">No upcoming appointments</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Today's Schedule -->
+                <div class="col-lg-4">
+                    <div class="card summary-card">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="mb-0 text-primary"><i class="fas fa-clock me-2"></i>Today's Schedule</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if current_patient %}
+                            <div class="schedule-card p-3 mb-3 bg-primary text-white">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-user-md fa-2x me-3"></i>
+                                    <div>
+                                        <h6 class="mb-1">Now Serving</h6>
+                                        <div class="fw-bold">{{ current_patient.patient.name }}</div>
+                                        <small>Queue #{{ current_patient.queue_number }}</small>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <a href="{{ url_for('update_queue', queue_id=current_patient.id, action='complete') }}" class="btn btn-light btn-sm">Complete</a>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% for appointment in today_appointments[:3] %}
+                            <div class="schedule-card p-3 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Patient" class="rounded-circle me-3" style="width: 40px; height: 40px;">
+                                    <div>
+                                        <div class="fw-bold">{{ appointment.patient.name }}</div>
+                                        <small class="text-muted">{{ appointment.appointment_time.strftime('%H:%M') }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+
+                            <div class="text-center mt-3">
+                                <small class="text-muted">{{ waiting_count }} patients waiting</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-lg-8">
+                    <div class="card summary-card">
+                        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 text-primary"><i class="fas fa-comments me-2"></i>Assigned Chat Consultations</h5>
+                            <a href="{{ url_for('chat_consultation') }}" class="btn btn-sm btn-outline-primary">View All Chats</a>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="border-0 ps-4">Topic</th>
+                                            <th class="border-0">Patient</th>
+                                            <th class="border-0">Status</th>
+                                            <th class="border-0">Updated</th>
+                                            <th class="border-0 pe-4">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for consultation in chat_consultations_assigned[:5] %}
+                                        <tr>
+                                            <td class="ps-4">{{ consultation.topic }}</td>
+                                            <td>{{ consultation.patient.name }}</td>
+                                            <td><span class="badge bg-success">{{ consultation.status.replace('_', ' ').title() }}</span></td>
+                                            <td>{{ consultation.updated_at.strftime('%b %d %I:%M %p') }}</td>
+                                            <td class="pe-4">
+                                                <a href="{{ url_for('view_chat_consultation', consultation_id=consultation.id) }}" class="btn btn-sm btn-outline-primary">Open</a>
+                                            </td>
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted py-4">No assigned consultations yet</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card summary-card mb-4">
+                        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 text-primary"><i class="fas fa-video me-2"></i>Virtual Appointments</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush">
+                                {% for appointment in virtual_appointments[:6] %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="fw-bold">{{ appointment.patient.name }}</div>
+                                            <small class="text-muted">{{ appointment.appointment_time.strftime('%b %d %I:%M %p') }}</small>
+                                        </div>
+                                        <span class="badge bg-success align-self-center">{{ appointment.status }}</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <a href="{{ url_for('telemedicine_call', appointment_id=appointment.id) }}" class="btn btn-sm btn-primary">Join Call</a>
+                                        <a href="{{ url_for('appointment_details', appointment_id=appointment.id) }}" class="btn btn-sm btn-outline-secondary ms-2">Details</a>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="p-4 text-center text-muted">No upcoming virtual appointments</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card summary-card">
+                        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 text-primary"><i class="fas fa-user-clock me-2"></i>Waiting Chat Requests</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush">
+                                {% for consultation in unassigned_consultations[:5] %}
+                                <a href="{{ url_for('view_chat_consultation', consultation_id=consultation.id) }}" class="list-group-item list-group-item-action">
+                                    <div>
+                                        <div class="fw-bold">{{ consultation.topic }}</div>
+                                        <small class="text-muted">{{ consultation.patient.name }} · {{ consultation.created_at.strftime('%b %d %I:%M %p') }}</small>
+                                    </div>
+                                </a>
+                                {% else %}
+                                <div class="p-4 text-center text-muted">No waiting chat requests</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointments Section -->
+        <div id="section-appointments" class="section-content d-none">
+            <div class="card summary-card">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0 text-primary"><i class="fas fa-calendar-check me-2"></i>All Appointments</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0 ps-4">Patient</th>
+                                    <th class="border-0">Date & Time</th>
+                                    <th class="border-0">Status</th>
+                                    <th class="border-0">Contact</th>
+                                    <th class="border-0 pe-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in appointments %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Patient" style="width: 40px; height: 40px;" class="rounded-circle">
+                                            <div class="ms-3">
+                                                <div class="fw-bold">{{ appointment.patient.name }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ appointment.appointment_time.strftime('%b %d, %Y %H:%M') }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if appointment.status == 'scheduled' %}primary{% elif appointment.status == 'completed' %}success{% elif appointment.status == 'missed' %}danger{% else %}warning{% endif %}">
+                                            {{ appointment.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ appointment.patient.phone_number }}</td>
+                                    <td class="pe-4">
+                                        <a href="{{ url_for('appointment_details', appointment_id=appointment.id) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">No appointments found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patients Section -->
+        <div id="section-patients" class="section-content d-none">
+            <div class="row g-4">
+                {% set seen_patients = [] %}
+                {% for appointment in appointments %}
+                    {% if appointment.patient.id not in seen_patients %}
+                        {% set _ = seen_patients.append(appointment.patient.id) %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card summary-card">
+                                <div class="card-body text-center">
+                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Patient" class="rounded-circle mb-3" style="width: 60px; height: 60px;">
+                                    <h6 class="text-primary fw-bold">{{ appointment.patient.name }}</h6>
+                                    <p class="text-muted small mb-3">
+                                        <i class="fas fa-phone me-2"></i>{{ appointment.patient.phone_number }}
+                                    </p>
+                                    <a href="{{ url_for('patient_history', patient_id=appointment.patient.id) }}" class="btn btn-sm btn-outline-primary w-100">View History</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Schedule Section -->
+        <div id="section-schedule" class="section-content d-none">
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="card summary-card">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="mb-0 text-primary"><i class="fas fa-calendar-week me-2"></i>Weekly Schedule</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Time Slot</th>
+                                            <th>Monday</th>
+                                            <th>Tuesday</th>
+                                            <th>Wednesday</th>
+                                            <th>Thursday</th>
+                                            <th>Friday</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="fw-bold">09:00 AM</td>
+                                            <td><span class="badge bg-success">Available</span></td>
+                                            <td><span class="badge bg-success">Available</span></td>
+                                            <td><span class="badge bg-warning">Busy</span></td>
+                                            <td><span class="badge bg-success">Available</span></td>
+                                            <td><span class="badge bg-success">Available</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">10:00 AM</td>
+                                            <td><span class="badge bg-success">Available</span></td>
+                                            <td><span class="badge bg-warning">Busy</span></td>
+                                            <td><span class="badge bg-success">Available</span></td>
+                                            <td><span class="badge bg-success">Available</span></td>
+                                            <td><span class="badge bg-success">Available</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">02:00 PM</td>
+                                            <td><span class="badge bg-warning">Busy</span></td>
+                                            <td><span class="badge bg-success">Available</span></td>
+                                            <td><span class="badge bg-success">Available</span></td>
+                                            <td><span class="badge bg-warning">Busy</span></td>
+                                            <td><span class="badge bg-success">Available</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">03:00 PM</td>
+                                            <td><span class="badge bg-success">Available</span></td>
+                                            <td><span class="badge bg-success">Available</span></td>
+                                            <td><span class="badge bg-warning">Busy</span></td>
+                                            <td><span class="badge bg-success">Available</span></td>
+                                            <td><span class="badge bg-success">Available</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card summary-card">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="mb-0 text-primary"><i class="fas fa-info-circle me-2"></i>Schedule Info</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <small class="text-muted">Working Hours</small>
+                                <div class="fw-bold">9:00 AM - 5:00 PM</div>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted">Break Time</small>
+                                <div class="fw-bold">1:00 PM - 2:00 PM</div>
+                            </div>
+                            <div>
+                                <small class="text-muted">Available Days</small>
+                                <div class="fw-bold">Monday - Friday</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="section-settings" class="section-content d-none">
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="card summary-card">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="mb-0 text-primary"><i class="fas fa-cog me-2"></i>Doctor Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" value="Dr. {{ current_user.name }}" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Specialty</label>
+                                    <input type="text" class="form-control" value="{{ current_user.doctor.specialty }}" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" value="{{ current_user.email }}" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Notification Preferences</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                                        <label class="form-check-label" for="emailNotifications">
+                                            Email Notifications
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="smsNotifications" checked>
+                                        <label class="form-check-label" for="smsNotifications">
+                                            SMS Notifications
+                                        </label>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function switchSection(event, sectionName) {
+    event.preventDefault();
+    
+    // Hide all sections
+    document.querySelectorAll('.section-content').forEach(section => {
+        section.classList.add('d-none');
+    });
+    
+    // Show selected section
+    const selectedSection = document.getElementById('section-' + sectionName);
+    if (selectedSection) {
+        selectedSection.classList.remove('d-none');
+    }
+    
+    // Update active nav link
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    event.target.closest('.nav-link').classList.add('active');
+    
+    // Update page title
+    const titles = {
+        'dashboard': 'Dashboard',
+        'appointments': 'All Appointments',
+        'patients': 'Patients',
+        'schedule': 'My Schedule',
+        'settings': 'Settings'
+    };
+    document.getElementById('page-title').textContent = titles[sectionName] || 'Dashboard';
+}
+</script>
+{% endblock %}

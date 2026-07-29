@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Lab Test Booking{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-11">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                <div>
+                    <h3 class="mb-1">Lab Test Booking</h3>
+                    <p class="text-muted mb-0">Request lab tests and keep the booking history in one place.</p>
+                </div>
+                <a href="{{ url_for('health_records') }}" class="btn btn-outline-primary">Health Records</a>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-5">
+                    <div class="card summary-card h-100">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="mb-0 text-primary"><i class="fas fa-vials me-2"></i>New Test Request</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" class="needs-loading needs-validation" novalidate>
+                                <div class="mb-3">
+                                    <label for="test_name" class="form-label">Test Name</label>
+                                    <input type="text" class="form-control" id="test_name" name="test_name" placeholder="CBC, malaria test, lipid profile" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="preferred_date" class="form-label">Preferred Date</label>
+                                    <input type="date" class="form-control" id="preferred_date" name="preferred_date">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="notes" class="form-label">Notes</label>
+                                    <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Preparation instructions or special requests"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-calendar-check me-2"></i>Submit Request
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="card summary-card">
+                        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 text-primary"><i class="fas fa-clipboard-list me-2"></i>Your Lab Requests</h5>
+                            <span class="badge bg-primary-soft text-primary">{{ bookings|length }} requests</span>
+                        </div>
+                        <div class="card-body">
+                            {% if bookings %}
+                                {% for booking in bookings %}
+                                <div class="border rounded p-3 mb-3 bg-white">
+                                    <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
+                                        <div>
+                                            <h6 class="mb-1">{{ booking.test_name }}</h6>
+                                            <div class="small text-muted">Requested {{ booking.created_at.strftime('%b %d, %Y at %I:%M %p') }}</div>
+                                        </div>
+                                        <span class="badge bg-{% if booking.status == 'completed' %}success{% else %}warning{% endif %}">{{ booking.status|title }}</span>
+                                    </div>
+                                    <div class="small text-muted">Preferred date: {{ booking.preferred_date.strftime('%b %d, %Y') if booking.preferred_date else 'Anytime' }}</div>
+                                    <div class="small text-muted">{{ booking.notes or 'No extra notes' }}</div>
+                                    <div class="small text-primary mt-2">Results can be uploaded to Health Records once available.</div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted mb-0">No lab test requests yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

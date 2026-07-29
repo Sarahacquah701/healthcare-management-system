@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}QR Code Check-in{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center">
+                <h2 class="mb-4">QR Code Check-in</h2>
+                <p class="text-muted mb-4">Scan this QR code with your phone to check in for your appointment.</p>
+                
+                <div class="mb-4">
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; display: inline-block;">
+                        <div style="font-family: monospace; font-size: 24px; font-weight: bold; color: #333;">
+                            █▀▀▀▀▀█<br>
+                            █ █▀▀█ █<br>
+                            █ ▀▀▀▀ █<br>
+                            █▄▄▄▄▄█<br>
+                            █ █ ▀ █<br>
+                            █ ▀ ▀ █<br>
+                            █▄▄▄▄▄█
+                        </div>
+                    </div>
+                </div>
+                
+                <p class="mb-4">Enter the appointment code shown on your dashboard to check in.</p>
+                <form method="POST" action="{{ url_for('checkin_appointment') }}">
+                    <div class="mb-3">
+                        <input type="text" class="form-control form-control-lg text-center" id="appointment_code" name="appointment_code" placeholder="Enter appointment code" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg">Check In</button>
+                </form>
+                
+                <div class="mt-4">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-link">Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

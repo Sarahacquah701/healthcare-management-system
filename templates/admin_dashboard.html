@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>Admin Dashboard</h2>
+        <p class="text-muted">Manage doctors, walk-ins, and system settings.</p>
+    </div>
+    <div>
+        <a href="{{ url_for('analytics') }}" class="btn btn-info me-2">Analytics</a>
+        <a href="{{ url_for('manage_slots') }}" class="btn btn-warning me-2">Manage Slots</a>
+        <a href="{{ url_for('admin_add_doctor') }}" class="btn btn-primary me-2">Add Doctor</a>
+        <a href="{{ url_for('admin_add_walkin') }}" class="btn btn-secondary">Add Walk-in</a>
+    </div>
+</div>
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <h4>Appointments</h4>
+        <form method="GET" action="{{ url_for('dashboard') }}" class="row g-3 align-items-end mt-1">
+            <div class="col-md-4">
+                <label class="form-label" for="search">Patient Name</label>
+                <input class="form-control" id="search" name="search" value="{{ search }}" placeholder="Search patients">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="status">Status</label>
+                <select class="form-select" id="status" name="status">
+                    <option value="">All statuses</option>
+                    {% for status in ['scheduled', 'checked_in', 'completed', 'missed', 'cancelled'] %}
+                    <option value="{{ status }}" {% if status_filter == status %}selected{% endif %}>{{ status|replace('_', ' ')|title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="doctor_id">Doctor</label>
+                <select class="form-select" id="doctor_id" name="doctor_id">
+                    <option value="">All doctors</option>
+                    {% for doctor in doctors %}
+                    <option value="{{ doctor.id }}" {% if doctor_filter == doctor.id %}selected{% endif %}>Dr. {{ doctor.user.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100" type="submit">Filter</button>
+            </div>
+        </form>
+        <div class="table-responsive mt-3">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Patient</th>
+                        <th>Doctor</th>
+                        <th>Date & Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in appointments %}
+                    <tr>
+                        <td>{{ appointment.patient.name }}</td>
+                        <td>Dr. {{ appointment.doctor_rel.user.name }}</td>
+                        <td>{{ appointment.appointment_time.strftime('%b %d, %Y %I:%M %p') }}</td>
+                        <td>
+                            <span class="badge bg-{% if appointment.status == 'scheduled' %}primary{% elif appointment.status == 'completed' %}success{% elif appointment.status == 'missed' %}danger{% elif appointment.status == 'cancelled' %}secondary{% else %}warning{% endif %}">
+                                {{ appointment.status|replace('_', ' ')|title }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4" class="text-muted">No appointments found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <h4>Active Queue Controls</h4>
+        <div class="table-responsive mt-3">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Patient</th>
+                        <th>Doctor</th>
+                        <th>Queue #</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in active_queue %}
+                    <tr>
+                        <td>{{ record.patient.name }}</td>
+                        <td>Dr. {{ record.doctor_rel.user.name }}</td>
+                        <td>{{ record.queue_number }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('admin_queue_action', queue_id=record.id, action='priority') }}" class="d-flex gap-2">
+                                <select class="form-select form-select-sm" name="priority">
+                                    {% for priority in ['normal', 'priority', 'emergency'] %}
+                                    <option value="{{ priority }}" {% if record.priority == priority %}selected{% endif %}>{{ priority|title }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button class="btn btn-sm btn-outline-primary" type="submit">Save</button>
+                            </form>
+                        </td>
+                        <td>{{ record.status|replace('_', ' ')|title }}</td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <form method="POST" action="{{ url_for('admin_queue_action', queue_id=record.id, action='up') }}">
+                                    <button class="btn btn-sm btn-outline-secondary" type="submit"><i class="fas fa-arrow-up"></i></button>
+                                </form>
+                                <form method="POST" action="{{ url_for('admin_queue_action', queue_id=record.id, action='down') }}">
+                                    <button class="btn btn-sm btn-outline-secondary" type="submit"><i class="fas fa-arrow-down"></i></button>
+                                </form>
+                                <form method="POST" action="{{ url_for('admin_queue_action', queue_id=record.id, action='remove') }}">
+                                    <button class="btn btn-sm btn-outline-danger" type="submit"><i class="fas fa-times"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-muted">No active queue records.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h4>Users</h4>
+                <table class="table table-hover mt-3">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.role }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" class="text-muted">No users found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h4>Doctors</h4>
+                <table class="table table-hover mt-3">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Specialty</th>
+                            <th>Consultation Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doctor in doctors %}
+                        <tr>
+                            <td>{{ doctor.user.name }}</td>
+                            <td>{{ doctor.specialty }}</td>
+                            <td>{{ doctor.consultation_time }} min</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="text-muted">No doctors added yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

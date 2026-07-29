@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% block title %}Symptom Checker{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card summary-card mb-4">
+                <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                    <div>
+                        <h3 class="mb-1 text-primary"><i class="fas fa-stethoscope me-2"></i>AI Symptom Checker</h3>
+                        <p class="text-muted mb-0">Describe symptoms and get a guided triage suggestion, not a diagnosis.</p>
+                    </div>
+                    <a href="{{ url_for('doctors_directory') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-user-md me-2"></i>Find a Doctor
+                    </a>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-7">
+                    <div class="card summary-card">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="mb-0 text-primary"><i class="fas fa-notes-medical me-2"></i>Check Symptoms</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" class="needs-validation" novalidate>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label" for="symptoms">Symptoms</label>
+                                        <textarea class="form-control" id="symptoms" name="symptoms" rows="5" placeholder="Example: fever, cough, sore throat, body aches" required>{{ symptoms }}</textarea>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label" for="duration">Duration</label>
+                                        <input class="form-control" id="duration" name="duration" value="{{ duration }}" placeholder="e.g. 2 days">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label" for="age_group">Age Group</label>
+                                        <select class="form-select" id="age_group" name="age_group">
+                                            <option value="" {% if not age_group %}selected{% endif %}>Select</option>
+                                            <option value="child" {% if age_group == 'child' %}selected{% endif %}>Child</option>
+                                            <option value="adult" {% if age_group == 'adult' %}selected{% endif %}>Adult</option>
+                                            <option value="senior" {% if age_group == 'senior' %}selected{% endif %}>Senior</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label d-block">Quick Flags</label>
+                                        <div class="d-flex flex-wrap gap-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="fever" name="fever" {% if fever %}checked{% endif %}>
+                                                <label class="form-check-label" for="fever">Fever</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="breathing" name="breathing" {% if breathing %}checked{% endif %}>
+                                                <label class="form-check-label" for="breathing">Breathing trouble</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="chest_pain" name="chest_pain" {% if chest_pain %}checked{% endif %}>
+                                                <label class="form-check-label" for="chest_pain">Chest pain</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-column flex-md-row gap-2 mt-4">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search me-2"></i>Check Symptoms
+                                    </button>
+                                    <a href="{{ url_for('book_appointment', emergency='1') }}" class="btn btn-outline-danger">
+                                        <i class="fas fa-triangle-exclamation me-2"></i>Emergency Booking
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-5">
+                    <div class="card summary-card mb-4">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="mb-0 text-primary"><i class="fas fa-shield-heart me-2"></i>Important</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-2">This tool helps guide next steps. It does not diagnose disease.</p>
+                            <p class="mb-0">For chest pain, severe breathing trouble, stroke-like symptoms, heavy bleeding, or fainting, use emergency care immediately.</p>
+                        </div>
+                    </div>
+
+                    {% if result %}
+                    <div class="card summary-card">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="mb-0 text-primary"><i class="fas fa-clipboard-check me-2"></i>Guidance Result</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <span class="badge bg-{% if result.risk_level == 'Emergency' %}danger{% elif result.risk_level == 'Urgent' %}warning{% elif result.risk_level == 'Soon' %}info{% else %}success{% endif %} fs-6">
+                                    {{ result.risk_level }}
+                                </span>
+                            </div>
+                            <h5>{{ result.summary }}</h5>
+                            <p class="text-muted mb-2"><strong>Suggested specialty:</strong> {{ result.specialty }}</p>
+                            <p class="mb-2">{{ result.advice }}</p>
+                            <p class="text-muted small mb-3">{{ result.extra }}</p>
+                            {% if result.suggested_meds %}
+                            <div class="mb-3">
+                                <h6>Possible medicines (informational only)</h6>
+                                <ul class="list-unstyled">
+                                    {% for med in result.suggested_meds %}
+                                    <li class="mb-2">
+                                        <strong>{{ med.name }}</strong>{% if med.dose %}: <span>{{ med.dose }}</span>{% endif %}
+                                        <div class="small text-muted">{% if med.otc %}OTC{% else %}Prescription{% endif %} — {{ med.caution }}</div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                <div class="small text-warning">These are informational suggestions only — consult a clinician before taking any medicine.</div>
+                            </div>
+                            {% endif %}
+                            <a href="{{ result.action_url }}" class="btn btn-primary w-100">{{ result.action_label }}</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

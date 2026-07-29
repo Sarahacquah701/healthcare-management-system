@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block title %}Health Records{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-11">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                <div>
+                    <h3 class="mb-1">Health Records</h3>
+                    <p class="text-muted mb-0">Upload prescriptions, test results, and medical documents.</p>
+                </div>
+                <a href="{{ url_for('medical_history') }}" class="btn btn-outline-secondary">Medical History</a>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-5">
+                    <div class="card summary-card h-100">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="mb-0 text-primary"><i class="fas fa-upload me-2"></i>Upload Record</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" enctype="multipart/form-data" class="needs-loading needs-validation" novalidate>
+                                <div class="mb-3">
+                                    <label for="title" class="form-label">Title</label>
+                                    <input type="text" class="form-control" id="title" name="title" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="record_type" class="form-label">Record Type</label>
+                                    <select class="form-select" id="record_type" name="record_type" required>
+                                        <option value="">Choose type</option>
+                                        <option>Prescription</option>
+                                        <option>Test Result</option>
+                                        <option>Medical History</option>
+                                        <option>Discharge Summary</option>
+                                        <option>Other</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="shared_with_doctor_id" class="form-label">Share With Doctor</label>
+                                    <select class="form-select" id="shared_with_doctor_id" name="shared_with_doctor_id">
+                                        <option value="">Keep private</option>
+                                        {% for doctor in doctors %}
+                                        <option value="{{ doctor.id }}">Dr. {{ doctor.user.name }} - {{ doctor.specialty }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description</label>
+                                    <textarea class="form-control" id="description" name="description" rows="3" placeholder="Optional notes about the file"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="record_file" class="form-label">File</label>
+                                    <input type="file" class="form-control" id="record_file" name="record_file" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-cloud-upload-alt me-2"></i>Save Record
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="card summary-card">
+                        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 text-primary"><i class="fas fa-folder-open me-2"></i>Saved Records</h5>
+                            <span class="badge bg-primary-soft text-primary">{{ records|length }} items</span>
+                        </div>
+                        <div class="card-body">
+                            {% if records %}
+                                {% for record in records %}
+                                <div class="border rounded p-3 mb-3 bg-white">
+                                    <div class="d-flex justify-content-between align-items-start gap-3">
+                                        <div>
+                                            <h6 class="mb-1">{{ record.title }}</h6>
+                                            <div class="small text-muted mb-1">{{ record.record_type }}</div>
+                                            <div class="small text-muted">{{ record.description or 'No description' }}</div>
+                                            <div class="small text-muted">Uploaded {{ record.created_at.strftime('%b %d, %Y at %I:%M %p') }}</div>
+                                            {% if record.shared_with_doctor %}
+                                            <div class="small text-primary">Shared with Dr. {{ record.shared_with_doctor.user.name }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <a href="{{ url_for('download_health_record', record_id=record.id) }}" class="btn btn-sm btn-outline-primary">Download</a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted mb-0">No records uploaded yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Manage Appointment Slots{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>Manage Appointment Slots</h2>
+        <p class="text-muted">Create and manage available appointment time slots for doctors.</p>
+    </div>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header">
+                <h5>Add New Slot</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="doctor_id" class="form-label">Doctor</label>
+                        <select class="form-select" id="doctor_id" name="doctor_id" required>
+                            {% for doctor in doctors %}
+                            <option value="{{ doctor.id }}">{{ doctor.user.name }} - {{ doctor.specialty }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="date" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="date" name="date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="start_time" class="form-label">Start Time</label>
+                        <input type="time" class="form-control" id="start_time" name="start_time" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="end_time" class="form-label">End Time</label>
+                        <input type="time" class="form-control" id="end_time" name="end_time" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Slot</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header">
+                <h5>Available Slots</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Doctor</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for slot in slots %}
+                        <tr>
+                            <td>{{ slot.doctor.user.name }}</td>
+                            <td>{{ slot.date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ slot.start_time.strftime('%H:%M') }} - {{ slot.end_time.strftime('%H:%M') }}</td>
+                            <td>
+                                {% if slot.is_available %}
+                                <span class="badge bg-success">Available</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Booked</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" class="text-muted">No appointment slots created yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
