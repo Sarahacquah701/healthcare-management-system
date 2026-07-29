@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Hospital Queue and Appointment Management System
 
 This is a web-based application for managing hospital appointments and queues, built with Flask.
@@ -39,3 +40,7 @@ This is a web-based application for managing hospital appointments and queues, b
 
 - If database issues, delete `hospital_queue.db` and restart.
 - Ensure all dependencies are installed.
+=======
+# healthcare-management-system
+Healthcare management system
+>>>>>>> ad219c7917b861d5b474c9294daae4a14e38c15e
