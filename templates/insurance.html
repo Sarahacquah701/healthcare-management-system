@@ -1,116 +1,82 @@
 {% extends 'base.html' %}
 {% block title %}Insurance{% endblock %}
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-11">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-                <div>
-                    <h3 class="mb-1">Health Insurance</h3>
-                    <p class="text-muted mb-0">Save your coverage details and keep a digital card on file.</p>
-                </div>
-                <a href="{{ url_for('book_appointment') }}" class="btn btn-outline-primary">Back to Booking</a>
-            </div>
-
-            <div class="row g-4">
-                <div class="col-lg-5">
-                    <div class="card summary-card h-100">
-                        <div class="card-header bg-white border-0">
-                            <h5 class="mb-0 text-primary"><i class="fas fa-id-card me-2"></i>Insurance Profile</h5>
-                        </div>
-                        <div class="card-body">
-                            <form method="POST" class="needs-loading needs-validation" novalidate>
-                                <div class="mb-3">
-                                    <label for="provider_name" class="form-label">Provider Name</label>
-                                    <input type="text" class="form-control" id="provider_name" name="provider_name" value="{{ insurance_profile.provider_name if insurance_profile else '' }}" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="policy_number" class="form-label">Policy Number</label>
-                                    <input type="text" class="form-control" id="policy_number" name="policy_number" value="{{ insurance_profile.policy_number if insurance_profile else '' }}" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="member_id" class="form-label">Member ID</label>
-                                    <input type="text" class="form-control" id="member_id" name="member_id" value="{{ insurance_profile.member_id if insurance_profile else '' }}">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="coverage_level" class="form-label">Coverage Level</label>
-                                    <input type="text" class="form-control" id="coverage_level" name="coverage_level" value="{{ insurance_profile.coverage_level if insurance_profile else '' }}" placeholder="Basic, Standard, Premium">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="expiry_date" class="form-label">Expiry Date</label>
-                                    <input type="date" class="form-control" id="expiry_date" name="expiry_date" value="{{ insurance_profile.expiry_date.strftime('%Y-%m-%d') if insurance_profile and insurance_profile.expiry_date else '' }}">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="coverage_notes" class="form-label">Coverage Notes</label>
-                                    <textarea class="form-control" id="coverage_notes" name="coverage_notes" rows="3">{{ insurance_profile.coverage_notes if insurance_profile else '' }}</textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary w-100">
-                                    <i class="fas fa-save me-2"></i>Save Insurance Profile
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+{% include 'partials/page_hero.html' with context %}
+<div class="page-shell">
+    <section class="page-card">
+        <div class="card-body">
+            <div class="row g-4 align-items-start">
                 <div class="col-lg-7">
-                    {% if insurance_profile %}
-                    <div class="card summary-card mb-4 border-success">
-                        <div class="card-body p-4 p-md-5">
-                            <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
-                                <div>
-                                    <span class="badge bg-success mb-2">Digital Insurance Card</span>
-                                    <h4 class="mb-1">{{ insurance_profile.provider_name }}</h4>
-                                    <p class="text-muted mb-0">Policy {{ insurance_profile.policy_number }}</p>
-                                </div>
-                                <i class="fas fa-shield-heart fa-3x text-success"></i>
-                            </div>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <small class="text-muted d-block">Member ID</small>
-                                    <strong>{{ insurance_profile.member_id or 'Not provided' }}</strong>
-                                </div>
-                                <div class="col-md-6">
-                                    <small class="text-muted d-block">Coverage Level</small>
-                                    <strong>{{ insurance_profile.coverage_level or 'Not provided' }}</strong>
-                                </div>
-                                <div class="col-md-6">
-                                    <small class="text-muted d-block">Digital Card #</small>
-                                    <strong>{{ insurance_profile.digital_card_number }}</strong>
-                                </div>
-                                <div class="col-md-6">
-                                    <small class="text-muted d-block">Coverage Status</small>
-                                    <strong class="text-success">Active on file</strong>
-                                </div>
-                                <div class="col-12">
-                                    <small class="text-muted d-block">Notes</small>
-                                    <p class="mb-0">{{ insurance_profile.coverage_notes or 'No coverage notes added.' }}</p>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="info-badge mb-3"><i class="fas fa-shield-alt"></i> Coverage overview</div>
+                    <h3 class="mb-3">Keep insurance details ready so billing, claims, and appointment check-in remain simple.</h3>
+                    <p class="text-muted mb-4">HealthFlow keeps your provider, policy, and coverage notes in one secure place so staff can confirm details quickly.</p>
+                    <div class="pill-list">
+                        <span class="pill-chip"><i class="fas fa-id-card me-1"></i>Digital card</span>
+                        <span class="pill-chip"><i class="fas fa-file-contract me-1"></i>Coverage insights</span>
+                        <span class="pill-chip"><i class="fas fa-clipboard-check me-1"></i>Claims ready</span>
                     </div>
-                    {% else %}
-                    <div class="card summary-card mb-4">
-                        <div class="card-body p-4 text-center">
-                            <i class="fas fa-id-card fa-3x text-muted mb-3"></i>
-                            <h5>No insurance profile yet</h5>
-                            <p class="text-muted mb-0">Save your policy details to check coverage before booking.</p>
-                        </div>
-                    </div>
-                    {% endif %}
-                    <div class="card summary-card">
-                        <div class="card-header bg-white border-0">
-                            <h5 class="mb-0 text-primary"><i class="fas fa-circle-info me-2"></i>How it helps</h5>
-                        </div>
-                        <div class="card-body">
-                            <ul class="mb-0 text-muted">
-                                <li>Keep policy details ready before appointments.</li>
-                                <li>Show the digital card during booking or check-in.</li>
-                                <li>Use coverage notes as a quick reminder for staff.</li>
-                            </ul>
+                </div>
+                <div class="col-lg-5">
+                    <div class="card-soft p-4">
+                        <h5 class="mb-3">Accepted providers</h5>
+                        <div class="d-grid gap-2">
+                            <div class="rounded-3 bg-white px-3 py-2 border">BlueShield Health</div>
+                            <div class="rounded-3 bg-white px-3 py-2 border">Aetna Care</div>
+                            <div class="rounded-3 bg-white px-3 py-2 border">NorthPeak Insurance</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <section class="row g-4">
+        <div class="col-lg-5">
+            <div class="page-card h-100">
+                <div class="card-body">
+                    <div class="section-heading">
+                        <h4>Insurance profile</h4>
+                        <span class="info-badge"><i class="fas fa-id-card"></i> Update</span>
+                    </div>
+                    <form method="POST" class="needs-loading needs-validation" novalidate>
+                        <div class="mb-3"><label for="provider_name" class="form-label">Provider name</label><input type="text" class="form-control" id="provider_name" name="provider_name" value="{{ insurance_profile.provider_name if insurance_profile else '' }}" required></div>
+                        <div class="mb-3"><label for="policy_number" class="form-label">Policy number</label><input type="text" class="form-control" id="policy_number" name="policy_number" value="{{ insurance_profile.policy_number if insurance_profile else '' }}" required></div>
+                        <div class="mb-3"><label for="member_id" class="form-label">Member ID</label><input type="text" class="form-control" id="member_id" name="member_id" value="{{ insurance_profile.member_id if insurance_profile else '' }}"></div>
+                        <div class="mb-3"><label for="coverage_level" class="form-label">Coverage level</label><input type="text" class="form-control" id="coverage_level" name="coverage_level" value="{{ insurance_profile.coverage_level if insurance_profile else '' }}" placeholder="Basic, Standard, Premium"></div>
+                        <div class="mb-3"><label for="expiry_date" class="form-label">Expiry date</label><input type="date" class="form-control" id="expiry_date" name="expiry_date" value="{{ insurance_profile.expiry_date.strftime('%Y-%m-%d') if insurance_profile and insurance_profile.expiry_date else '' }}"></div>
+                        <div class="mb-3"><label for="coverage_notes" class="form-label">Coverage notes</label><textarea class="form-control" id="coverage_notes" name="coverage_notes" rows="3">{{ insurance_profile.coverage_notes if insurance_profile else '' }}</textarea></div>
+                        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-save me-2"></i>Save insurance profile</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="page-card h-100">
+                <div class="card-body">
+                    {% if insurance_profile %}
+                    <div class="border rounded-4 p-4 bg-light mb-4">
+                        <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+                            <div>
+                                <span class="badge bg-success mb-2">Digital card</span>
+                                <h4 class="mb-1">{{ insurance_profile.provider_name }}</h4>
+                                <p class="text-muted mb-0">Policy {{ insurance_profile.policy_number }}</p>
+                            </div>
+                            <i class="fas fa-shield-heart fa-3x text-success"></i>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6"><small class="text-muted d-block">Member ID</small><strong>{{ insurance_profile.member_id or 'Not provided' }}</strong></div>
+                            <div class="col-md-6"><small class="text-muted d-block">Coverage level</small><strong>{{ insurance_profile.coverage_level or 'Not provided' }}</strong></div>
+                            <div class="col-md-6"><small class="text-muted d-block">Digital card #</small><strong>{{ insurance_profile.digital_card_number }}</strong></div>
+                            <div class="col-md-6"><small class="text-muted d-block">Coverage status</small><strong class="text-success">Active on file</strong></div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">No insurance profile yet. Add your policy details to be ready for appointments and claims.</div>
+                    {% endif %}
+                    <div class="metric-card"><h6 class="text-primary">How it helps</h6><ul class="mb-0 mt-3 text-muted small"><li>Keep policy details ready before appointments.</li><li>Show the digital card during check-in.</li><li>Use coverage notes as quick reminders for staff.</li></ul></div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 {% endblock %}

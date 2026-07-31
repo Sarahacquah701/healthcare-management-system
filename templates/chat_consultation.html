@@ -1,76 +1,90 @@
 {% extends 'base.html' %}
-
 {% block title %}Chat Consultation{% endblock %}
-
 {% block content %}
-<div class="container mt-5 mb-5">
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-comments"></i> Start a Chat Consultation</h5>
+{% include 'partials/page_hero.html' with context %}
+<div class="page-shell">
+    <section class="page-card">
+        <div class="card-body">
+            <div class="row g-4 align-items-start">
+                <div class="col-lg-7">
+                    <div class="info-badge mb-3"><i class="fas fa-comments"></i> Secure messaging</div>
+                    <h3 class="mb-3">Start a secure chat with a clinician, share updates, and keep follow-up conversations in one place.</h3>
+                    <p class="text-muted mb-4">The chat experience is designed to feel fast and reassuring while staying consistent with the rest of HealthFlow.</p>
+                    <div class="pill-list">
+                        <span class="pill-chip"><i class="fas fa-clock me-1"></i>Fast replies</span>
+                        <span class="pill-chip"><i class="fas fa-paperclip me-1"></i>Attachment support</span>
+                        <span class="pill-chip"><i class="fas fa-user-check me-1"></i>Appointment-linked chats</span>
+                    </div>
                 </div>
+                <div class="col-lg-5">
+                    <div class="card-soft p-4">
+                        <h5 class="mb-3">Quick reply suggestions</h5>
+                        <div class="d-grid gap-2">
+                            <div class="rounded-3 bg-white px-3 py-2 border">“I need clarification on my medication.”</div>
+                            <div class="rounded-3 bg-white px-3 py-2 border">“Can I upload my lab result?”</div>
+                            <div class="rounded-3 bg-white px-3 py-2 border">“I want to reschedule my visit.”</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-4">
+        <div class="col-lg-8">
+            <div class="page-card mb-4">
                 <div class="card-body">
+                    <div class="section-heading">
+                        <h4>Start a chat consultation</h4>
+                        <span class="info-badge"><i class="fas fa-plus"></i> New request</span>
+                    </div>
                     <form method="POST" class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label">Reason for consultation</label>
-                            <input type="text" name="topic" class="form-control" placeholder="Describe your concern" required>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Preferred doctor (optional)</label>
-                            <select name="doctor_id" class="form-select">
-                                <option value="">Any available doctor</option>
-                                {% for doctor in doctors %}
-                                <option value="{{ doctor.id }}">Dr. {{ doctor.user.name }} - {{ doctor.specialty }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary">Request Consultation</button>
-                        </div>
+                        <div class="col-12"><label class="form-label">Reason for consultation</label><input type="text" name="topic" class="form-control" placeholder="Describe your concern" required></div>
+                        <div class="col-12"><label class="form-label">Preferred doctor (optional)</label><select name="doctor_id" class="form-select"><option value="">Any available doctor</option>{% for doctor in doctors %}<option value="{{ doctor.id }}">Dr. {{ doctor.user.name }} - {{ doctor.specialty }}</option>{% endfor %}</select></div>
+                        <div class="col-12"><button type="submit" class="btn btn-primary">Request consultation</button></div>
                     </form>
                 </div>
             </div>
-
-            <div class="card shadow-sm">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0"><i class="fas fa-history"></i> My Consultation Requests</h5>
-                </div>
+            <div class="page-card">
                 <div class="card-body">
+                    <div class="section-heading">
+                        <h4>My consultation requests</h4>
+                        <span class="info-badge"><i class="fas fa-history"></i> Recent</span>
+                    </div>
                     {% if consultations %}
-                        <div class="list-group">
+                        <div class="d-grid gap-2">
                             {% for consultation in consultations %}
-                            <a href="{{ url_for('view_chat_consultation', consultation_id=consultation.id) }}" class="list-group-item list-group-item-action">
-                                <div class="d-flex justify-content-between">
-                                    <strong>{{ consultation.topic }}</strong>
-                                    <span class="badge bg-{{ 'success' if consultation.status == 'active' else 'warning' if consultation.status == 'waiting_response' else 'secondary' }}">{{ consultation.status.replace('_', ' ').title() }}</span>
+                            <a href="{{ url_for('view_chat_consultation', consultation_id=consultation.id) }}" class="border rounded-4 p-3 bg-light text-decoration-none text-dark">
+                                <div class="d-flex justify-content-between align-items-start gap-3">
+                                    <div>
+                                        <strong>{{ consultation.topic }}</strong>
+                                        <div class="small text-muted">Requested {{ consultation.created_at.strftime('%d %b %Y %I:%M %p') }}</div>
+                                        {% if consultation.doctor_rel %}<div class="small text-muted">Assigned doctor: Dr. {{ consultation.doctor_rel.user.name }}</div>{% endif %}
+                                    </div>
+                                    <span class="badge bg-{% if consultation.status == 'active' %}success{% elif consultation.status == 'waiting_response' %}warning{% else %}secondary{% endif %}">{{ consultation.status.replace('_', ' ').title() }}</span>
                                 </div>
-                                <p class="mb-1 text-muted small">Requested {{ consultation.created_at.strftime('%d %b %Y %I:%M %p') }}</p>
-                                {% if consultation.doctor_rel %}
-                                <p class="mb-0 small">Assigned Doctor: Dr. {{ consultation.doctor_rel.user.name }}</p>
-                                {% endif %}
                             </a>
                             {% endfor %}
                         </div>
                     {% else %}
-                    <p class="text-muted">No chat consultations yet. Submit a request to get guidance from a doctor.</p>
+                        <div class="empty-state">No chat consultations yet. Submit one to start a secure care conversation.</div>
                     {% endif %}
                 </div>
             </div>
         </div>
-
         <div class="col-lg-4">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0"><i class="fas fa-lightbulb"></i> How Chat Works</h5>
-                </div>
+            <div class="page-card">
                 <div class="card-body">
-                    <p class="mb-2">Create a chat consultation request and a doctor will review it shortly.</p>
-                    <p class="mb-2">You can continue the conversation inside each consultation thread.</p>
-                    <p class="mb-0">Use chat for non-emergency questions, follow-ups, or prescription guidance.</p>
+                    <div class="section-heading">
+                        <h4>How chat works</h4>
+                        <span class="info-badge"><i class="fas fa-lightbulb"></i> Tips</span>
+                    </div>
+                    <div class="metric-card mb-3">Create a consultation request and a clinician will review it shortly.</div>
+                    <div class="metric-card mb-3">Attach images or files if they help explain your concern.</div>
+                    <div class="metric-card">Use it for non-emergency questions, follow-ups, or prescription guidance.</div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 </div>
 {% endblock %}

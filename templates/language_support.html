@@ -1,32 +1,85 @@
 {% extends 'base.html' %}
 {% block title %}{{ _('Language Support') }}{% endblock %}
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card summary-card">
-                <div class="card-header bg-white border-0"><h4 class="mb-0 text-primary">{{ _('Multi-Language Support') }}</h4></div>
-                <div class="card-body">
-                    <form method="POST" class="needs-loading">
-                        <div class="mb-3">
-                            <label class="form-label">{{ _('Preferred Language') }}</label>
-                            <select class="form-select" name="preferred_language">
-                                {% for language in languages %}
-                                <option value="{{ language.code }}" {% if current_lang == language.code %}selected{% endif %}>{{ language.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="voice_assistance_enabled" name="voice_assistance_enabled" {% if preference and preference.voice_assistance_enabled %}checked{% endif %}>
-                            <label class="form-check-label" for="voice_assistance_enabled">{{ _('Enable voice assistance for elderly users') }}</label>
-                        </div>
-                        <button class="btn btn-primary" type="submit">{{ _('Save Preference') }}</button>
-                    </form>
-                    <hr>
-                    <p class="text-muted mb-0">{{ _('Supported languages currently include English, French, Spanish, Hindi, Chinese, Korean, Twi, and Hausa.') }}</p>
+{% include 'partials/page_hero.html' with context %}
+<div class="page-shell">
+    <section class="page-card">
+        <div class="card-body">
+            <div class="row g-4 align-items-start">
+                <div class="col-lg-7">
+                    <div class="info-badge mb-3"><i class="fas fa-globe"></i> Inclusive experience</div>
+                    <h3 class="mb-3">HealthFlow is designed to feel natural for patients, families, and caregivers across many languages and accessibility needs.</h3>
+                    <p class="text-muted mb-4">Switch the experience instantly, enable voice support, and preview translated content so the platform feels welcoming from the first visit.</p>
+                    <div class="pill-list">
+                        <span class="pill-chip"><i class="fas fa-language me-1"></i>8 supported languages</span>
+                        <span class="pill-chip"><i class="fas fa-volume-up me-1"></i>Voice assistance</span>
+                        <span class="pill-chip"><i class="fas fa-universal-access me-1"></i>Accessible UX</span>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="card-soft p-4">
+                        <h5 class="mb-3">Choose a language</h5>
+                        <form method="POST" class="needs-loading">
+                            <div class="mb-3">
+                                <label class="form-label">Preferred language</label>
+                                <select class="form-select" name="preferred_language">
+                                    {% for language in languages %}
+                                    <option value="{{ language.code }}" {% if current_lang == language.code %}selected{% endif %}>{{ language.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="voice_assistance_enabled" name="voice_assistance_enabled" {% if preference and preference.voice_assistance_enabled %}checked{% endif %}>
+                                <label class="form-check-label" for="voice_assistance_enabled">Enable voice assistance for elderly or low-vision users</label>
+                            </div>
+                            <button class="btn btn-primary w-100" type="submit">Save preference</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <section class="row g-4">
+        <div class="col-lg-7">
+            <div class="page-card h-100">
+                <div class="card-body">
+                    <div class="section-heading">
+                        <h4>Supported languages</h4>
+                        <span class="info-badge"><i class="fas fa-globe"></i> Multilingual ready</span>
+                    </div>
+                    <div class="row g-3">
+                        {% for language in languages %}
+                        <div class="col-md-6">
+                            <div class="metric-card h-100">
+                                <div class="fw-semibold">{{ language.name }}</div>
+                                <div class="small text-muted">{{ language.code }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="page-card h-100">
+                <div class="card-body">
+                    <div class="section-heading">
+                        <h4>Translated content preview</h4>
+                        <span class="info-badge"><i class="fas fa-eye"></i> Live preview</span>
+                    </div>
+                    <div class="border rounded-4 p-3 bg-light">
+                        <div class="fw-semibold mb-2">“Book your next appointment”</div>
+                        <div class="text-muted small">This message will appear in the language you select, maintaining the same navigation and care guidance.</div>
+                    </div>
+                    <div class="mt-3">
+                        <div class="quick-chip mb-2"><i class="fas fa-mobile-alt"></i> Mobile-first layout</div>
+                        <div class="quick-chip mb-2"><i class="fas fa-text-height"></i> Clear typography</div>
+                        <div class="quick-chip"><i class="fas fa-volume-mute"></i> Optional audio prompts</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 {% endblock %}

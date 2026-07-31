@@ -33,8 +33,6 @@ app.config['HEALTH_RECORD_UPLOAD_FOLDER'] = os.path.join(UPLOAD_BASE, 'uploads',
 os.makedirs(app.config['HEALTH_RECORD_UPLOAD_FOLDER'], exist_ok=True)
 app.config['CHAT_UPLOAD_FOLDER'] = os.path.join(UPLOAD_BASE, 'uploads', 'chat_attachments')
 os.makedirs(app.config['CHAT_UPLOAD_FOLDER'], exist_ok=True)
-app.config['PROFILE_PICTURE_UPLOAD_FOLDER'] = os.path.join(UPLOAD_BASE , 'uploads', 'profile_pictures')
-os.makedirs(app.config['PROFILE_PICTURE_UPLOAD_FOLDER'], exist_ok=True)
 
 _translation_cache = {}
 
@@ -707,7 +705,13 @@ def register():
         if role == 'doctor':
             specialty = request.form['specialty']
             consultation_time = int(request.form.get('consultation_time', 15))
-            doctor = Doctor(user_id=user.id, specialty=specialty, consultation_time=consultation_time)
+            allows_telemedicine = request.form.get('allows_telemedicine') == 'on'
+            doctor = Doctor(
+                user_id=user.id,
+                specialty=specialty,
+                consultation_time=consultation_time,
+                allows_telemedicine=allows_telemedicine
+            )
             db.session.add(doctor)
             db.session.commit()
         

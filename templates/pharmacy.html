@@ -1,85 +1,394 @@
 {% extends 'base.html' %}
 
-{% block title %}Pharmacy - Order Medicines{% endblock %}
+{% block title %}Online Pharmacy{% endblock %}
 
 {% block content %}
-<div class="container mt-5 mb-5">
-    <!-- Header -->
-    <div class="mb-4">
-        <h1><i class="fas fa-pills"></i> Online Pharmacy</h1>
-        <p class="text-muted">Order medicines with prescription upload and home delivery</p>
-    </div>
+{% set hero_eyebrow = 'HealthFlow Pharmacy' %}
+{% set hero_title = 'Order Your Medications Online' %}
+{% set hero_subtitle = 'Browse trusted medicines, upload prescriptions, and manage deliveries through a calm, secure healthcare experience.' %}
+{% set hero_primary_label = 'Shop Medicines' %}
+{% set hero_primary_url = '#catalog' %}
+{% set hero_secondary_label = 'Upload Prescription' %}
+{% set hero_secondary_url = '#prescriptions' %}
+{% set hero_timestamp = 'Same-day care support' %}
+{% include 'partials/page_hero.html' %}
 
-    <div class="row">
-        <!-- Available Medicines -->
-        <div class="col-md-8">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header" style="background-color: var(--primary); color: white;">
-                    <h5 class="mb-0"><i class="fas fa-list"></i> Available Medicines</h5>
+{% set categories = [
+  {'name': 'Prescription Medicines', 'icon': 'fas fa-file-medical', 'count': '8 items'},
+  {'name': 'Over-the-Counter Medicines', 'icon': 'fas fa-pills', 'count': '12 items'},
+  {'name': 'Vitamins & Supplements', 'icon': 'fas fa-seedling', 'count': '6 items'},
+  {'name': 'Personal Care', 'icon': 'fas fa-soap', 'count': '5 items'},
+  {'name': 'First Aid', 'icon': 'fas fa-bandage', 'count': '7 items'},
+  {'name': 'Baby Care', 'icon': 'fas fa-baby', 'count': '4 items'},
+  {'name': 'Diabetes Care', 'icon': 'fas fa-syringe', 'count': '3 items'},
+  {'name': 'Medical Devices', 'icon': 'fas fa-stethoscope', 'count': '4 items'}
+] %}
+
+{% set featured_medicine = {
+  'name': 'Amoxicillin 500mg',
+  'category': 'Prescription Medicines',
+  'dosage': '500mg • 14 capsules',
+  'price': 'GHS 28.00',
+  'rating': '4.8',
+  'availability': 'In stock',
+  'description': 'A commonly prescribed antibiotic for bacterial infections, delivered with pharmacist guidance and secure prescription review.',
+  'instructions': 'Take once every 8 hours or as directed by your clinician.',
+  'ingredients': 'Amoxicillin trihydrate, microcrystalline cellulose, magnesium stearate.',
+  'side_effects': 'Mild nausea, diarrhea, or rash may occur; contact support if symptoms persist.',
+  'precautions': 'Avoid use if you have a history of penicillin allergy.',
+  'storage': 'Store in a cool, dry place below 25°C away from sunlight.',
+  'requires_prescription': true,
+  'reviews': ['Fast delivery and friendly pharmacist support.', 'Clear dosage instructions and reliable packaging.']
+} %}
+
+{% set catalog_items = [
+  {'name': 'Paracetamol 500mg', 'category': 'Over-the-Counter Medicines', 'dosage': '500mg • 20 tablets', 'price': 'GHS 12.00', 'rating': '4.7', 'availability': 'In stock', 'requires_prescription': false, 'image': 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=900&q=80'},
+  {'name': 'Vitamin D3 1000IU', 'category': 'Vitamins & Supplements', 'dosage': '1 softgel daily', 'price': 'GHS 18.50', 'rating': '4.6', 'availability': 'Low stock', 'requires_prescription': false, 'image': 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=900&q=80'},
+  {'name': 'Insulin Pen Needles', 'category': 'Diabetes Care', 'dosage': '4mm • 100 count', 'price': 'GHS 32.00', 'rating': '4.9', 'availability': 'In stock', 'requires_prescription': true, 'image': 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=900&q=80'},
+  {'name': 'Digital Thermometer', 'category': 'Medical Devices', 'dosage': 'Fast-reading', 'price': 'GHS 24.00', 'rating': '4.5', 'availability': 'In stock', 'requires_prescription': false, 'image': 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=900&q=80'}
+] %}
+
+{% set services = [
+  {'title': 'Licensed pharmacists', 'description': 'Every prescription is reviewed by trained pharmacists before dispatch.'},
+  {'title': 'Secure prescription verification', 'description': 'Upload a prescription and receive confirmation within a short turnaround time.'},
+  {'title': 'Fast home delivery', 'description': 'Same-day and next-day options are available for eligible orders.'},
+  {'title': 'Medication refill reminders', 'description': 'Stay on schedule with reminders before your refill window closes.'},
+  {'title': 'Round-the-clock support', 'description': 'Get answers for urgent questions through the HealthFlow care team.'}
+] %}
+
+{% set faqs = [
+  {'question': 'Do you accept prescription uploads?', 'answer': 'Yes. Prescription-only medicines can be ordered after secure upload and review.'},
+  {'question': 'Can I choose pickup instead of delivery?', 'answer': 'Yes. Pickup is available at select partner pharmacies in your area.'},
+  {'question': 'How quickly will my order arrive?', 'answer': 'Most orders arrive within 24–48 hours, depending on location and item availability.'}
+] %}
+
+{% set testimonials = [
+  {'name': 'Grace M.', 'quote': 'The experience felt reassuring and simple. I was able to upload my prescription and track delivery without any confusion.'},
+  {'name': 'Daniel R.', 'quote': 'The refill reminders help me stay consistent with my treatment plan, and the support team is always responsive.'}
+] %}
+
+{% set order_history = orders if orders else [
+  {'id': 'PH-1024', 'product': 'Paracetamol 500mg', 'status': 'Delivered', 'eta': 'Delivered yesterday', 'amount': 'GHS 12.00'},
+  {'id': 'PH-1088', 'product': 'Vitamin D3 1000IU', 'status': 'In transit', 'eta': 'Arrives today', 'amount': 'GHS 18.50'}
+] %}
+
+<div class="page-shell">
+    <section class="page-card">
+        <div class="card-body">
+            <div class="row g-4 align-items-start">
+                <div class="col-lg-7">
+                    <div class="info-badge mb-3"><i class="fas fa-pills"></i> Trusted by patients</div>
+                    <h3 class="mb-3">A pharmacy experience designed to feel calm, secure, and connected to your care team.</h3>
+                    <p class="text-muted mb-4">From discovery to delivery, HealthFlow helps you shop for everyday essentials and prescription care with clear instructions, pharmacist support, and flexible fulfillment.</p>
+                    <div class="pill-list">
+                        <span class="pill-chip"><i class="fas fa-prescription-bottle-alt me-1"></i>Prescription support</span>
+                        <span class="pill-chip"><i class="fas fa-truck me-1"></i>Fast delivery</span>
+                        <span class="pill-chip"><i class="fas fa-shield-alt me-1"></i>Secure checkout</span>
+                    </div>
                 </div>
-                <div class="card-body">
-                    {% if medicines %}
-                        <div class="row">
-                            {% for medicine in medicines %}
-                            <div class="col-md-6 mb-3">
-                                <div class="border rounded p-3">
-                                    <h6>{{ medicine.name }}</h6>
-                                    {% if medicine.dosage %}
-                                    <p class="text-muted small mb-1"><i class="fas fa-info-circle"></i> {{ medicine.dosage }}</p>
-                                    {% endif %}
-                                    <p class="mb-2">{{ medicine.description or 'High-quality medicine' }}</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="badge" style="background-color: var(--success);">GHS {{ medicine.price }}</span>
-                                        {% if medicine.requires_prescription %}
-                                        <span class="badge bg-warning">Prescription Required</span>
-                                        {% endif %}
-                                    </div>
-                                    <form method="POST" enctype="multipart/form-data" class="mt-2">
-                                        <input type="hidden" name="medicine_id" value="{{ medicine.id }}">
-                                        <input type="number" name="quantity" value="1" min="1" max="10" class="form-control form-control-sm mb-2" placeholder="Qty">
-                                        <input type="text" name="delivery_address" placeholder="Delivery address" class="form-control form-control-sm mb-2">
-                                        {% if medicine.requires_prescription %}
-                                        <input type="file" name="prescription" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" class="form-control form-control-sm mb-2" required>
-                                        {% endif %}
-                                        <textarea name="notes" placeholder="Special notes (optional)" class="form-control form-control-sm mb-2" rows="2"></textarea>
-                                        <button type="submit" class="btn btn-sm" style="background-color: var(--primary); color: white; width: 100%;">Order Now</button>
-                                    </form>
-                                </div>
-                            </div>
-                            {% endfor %}
+                <div class="col-lg-5">
+                    <div class="card-soft p-4">
+                        <h5 class="mb-3">Need help choosing?</h5>
+                        <div class="d-grid gap-2">
+                            <div class="rounded-3 bg-white px-3 py-2 border">Search by condition, category, or prescription status</div>
+                            <div class="rounded-3 bg-white px-3 py-2 border">Compare dosage, price, and availability in one view</div>
+                            <div class="rounded-3 bg-white px-3 py-2 border">Get refill reminders before your next supply runs out</div>
                         </div>
-                    {% else %}
-                    <div class="alert alert-info mb-0"><i class="fas fa-inbox"></i> No medicines in stock at the moment.</div>
-                    {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Order History -->
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-header" style="background-color: var(--primary); color: white;">
-                    <h5 class="mb-0"><i class="fas fa-history"></i> My Orders</h5>
+    <section class="page-card">
+        <div class="card-body">
+            <div class="section-heading">
+                <h4>Find what you need</h4>
+                <span class="info-badge"><i class="fas fa-search"></i> Smart filters</span>
+            </div>
+            <form class="row g-3">
+                <div class="col-lg-4">
+                    <label class="form-label" for="pharmacy-search">Search medicines</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input class="form-control" id="pharmacy-search" type="text" placeholder="Search by name, brand, condition, or status">
+                    </div>
                 </div>
-                <div class="card-body" style="max-height: 600px; overflow-y: auto;">
-                    {% if orders %}
-                        {% for order in orders %}
-                        <div class="border-bottom pb-3 mb-3">
-                            <p class="mb-1"><strong>{{ order.medicine.name }}</strong></p>
-                            <p class="mb-1 text-muted small">Qty: {{ order.quantity }}</p>
-                            <p class="mb-1 text-muted small">{{ order.created_at.strftime('%d %b %Y') }}</p>
-                            <p class="mb-2"><strong>GHS {{ order.total_price }}</strong></p>
-                            <span class="badge {% if order.status == 'delivered' %}bg-success{% elif order.status == 'shipped' %}bg-info{% elif order.status == 'cancelled' %}bg-danger{% else %}bg-warning{% endif %}">
-                                {{ order.status.title() }}
-                            </span>
+                <div class="col-lg-3">
+                    <label class="form-label" for="pharmacy-category">Category</label>
+                    <select class="form-select" id="pharmacy-category">
+                        <option>All categories</option>
+                        {% for category in categories %}
+                        <option>{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-lg-3">
+                    <label class="form-label" for="pharmacy-status">Prescription status</label>
+                    <select class="form-select" id="pharmacy-status">
+                        <option>Any</option>
+                        <option>Prescription required</option>
+                        <option>OTC</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 d-flex align-items-end">
+                    <button class="btn btn-primary w-100" type="button"><i class="fas fa-sliders-h me-2"></i>Apply</button>
+                </div>
+            </form>
+            <div class="pill-list mt-4">
+                {% for category in categories %}
+                <span class="pill-chip"><i class="{{ category.icon }} me-1"></i>{{ category.name }} · {{ category.count }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section id="catalog" class="row g-4">
+        <div class="col-lg-8">
+            <div class="page-card h-100">
+                <div class="card-body">
+                    <div class="section-heading">
+                        <h4>Featured medicines</h4>
+                        <span class="info-badge"><i class="fas fa-store"></i> Pharmacy catalog</span>
+                    </div>
+                    <div class="row g-4">
+                        {% for item in catalog_items %}
+                        <div class="col-md-6">
+                            <article class="border rounded-4 p-3 h-100 bg-light">
+                                <img src="{{ item.image }}" alt="{{ item.name }}" class="img-fluid rounded-3 mb-3" style="height: 170px; width: 100%; object-fit: cover;">
+                                <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                    <div>
+                                        <div class="fw-semibold">{{ item.name }}</div>
+                                        <div class="small text-muted">{{ item.category }}</div>
+                                    </div>
+                                    <span class="badge bg-success">{{ item.availability }}</span>
+                                </div>
+                                <div class="small text-muted mb-2">{{ item.dosage }}</div>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="fw-bold text-primary">{{ item.price }}</span>
+                                    <span class="small"><i class="fas fa-star text-warning"></i> {{ item.rating }}</span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-primary btn-sm flex-grow-1" type="button"><i class="fas fa-eye me-1"></i>View Details</button>
+                                    <button class="btn btn-primary btn-sm flex-grow-1" type="button"><i class="fas fa-cart-plus me-1"></i>Add to Cart</button>
+                                </div>
+                            </article>
                         </div>
                         {% endfor %}
-                    {% else %}
-                    <p class="text-muted text-center">No orders yet</p>
-                    {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+        <div class="col-lg-4">
+            <div class="page-card h-100">
+                <div class="card-body">
+                    <div class="section-heading">
+                        <h4>Medicine details</h4>
+                        <span class="info-badge"><i class="fas fa-info-circle"></i> Spotlight</span>
+                    </div>
+                    <div class="metric-card mb-3">
+                        <h6 class="text-primary">{{ featured_medicine.name }}</h6>
+                        <div class="small text-muted mb-2">{{ featured_medicine.category }} · {{ featured_medicine.dosage }}</div>
+                        <p class="small text-muted mb-2">{{ featured_medicine.description }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">{{ featured_medicine.price }}</span>
+                            <span class="small"><i class="fas fa-star text-warning"></i> {{ featured_medicine.rating }}</span>
+                        </div>
+                    </div>
+                    <div class="metric-card mb-3">
+                        <div class="fw-semibold mb-2">How to use</div>
+                        <div class="small text-muted">{{ featured_medicine.instructions }}</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="fw-semibold mb-2">Prescription requirements</div>
+                        <div class="small text-muted">{{ 'Requires a valid prescription upload before checkout.' if featured_medicine.requires_prescription else 'No prescription required for this item.' }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="prescriptions" class="row g-4">
+        <div class="col-lg-6">
+            <div class="page-card h-100">
+                <div class="card-body">
+                    <div class="section-heading">
+                        <h4>Upload prescription</h4>
+                        <span class="info-badge"><i class="fas fa-upload"></i> Secure upload</span>
+                    </div>
+                    <form class="needs-loading">
+                        <div class="mb-3">
+                            <label class="form-label" for="prescription-file">Upload prescription</label>
+                            <input class="form-control" id="prescription-file" type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="doctor-notes">Notes for pharmacist</label>
+                            <textarea class="form-control" id="doctor-notes" rows="3" placeholder="Add dosage instructions or concerns"></textarea>
+                        </div>
+                        <button class="btn btn-primary w-100" type="button"><i class="fas fa-cloud-upload-alt me-2"></i>Submit prescription</button>
+                    </form>
+                    <div class="metric-card mt-3">
+                        <div class="fw-semibold mb-2">Prescription status</div>
+                        <div class="small text-muted">Pending Review · Approved · Rejected</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="page-card h-100">
+                <div class="card-body">
+                    <div class="section-heading">
+                        <h4>My prescriptions</h4>
+                        <span class="info-badge"><i class="fas fa-notes-medical"></i> Refill ready</span>
+                    </div>
+                    <div class="border rounded-4 p-3 mb-3 bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-semibold">Lisinopril 10mg</div>
+                                <div class="small text-muted">Next refill in 6 days</div>
+                            </div>
+                            <span class="badge bg-success">Active</span>
+                        </div>
+                    </div>
+                    <div class="border rounded-4 p-3 mb-3 bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-semibold">Metformin 500mg</div>
+                                <div class="small text-muted">Prescription history available</div>
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm" type="button">Request refill</button>
+                        </div>
+                    </div>
+                    <div class="empty-state">Medication reminders can be sent before your current supply runs low.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-4">
+        <div class="col-lg-7">
+            <div class="page-card h-100">
+                <div class="card-body">
+                    <div class="section-heading">
+                        <h4>Cart & checkout</h4>
+                        <span class="info-badge"><i class="fas fa-credit-card"></i> Secure payment</span>
+                    </div>
+                    <div class="border rounded-4 p-3 mb-3 bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-semibold">Paracetamol 500mg</div>
+                                <div class="small text-muted">Quantity 2 · Delivery</div>
+                            </div>
+                            <div class="fw-semibold">GHS 24.00</div>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="discount-code">Discount code</label>
+                            <input class="form-control" id="discount-code" placeholder="ENTER10">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="delivery-method">Delivery method</label>
+                            <select class="form-select" id="delivery-method">
+                                <option>Home delivery</option>
+                                <option>Pickup</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Payment method</label>
+                            <div class="pill-list">
+                                <span class="pill-chip"><i class="fas fa-mobile-alt me-1"></i>Mobile money</span>
+                                <span class="pill-chip"><i class="fas fa-credit-card me-1"></i>Card</span>
+                                <span class="pill-chip"><i class="fas fa-wallet me-1"></i>Cash on delivery</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary mt-3" type="button"><i class="fas fa-lock me-2"></i>Place secure order</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="page-card h-100">
+                <div class="card-body">
+                    <div class="section-heading">
+                        <h4>Order tracking</h4>
+                        <span class="info-badge"><i class="fas fa-map-marker-alt"></i> Live updates</span>
+                    </div>
+                    {% for order in order_history %}
+                    <div class="border rounded-4 p-3 mb-3 bg-light">
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <div>
+                                <div class="fw-semibold">{{ order.id }}</div>
+                                <div class="small text-muted">{{ order.product }}</div>
+                            </div>
+                            <span class="badge bg-success">{{ order.status }}</span>
+                        </div>
+                        <div class="small text-muted mt-2">{{ order.eta }}</div>
+                        <div class="small fw-semibold mt-2">{{ order.amount }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="page-card">
+        <div class="card-body">
+            <div class="section-heading">
+                <h4>Why patients choose HealthFlow Pharmacy</h4>
+                <span class="info-badge"><i class="fas fa-heart"></i> Care-first services</span>
+            </div>
+            <div class="row g-4">
+                {% for service in services %}
+                <div class="col-md-4">
+                    <div class="metric-card h-100">
+                        <h6 class="text-primary">{{ service.title }}</h6>
+                        <p class="small text-muted mb-0 mt-2">{{ service.description }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-4">
+        <div class="col-lg-7">
+            <div class="page-card h-100">
+                <div class="card-body">
+                    <div class="section-heading">
+                        <h4>Frequently asked questions</h4>
+                        <span class="info-badge"><i class="fas fa-question-circle"></i> Helpful answers</span>
+                    </div>
+                    <div class="d-grid gap-3">
+                        {% for faq in faqs %}
+                        <div class="border rounded-4 p-3 bg-light">
+                            <div class="fw-semibold mb-1">{{ faq.question }}</div>
+                            <div class="small text-muted">{{ faq.answer }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="page-card h-100">
+                <div class="card-body">
+                    <div class="section-heading">
+                        <h4>Patient testimonials</h4>
+                        <span class="info-badge"><i class="fas fa-comments"></i> Community</span>
+                    </div>
+                    {% for testimonial in testimonials %}
+                    <div class="metric-card mb-3">
+                        <div class="fw-semibold mb-2">{{ testimonial.name }}</div>
+                        <div class="small text-muted">“{{ testimonial.quote }}”</div>
+                    </div>
+                    {% endfor %}
+                    <div class="mt-3">
+                        <a href="#catalog" class="btn btn-primary w-100"><i class="fas fa-pills me-2"></i>Order safely with HealthFlow</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 {% endblock %}

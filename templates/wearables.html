@@ -1,57 +1,80 @@
 {% extends 'base.html' %}
 {% block title %}Wearable Integration{% endblock %}
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-11">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h3 class="mb-1">Wearable Device Integration</h3>
-                    <p class="text-muted mb-0">Sync smartwatch and fitness tracker data manually.</p>
-                </div>
-                <a href="{{ url_for('patient_tools') }}" class="btn btn-outline-primary">Patient Tools</a>
-            </div>
-            <div class="row g-4">
-                <div class="col-lg-4">
-                    <div class="card summary-card h-100">
-                        <div class="card-header bg-white border-0"><h5 class="mb-0 text-primary">Sync Data</h5></div>
-                        <div class="card-body">
-                            <form method="POST" class="needs-loading needs-validation" novalidate>
-                                <div class="mb-3"><label class="form-label">Device Name</label><input type="text" class="form-control" name="device_name" required></div>
-                                <div class="mb-3"><label class="form-label">Heart Rate</label><input type="number" class="form-control" name="heart_rate"></div>
-                                <div class="mb-3"><label class="form-label">Steps</label><input type="number" class="form-control" name="steps"></div>
-                                <div class="mb-3"><label class="form-label">Sleep Hours</label><input type="number" step="0.1" class="form-control" name="sleep_hours"></div>
-                                <button class="btn btn-primary w-100" type="submit">Save Snapshot</button>
-                            </form>
-                        </div>
+{% include 'partials/page_hero.html' with context %}
+<div class="page-shell">
+    <section class="page-card">
+        <div class="card-body">
+            <div class="row g-4 align-items-start">
+                <div class="col-lg-7">
+                    <div class="info-badge mb-3"><i class="fas fa-watch"></i> Connected wellness</div>
+                    <h3 class="mb-3">Bring wearable data into your care plan and review daily trends in a single dashboard.</h3>
+                    <p class="text-muted mb-4">HealthFlow can surface heart rate, steps, sleep, and activity snapshots to create a more complete picture of your day-to-day health.</p>
+                    <div class="pill-list">
+                        <span class="pill-chip"><i class="fas fa-heartbeat me-1"></i>Heart rate</span>
+                        <span class="pill-chip"><i class="fas fa-shoe-prints me-1"></i>Steps</span>
+                        <span class="pill-chip"><i class="fas fa-bed me-1"></i>Sleep</span>
                     </div>
                 </div>
-                <div class="col-lg-8">
-                    <div class="card summary-card">
-                        <div class="card-header bg-white border-0"><h5 class="mb-0 text-primary">Synced Readings</h5></div>
-                        <div class="card-body">
-                            {% if snapshots %}
-                                <div class="row g-3">
-                                    {% for snapshot in snapshots %}
-                                    <div class="col-md-6">
-                                        <div class="border rounded p-3 bg-white h-100">
-                                            <strong>{{ snapshot.device_name }}</strong>
-                                            <div class="small text-muted">{{ snapshot.recorded_at.strftime('%b %d, %Y %I:%M %p') }}</div>
-                                            <div class="small text-muted">Heart rate: {{ snapshot.heart_rate or 'N/A' }}</div>
-                                            <div class="small text-muted">Steps: {{ snapshot.steps or 'N/A' }}</div>
-                                            <div class="small text-muted">Sleep: {{ snapshot.sleep_hours or 'N/A' }} hrs</div>
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <p class="text-muted mb-0">No wearable readings synced yet.</p>
-                            {% endif %}
+                <div class="col-lg-5">
+                    <div class="card-soft p-4">
+                        <h5 class="mb-3">Connected devices</h5>
+                        <div class="d-grid gap-2">
+                            <div class="rounded-3 bg-white px-3 py-2 border">Apple Watch</div>
+                            <div class="rounded-3 bg-white px-3 py-2 border">Fitbit</div>
+                            <div class="rounded-3 bg-white px-3 py-2 border">Garmin</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <section class="row g-4">
+        <div class="col-lg-4">
+            <div class="page-card h-100">
+                <div class="card-body">
+                    <div class="section-heading">
+                        <h4>Sync device data</h4>
+                        <span class="info-badge"><i class="fas fa-sync"></i> Connect</span>
+                    </div>
+                    <form method="POST" class="needs-loading needs-validation" novalidate>
+                        <div class="mb-3"><label class="form-label">Device name</label><input type="text" class="form-control" name="device_name" required></div>
+                        <div class="mb-3"><label class="form-label">Heart rate</label><input type="number" class="form-control" name="heart_rate"></div>
+                        <div class="mb-3"><label class="form-label">Steps</label><input type="number" class="form-control" name="steps"></div>
+                        <div class="mb-3"><label class="form-label">Sleep hours</label><input type="number" step="0.1" class="form-control" name="sleep_hours"></div>
+                        <button class="btn btn-primary w-100" type="submit">Save snapshot</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="page-card h-100">
+                <div class="card-body">
+                    <div class="section-heading">
+                        <h4>Synced readings</h4>
+                        <span class="info-badge"><i class="fas fa-chart-line"></i> Insights</span>
+                    </div>
+                    {% if snapshots %}
+                        <div class="row g-3">
+                            {% for snapshot in snapshots %}
+                            <div class="col-md-6">
+                                <div class="border rounded-4 p-3 bg-light h-100">
+                                    <strong>{{ snapshot.device_name }}</strong>
+                                    <div class="small text-muted">{{ snapshot.recorded_at.strftime('%b %d, %Y %I:%M %p') }}</div>
+                                    <div class="small text-muted">Heart rate: {{ snapshot.heart_rate or 'N/A' }}</div>
+                                    <div class="small text-muted">Steps: {{ snapshot.steps or 'N/A' }}</div>
+                                    <div class="small text-muted">Sleep: {{ snapshot.sleep_hours or 'N/A' }} hrs</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">No wearable readings synced yet. Connect a device to start seeing your trends.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 {% endblock %}
