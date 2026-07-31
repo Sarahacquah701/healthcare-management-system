@@ -23,18 +23,20 @@
     </div>
     <div class="row g-4">
         <div class="col-md-4">
+            <a href="{{ url_for('book_appointment') }}" class="text-decoration-none text-dark"></a>
             <div class="card card-modern h-100 text-center">
                 <div class="card-body">
-                    <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Appointment booking" class="img-fluid rounded-3 mb-3 img-hover">
+                    <img src="/static/booking.jpg" alt="Appointment booking" class="img-fluid rounded-3 mb-3 img-hover">
                     <h5 class="card-title">{{ _('Appointment Booking') }}</h5>
                     <p class="card-text">{{ _('Schedule appointments with your preferred doctors at your convenience.') }}</p>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
+            <a href="{{ url_for('join_queue') }}" class="text-decoration-none text-dark"></a>
             <div class="card card-modern h-100 text-center">
                 <div class="card-body">
-                    <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Queue management" class="img-fluid rounded-3 mb-3 img-hover">
+                    <img src="/static/Appointment_Booking.jpg" alt="Queue management" class="img-fluid rounded-3 mb-3 img-hover">
                     <h5 class="card-title">{{ _('Queue Management') }}</h5>
                     <p class="card-text">{{ _('Efficient queue system with real-time updates and wait time estimation.') }}</p>
                 </div>
@@ -53,7 +55,7 @@
             <a href="{{ url_for('symptom_checker') }}" class="text-decoration-none text-dark">
                 <div class="card card-modern h-100 text-center service-card">
                     <div class="card-body">
-                        <img src="https://images.unsplash.com/photo-1584634731339-2520f0f5b5b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Symptom checker" class="img-fluid rounded-3 mb-3 img-hover">
+                        <img src="/static/symptom.jpg" alt="Symptom checker" class="img-fluid rounded-3 mb-3 img-hover">
                         <h5 class="card-title">{{ _('AI Symptom Checker') }}</h5>
                         <p class="card-text">{{ _('Get guided next-step advice based on your symptoms before booking.') }}</p>
                     </div>
@@ -96,7 +98,7 @@
             <a href="{{ url_for('health_records') }}" class="text-decoration-none text-dark">
                 <div class="card card-modern h-100 text-center service-card">
                     <div class="card-body">
-                        <img src="https://images.unsplash.com/photo-1583912267550-d96d7f9c0b35?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Health records" class="img-fluid rounded-3 mb-3 img-hover">
+                        <img src="/static/Medical.jpg" alt="Health records" class="img-fluid rounded-3 mb-3 img-hover">
                         <h5 class="card-title">{{ _('Health Records') }}</h5>
                         <p class="card-text">{{ _('Store reports, prescriptions, and medical history in one secure place.') }}</p>
                     </div>
@@ -137,15 +139,15 @@
 <!-- Doctors Section -->
 <section id="doctors" class="mb-5 fade-in-section">
     <div class="text-center mb-5">
-        <h2 class="section-title text-primary">{{ _('Meet Our Doctors') }}</h2>
-        <p class="section-subtitle">{{ _('Experienced healthcare professionals dedicated to your well-being') }}</p>
+        <h2 class="section-title text-primary">{{ _('Find the Right HealthCare Professional') }}</h2>
+        <p class="section-subtitle">{{ _('Browse verified doctors from different hospitals and clinics') }}</p>
     </div>
     <div class="row g-4">
         <div class="col-md-4">
             <div class="card card-modern text-center">
-                <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" class="card-img-top rounded-top img-hover" alt="Dr. Sarah Johnson">
+                <img src="/static/dr,sarah.jpg" class="card-img-top rounded-top img-hover"style="height: 250px; object-fit: cover;" alt="Dr. Sarah Johnson">
                 <div class="card-body">
-                    <h5 class="card-title">Dr. Sarah Johnson</h5>
+                    <h5 class="card-title">Dr. Smith Johnson</h5>
                     <p class="card-text text-muted">Cardiologist</p>
                     <p class="card-text">Specializing in heart health with over 15 years of experience.</p>
                 </div>
@@ -153,7 +155,7 @@
         </div>
         <div class="col-md-4">
             <div class="card card-modern text-center">
-                <img src="https://images.unsplash.com/photo-1594824804732-ca8db723f8fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" class="card-img-top rounded-top img-hover" alt="Dr. Michael Chen">
+                <img src="/static/neurologist.jpg" class="card-img-top rounded-top img-hover" style="height: 250px; object-fit: cover;" alt="Dr. Michael Chen">
                 <div class="card-body">
                     <h5 class="card-title">Dr. Michael Chen</h5>
                     <p class="card-text text-muted">Neurologist</p>
@@ -163,7 +165,7 @@
         </div>
         <div class="col-md-4">
             <div class="card card-modern text-center">
-                <img src="https://picsum.photos/id/102/300/200" class="card-img-top rounded-top img-hover" alt="Dr. Emily Rodriguez">
+                <img src="/static/nurse.jpg" class="card-img-top rounded-top img-hover" style="height: 250px; object-fit: cover;" alt="Dr. Emily Rodriguez">
                 <div class="card-body">
                     <h5 class="card-title">Dr. Emily Rodriguez</h5>
                     <p class="card-text text-muted">Pediatrician</p>
@@ -258,7 +260,7 @@
                     </div>
                     <p class="card-text">{{ _('"The doctors are amazing and the system makes everything so smooth. No more long waits or confusion. Highly recommend HealthFlow!"') }}</p>
                     <div class="text-warning">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                     </div>
                 </div>
             </div>

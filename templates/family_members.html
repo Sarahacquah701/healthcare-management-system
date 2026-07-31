@@ -1,106 +1,90 @@
 {% extends 'base.html' %}
 {% block title %}Family Members{% endblock %}
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-11">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-                <div>
-                    <h3 class="mb-1">Family Member Accounts</h3>
-                    <p class="text-muted mb-0">Manage dependents you can book appointments for.</p>
-                </div>
-                <div class="d-flex gap-2">
-                    <a href="{{ url_for('profile') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-user-cog me-2"></i>Profile
-                    </a>
-                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
-                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
-                    </a>
-                </div>
-            </div>
-
-            <div class="row g-4">
-                <div class="col-lg-5">
-                    <div class="card summary-card h-100">
-                        <div class="card-header bg-white border-0">
-                            <h5 class="mb-0 text-primary"><i class="fas fa-user-plus me-2"></i>Add Family Member</h5>
-                        </div>
-                        <div class="card-body">
-                            <form method="POST" class="needs-validation needs-loading" novalidate>
-                                <div class="mb-3">
-                                    <label for="name" class="form-label">Name</label>
-                                    <input type="text" class="form-control" id="name" name="name" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="relationship" class="form-label">Relationship</label>
-                                    <input type="text" class="form-control" id="relationship" name="relationship" placeholder="Spouse, child, parent" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="phone_number" class="form-label">Phone Number</label>
-                                    <input type="tel" class="form-control" id="phone_number" name="phone_number">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="date_of_birth" class="form-label">Date of Birth</label>
-                                    <input type="date" class="form-control" id="date_of_birth" name="date_of_birth">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="gender" class="form-label">Gender</label>
-                                    <select class="form-select" id="gender" name="gender">
-                                        <option value="">Select</option>
-                                        <option value="female">Female</option>
-                                        <option value="male">Male</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="notes" class="form-label">Notes</label>
-                                    <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Allergies, care preferences, or other notes"></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary w-100">
-                                    <i class="fas fa-save me-2"></i>Save Family Member
-                                </button>
-                            </form>
-                        </div>
+{% include 'partials/page_hero.html' with context %}
+<div class="page-shell">
+    <section class="page-card">
+        <div class="card-body">
+            <div class="row g-4 align-items-start">
+                <div class="col-lg-7">
+                    <div class="info-badge mb-3"><i class="fas fa-users"></i> Care coordination</div>
+                    <h3 class="mb-3">Manage family profiles and keep care plans clear for dependents, parents, and partners.</h3>
+                    <p class="text-muted mb-4">Create shared member profiles, assign relationships, and simplify appointment management across everyone you care for.</p>
+                    <div class="pill-list">
+                        <span class="pill-chip"><i class="fas fa-user-plus me-1"></i>Add dependents</span>
+                        <span class="pill-chip"><i class="fas fa-calendar-check me-1"></i>Book for others</span>
+                        <span class="pill-chip"><i class="fas fa-file-medical me-1"></i>Shared notes</span>
                     </div>
                 </div>
-
-                <div class="col-lg-7">
-                    <div class="card summary-card">
-                        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0 text-primary"><i class="fas fa-users me-2"></i>Saved Family Members</h5>
-                            <a href="{{ url_for('book_appointment') }}" class="btn btn-sm btn-outline-primary">Use in Booking</a>
-                        </div>
-                        <div class="card-body">
-                            {% if family_members %}
-                                <div class="row g-3">
-                                    {% for member in family_members %}
-                                    <div class="col-md-6">
-                                        <div class="p-3 rounded border h-100 bg-white">
-                                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                                <div>
-                                                    <h6 class="mb-1">{{ member.name }}</h6>
-                                                    <div class="text-muted small">{{ member.relationship|title }}</div>
-                                                </div>
-                                                <span class="badge bg-primary-soft text-primary">{{ member.gender|title if member.gender else 'Profile' }}</span>
-                                            </div>
-                                            <div class="small text-muted mb-1">{{ member.phone_number or 'No phone provided' }}</div>
-                                            <div class="small text-muted mb-1">{{ member.date_of_birth.strftime('%b %d, %Y') if member.date_of_birth else 'No date of birth' }}</div>
-                                            <div class="small mb-3">{{ member.notes or 'No notes saved' }}</div>
-                                            <form method="POST" action="{{ url_for('delete_family_member', family_member_id=member.id) }}" onsubmit="return confirm('Remove this family member?')">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger w-100">Remove</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <p class="text-muted mb-0">No family members saved yet. Add one to book appointments for dependents.</p>
-                            {% endif %}
+                <div class="col-lg-5">
+                    <div class="card-soft p-4">
+                        <h5 class="mb-3">Care summary</h5>
+                        <div class="d-grid gap-2">
+                            <div class="rounded-3 bg-white px-3 py-2 border">1-click booking for dependents</div>
+                            <div class="rounded-3 bg-white px-3 py-2 border">Shared contact and notes</div>
+                            <div class="rounded-3 bg-white px-3 py-2 border">Simple profile switching</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <section class="row g-4">
+        <div class="col-lg-5">
+            <div class="page-card h-100">
+                <div class="card-body">
+                    <div class="section-heading">
+                        <h4>Add family member</h4>
+                        <span class="info-badge"><i class="fas fa-user-plus"></i> New profile</span>
+                    </div>
+                    <form method="POST" class="needs-validation needs-loading" novalidate>
+                        <div class="mb-3"><label for="name" class="form-label">Name</label><input type="text" class="form-control" id="name" name="name" required></div>
+                        <div class="mb-3"><label for="relationship" class="form-label">Relationship</label><input type="text" class="form-control" id="relationship" name="relationship" placeholder="Spouse, child, parent" required></div>
+                        <div class="mb-3"><label for="phone_number" class="form-label">Phone number</label><input type="tel" class="form-control" id="phone_number" name="phone_number"></div>
+                        <div class="mb-3"><label for="date_of_birth" class="form-label">Date of birth</label><input type="date" class="form-control" id="date_of_birth" name="date_of_birth"></div>
+                        <div class="mb-3"><label for="gender" class="form-label">Gender</label><select class="form-select" id="gender" name="gender"><option value="">Select</option><option value="female">Female</option><option value="male">Male</option><option value="other">Other</option></select></div>
+                        <div class="mb-3"><label for="notes" class="form-label">Notes</label><textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Allergies, care preferences, or other notes"></textarea></div>
+                        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-save me-2"></i>Save family member</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="page-card h-100">
+                <div class="card-body">
+                    <div class="section-heading">
+                        <h4>Saved profiles</h4>
+                        <span class="info-badge"><i class="fas fa-users"></i> {{ family_members|length }} members</span>
+                    </div>
+                    {% if family_members %}
+                        <div class="row g-3">
+                            {% for member in family_members %}
+                            <div class="col-md-6">
+                                <div class="border rounded-4 p-3 h-100 bg-light">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <h6 class="mb-1">{{ member.name }}</h6>
+                                            <div class="text-muted small">{{ member.relationship|title }}</div>
+                                        </div>
+                                        <span class="badge bg-primary-soft text-primary">{{ member.gender|title if member.gender else 'Profile' }}</span>
+                                    </div>
+                                    <div class="small text-muted mb-1">{{ member.phone_number or 'No phone provided' }}</div>
+                                    <div class="small text-muted mb-1">{{ member.date_of_birth.strftime('%b %d, %Y') if member.date_of_birth else 'No date of birth' }}</div>
+                                    <div class="small mb-3">{{ member.notes or 'No notes saved' }}</div>
+                                    <form method="POST" action="{{ url_for('delete_family_member', family_member_id=member.id) }}" onsubmit="return confirm('Remove this family member?')">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger w-100">Remove</button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">No family members saved yet. Add one to manage appointments and notes for dependents.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 {% endblock %}

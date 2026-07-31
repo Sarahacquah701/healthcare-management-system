@@ -33,11 +33,29 @@
             background: var(--bg);
             color: var(--text);
         }
-        .navbar { background: rgba(255,255,255,0.96); backdrop-filter: blur(12px); }
-        .navbar .nav-link { color: var(--text); }
+        .navbar { background: rgba(255,255,255,0.96); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(29,111,165,.08); }
+        .navbar .nav-link { color: var(--text); font-weight: 600; padding: 0.68rem 0.95rem; border-radius: 999px; transition: all .2s ease; }
         .navbar .nav-link:hover,
-        .navbar .nav-link.active { color: var(--primary); }
-        .navbar-brand { font-weight: 700; color: var(--primary); }
+        .navbar .nav-link:focus,
+        .navbar .nav-link.active { color: var(--primary); background: var(--primary-soft); }
+        .navbar-brand { font-weight: 700; color: var(--primary); letter-spacing: -0.02em; }
+        .navbar .dropdown-menu { border: 1px solid rgba(29,111,165,.10); border-radius: 18px; box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08); padding: 0.6rem; margin-top: 0.45rem; display: none; position: absolute; z-index: 1050; min-width: 240px; }
+        .navbar .dropdown-menu.show { display: block; }
+        .navbar .dropdown-item { border-radius: 12px; padding: 0.7rem 0.85rem; color: var(--text); transition: all .2s ease; }
+        .navbar .dropdown-item:hover { background: var(--primary-soft); color: var(--primary); }
+        .navbar .dropdown-header { color: var(--primary); font-size: 0.78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 0.2rem 0.85rem 0.25rem; }
+        .navbar .mobile-submenu { padding: 0.2rem 0 0.4rem 0.5rem; }
+        .navbar .mobile-submenu a { display: block; padding: 0.6rem 0.75rem; border-radius: 12px; color: var(--text); text-decoration: none; transition: all .2s ease; }
+        .navbar .mobile-submenu a:hover { background: var(--primary-soft); color: var(--primary); }
+        .navbar .nav-cta { background: linear-gradient(135deg, #1d6fa5, #2d98d1); color: #fff !important; box-shadow: 0 10px 24px rgba(29,111,165,.18); }
+        .navbar .nav-cta:hover { color: #fff !important; transform: translateY(-1px); }
+        @media (max-width: 991px) {
+            .navbar-collapse { padding-top: 0.75rem; }
+            .navbar-nav .nav-item { width: 100%; }
+            .navbar .nav-link { padding: 0.8rem 0.95rem; }
+            .navbar .dropdown-menu { box-shadow: none; border: none; padding: 0.2rem 0 0.2rem 0.5rem; margin-top: 0; background: transparent; }
+            .navbar .dropdown-item { padding-left: 1rem; }
+        }
         .hero {
             background: linear-gradient(135deg, #f4fbff 0%, #eaf7ef 100%);
             border-radius: 28px;
@@ -49,6 +67,19 @@
         .section-subtitle { color: var(--muted); }
         .card-soft { background: var(--surface-soft); border: 1px solid rgba(34, 112, 98, 0.08); border-radius: 24px; }
         .card-soft .card-body { padding: 2rem; }
+        .page-shell { display: flex; flex-direction: column; gap: 1.5rem; }
+        .page-card { background: var(--surface); border: 1px solid rgba(29,111,165,.08); border-radius: 24px; box-shadow: 0 14px 38px rgba(15, 23, 42, 0.06); }
+        .page-card .card-body { padding: 1.5rem; }
+        .section-heading { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .section-heading h4 { margin: 0; font-size: 1.15rem; font-weight: 700; }
+        .info-badge { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.45rem 0.8rem; border-radius: 999px; background: var(--primary-soft); color: var(--primary); font-size: 0.85rem; font-weight: 600; }
+        .metric-card { border-radius: 18px; padding: 1rem; background: linear-gradient(135deg, #fff 0%, #f2fbff 100%); border: 1px solid rgba(29,111,165,.08); }
+        .pill-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .pill-chip { padding: 0.4rem 0.75rem; border-radius: 999px; background: #f3fbf5; border: 1px solid rgba(31,139,105,.12); color: #0f766e; font-size: 0.85rem; }
+        .empty-state { border: 1px dashed var(--border); border-radius: 16px; padding: 1.2rem; color: var(--muted); background: #fafdfb; }
+        .timeline-item { position: relative; padding-left: 1.3rem; margin-left: 0.25rem; border-left: 2px solid rgba(29,111,165,.16); }
+        .timeline-item::before { content: ''; position: absolute; left: -0.4rem; top: 0.2rem; width: 0.7rem; height: 0.7rem; border-radius: 999px; background: var(--primary); }
+        .quick-chip { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.7rem; border-radius: 999px; background: #f8fafc; border: 1px solid var(--border); color: var(--text); font-size: 0.85rem; }
         .doctor-card, .stats-card { border-radius: 24px; transition: transform .25s ease, box-shadow .25s ease; }
         .doctor-card:hover, .stats-card:hover { transform: translateY(-3px); box-shadow: 0 18px 40px rgba(31, 74, 109, 0.12); }
         .feature-card, .doctor-card { background: var(--surface); border: none; }
@@ -248,43 +279,130 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item"><a class="nav-link" data-i18n="nav.home" href="{{ url_for('home') }}">{{ _('Home') }}</a></li>
-                <li class="nav-item"><a class="nav-link" data-i18n="nav.book" href="{{ url_for('book_appointment') }}">{{ _('Book Appointment') }}</a></li>
+                <li class="nav-item"><a class="nav-link" data-i18n="nav.book" href="{{ url_for('book_appointment') }}">{{ _('Appointments') }}</a></li>
                 <li class="nav-item"><a class="nav-link" data-i18n="nav.doctors" href="{{ url_for('doctors_directory') }}">{{ _('Doctors') }}</a></li>
-                <li class="nav-item"><a class="nav-link" data-i18n="nav.symptom" href="{{ url_for('symptom_checker') }}">{{ _('Symptom Checker') }}</a></li>
-                <li class="nav-item"><a class="nav-link" data-i18n="nav.support" href="{{ url_for('support') }}">{{ _('Support') }}</a></li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link d-none d-lg-flex align-items-center dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ _('Services') }}</a>
+                    <button class="nav-link d-lg-none w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#servicesMenu" aria-expanded="false" aria-controls="servicesMenu">
+                        <span>{{ _('Services') }}</span>
+                    </button>
+                    <div class="collapse d-lg-none" id="servicesMenu">
+                        <div class="mobile-submenu">
+                            <a href="{{ url_for('pharmacy') }}">Online Pharmacy</a>
+                            <a href="{{ url_for('lab_tests') }}">Lab Tests</a>
+                            <a href="{{ url_for('blood_donation') }}">Blood Donation</a>
+                            <a href="{{ url_for('vaccinations') }}">Vaccination</a>
+                            <a href="{{ url_for('insurance') }}">Insurance</a>
+                            <a href="{{ url_for('billing') }}">Billing</a>
+                            <a href="{{ url_for('symptom_checker') }}">Symptom Checker</a>
+                        </div>
+                    </div>
+                    <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
+                        <li><h6 class="dropdown-header">Care services</h6></li>
+                        <li><a class="dropdown-item" href="{{ url_for('pharmacy') }}">Online Pharmacy</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('lab_tests') }}">Lab Tests</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('blood_donation') }}">Blood Donation</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('vaccinations') }}">Vaccination</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('insurance') }}">Insurance</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('billing') }}">Billing</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('symptom_checker') }}">Symptom Checker</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link d-none d-lg-flex align-items-center dropdown-toggle" href="#" id="portalDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ _('Patient Portal') }}</a>
+                    <button class="nav-link d-lg-none w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#portalMenu" aria-expanded="false" aria-controls="portalMenu">
+                        <span>{{ _('Patient Portal') }}</span>
+                    </button>
+                    <div class="collapse d-lg-none" id="portalMenu">
+                        <div class="mobile-submenu">
+                            <a href="{{ url_for('health_records') }}">Health Records</a>
+                            <a href="{{ url_for('medical_history') }}">Medical History</a>
+                            <a href="{{ url_for('reminders') }}">Reminders</a>
+                            <a href="{{ url_for('wellness_dashboard') }}">Wellness Dashboard</a>
+                            <a href="{{ url_for('family_members') }}">Family Members</a>
+                            <a href="{{ url_for('wearables') }}">Wearables</a>
+                            <a href="{{ url_for('language_support') }}">Language Support</a>
+                        </div>
+                    </div>
+                    <ul class="dropdown-menu" aria-labelledby="portalDropdown">
+                        <li><h6 class="dropdown-header">Portal tools</h6></li>
+                        <li><a class="dropdown-item" href="{{ url_for('health_records') }}">Health Records</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('medical_history') }}">Medical History</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('reminders') }}">Reminders</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('wellness_dashboard') }}">Wellness Dashboard</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('family_members') }}">Family Members</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('wearables') }}">Wearables</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('language_support') }}">Language Support</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link d-none d-lg-flex align-items-center dropdown-toggle" href="#" id="communityDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ _('Community') }}</a>
+                    <button class="nav-link d-lg-none w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#communityMenu" aria-expanded="false" aria-controls="communityMenu">
+                        <span>{{ _('Community') }}</span>
+                    </button>
+                    <div class="collapse d-lg-none" id="communityMenu">
+                        <div class="mobile-submenu">
+                            <a href="{{ url_for('chat_consultation') }}">Chat Consultation</a>
+                            <a href="{{ url_for('forum') }}">Community Forum</a>
+                            <a href="{{ url_for('emergency_sos') }}">Emergency SOS</a>
+                        </div>
+                    </div>
+                    <ul class="dropdown-menu" aria-labelledby="communityDropdown">
+                        <li><h6 class="dropdown-header">Community</h6></li>
+                        <li><a class="dropdown-item" href="{{ url_for('chat_consultation') }}">Chat Consultation</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('forum') }}">Community Forum</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('emergency_sos') }}">Emergency SOS</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link d-none d-lg-flex align-items-center dropdown-toggle" href="#" id="supportDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ _('Support') }}</a>
+                    <button class="nav-link d-lg-none w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#supportMenu" aria-expanded="false" aria-controls="supportMenu">
+                        <span>{{ _('Support') }}</span>
+                    </button>
+                    <div class="collapse d-lg-none" id="supportMenu">
+                        <div class="mobile-submenu">
+                            <a href="{{ url_for('support') }}">Help Center</a>
+                            <a href="{{ url_for('support') }}">FAQs</a>
+                            <a href="{{ url_for('home') }}#contact">Contact Us</a>
+                        </div>
+                    </div>
+                    <ul class="dropdown-menu" aria-labelledby="supportDropdown">
+                        <li><h6 class="dropdown-header">Support</h6></li>
+                        <li><a class="dropdown-item" href="{{ url_for('support') }}">Help Center</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('support') }}">FAQs</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('home') }}#contact">Contact Us</a></li>
+                    </ul>
+                </li>
+
                 <li class="nav-item"><a class="nav-link" data-i18n="nav.contact" href="{{ url_for('home') }}#contact">{{ _('Contact') }}</a></li>
             </ul>
+
             <ul class="navbar-nav ms-auto">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-i18n="nav.language">{{ _('Language') }}</a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
-                            <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='en') }}" data-lang="en">English</a></li>
-                            <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='fr') }}" data-lang="fr">Français</a></li>
-                            <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='es') }}" data-lang="es">Español</a></li>
-                            <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='hi') }}" data-lang="hi">हिन्दी</a></li>
-                            <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='zh') }}" data-lang="zh">中文</a></li>
-                            <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='ko') }}" data-lang="ko">한국어</a></li>
-                            <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='tw') }}" data-lang="tw">Twi</a></li>
-                            <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='ha') }}" data-lang="ha">Hausa</a></li>
-                        </ul>
-                    </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-i18n="nav.language">{{ _('Language') }}</a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
+                        <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='en') }}" data-lang="en">English</a></li>
+                        <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='fr') }}" data-lang="fr">Français</a></li>
+                        <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='es') }}" data-lang="es">Español</a></li>
+                        <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='hi') }}" data-lang="hi">हिन्दी</a></li>
+                        <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='zh') }}" data-lang="zh">中文</a></li>
+                        <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='ko') }}" data-lang="ko">한국어</a></li>
+                        <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='tw') }}" data-lang="tw">Twi</a></li>
+                        <li><a class="dropdown-item lang-select" href="{{ url_for('set_language', lang='ha') }}" data-lang="ha">Hausa</a></li>
+                    </ul>
+                </li>
                 {% if current_user.is_authenticated %}
-                    <li class="nav-item"><a class="nav-link" data-i18n="nav.patient_tools" href="{{ url_for('patient_tools') }}">{{ _('Patient Tools') }}</a></li>
-                    <li class="nav-item"><a class="nav-link" data-i18n="nav.reminders" href="{{ url_for('reminders') }}">{{ _('Reminders') }}</a></li>
-                    <li class="nav-item"><a class="nav-link" data-i18n="nav.health_records" href="{{ url_for('health_records') }}">{{ _('Health Records') }}</a></li>
-                    <li class="nav-item"><a class="nav-link" data-i18n="nav.lab_tests" href="{{ url_for('lab_tests') }}">{{ _('Lab Tests') }}</a></li>
-                    <li class="nav-item"><a class="nav-link" data-i18n="nav.insurance" href="{{ url_for('insurance') }}">{{ _('Insurance') }}</a></li>
-                    <li class="nav-item"><a class="nav-link" data-i18n="nav.billing" href="{{ url_for('billing') }}">{{ _('Billing') }}</a></li>
-                    <li class="nav-item"><a class="nav-link" data-i18n="nav.emergency_sos" href="{{ url_for('emergency_sos') }}">{{ _('Emergency SOS') }}</a></li>
-                    <li class="nav-item"><a class="nav-link" data-i18n="nav.family_members" href="{{ url_for('family_members') }}">{{ _('Family Members') }}</a></li>
-                    <li class="nav-item"><a class="nav-link" data-i18n="nav.dashboard" href="{{ url_for('dashboard') }}">{{ _('Dashboard') }}</a></li>
+                    <li class="nav-item"><a class="nav-link nav-cta" data-i18n="nav.dashboard" href="{{ url_for('dashboard') }}">{{ _('Dashboard') }}</a></li>
                     <li class="nav-item"><a class="nav-link" data-i18n="nav.logout" href="{{ url_for('logout') }}">{{ _('Logout') }}</a></li>
                 {% else %}
-                    <li class="nav-item"><a class="nav-link" data-i18n="nav.login" href="{{ url_for('login') }}">{{ _('Login') }}</a></li>
-                    <li class="nav-item"><a class="nav-link" data-i18n="nav.register" href="{{ url_for('register') }}">{{ _('Register') }}</a></li>
+                    <li class="nav-item"><a class="nav-link nav-cta" data-i18n="nav.login" href="{{ url_for('login') }}">{{ _('Login') }}</a></li>
                 {% endif %}
             </ul>
         </div>
@@ -351,6 +469,47 @@
 <script src="https://unpkg.com/i18next@23.16.8/dist/umd/i18next.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.navbar .nav-item.dropdown').forEach(function(item) {
+            const toggle = item.querySelector('.dropdown-toggle');
+            const menu = item.querySelector('.dropdown-menu');
+            if (!toggle || !menu) return;
+
+            const closeOthers = function() {
+                document.querySelectorAll('.navbar .nav-item.dropdown.show').forEach(function(openItem) {
+                    if (openItem !== item) {
+                        openItem.classList.remove('show');
+                        const openToggle = openItem.querySelector('.dropdown-toggle');
+                        if (openToggle) openToggle.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            };
+
+            toggle.addEventListener('click', function(event) {
+                if (window.innerWidth < 992) return;
+                event.preventDefault();
+                event.stopPropagation();
+                const isOpen = item.classList.contains('show');
+                closeOthers();
+                if (!isOpen) {
+                    item.classList.add('show');
+                    toggle.setAttribute('aria-expanded', 'true');
+                } else {
+                    item.classList.remove('show');
+                    toggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
+
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.navbar .nav-item.dropdown')) {
+                document.querySelectorAll('.navbar .nav-item.dropdown.show').forEach(function(openItem) {
+                    openItem.classList.remove('show');
+                    const toggle = openItem.querySelector('.dropdown-toggle');
+                    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+                });
+            }
+        });
+
         document.querySelectorAll('form.needs-loading').forEach(function(form) {
             form.addEventListener('submit', function() {
                 var button = form.querySelector('button[type="submit"]');

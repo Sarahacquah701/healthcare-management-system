@@ -56,6 +56,14 @@
                             <textarea class="form-control" id="contributions" name="contributions" rows="2" placeholder="Award-winning clinical research, patient care initiatives, community outreach..."></textarea>
                         </div>
                     </div>
+                    <div class="row g-3 mt-3">
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="allows_telemedicine" name="allows_telemedicine">
+                                <label class="form-check-label" for="allows_telemedicine">Allow telemedicine / virtual consultations</label>
+                            </div>
+                        </div>
+                    </div>
                     <button type="submit" class="btn btn-primary mt-4">Add Doctor</button>
                 </form>
                 <a href="{{ url_for('dashboard') }}" class="btn btn-link mt-3">Back to Dashboard</a>

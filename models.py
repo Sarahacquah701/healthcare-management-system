@@ -13,6 +13,7 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(50), nullable=False)  # 'patient', 'doctor', 'admin'
     name = db.Column(db.String(150), nullable=False)
     phone_number = db.Column(db.String(50), nullable=True)
+    profile_picture = db.Column(db.String(250), nullable=True)
     date_of_birth = db.Column(db.Date, nullable=True)
     gender = db.Column(db.String(50), nullable=True)
     blood_group = db.Column(db.String(10), nullable=True)

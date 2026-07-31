@@ -1,0 +1,46 @@
+{% set hero_eyebrow = hero_eyebrow|default('HealthFlow') %}
+{% set hero_title = hero_title|default('Welcome to HealthFlow') %}
+{% set hero_subtitle = hero_subtitle|default('Care that feels connected, calm, and confident.') %}
+{% set hero_primary_label = hero_primary_label|default('Explore services') %}
+{% set hero_primary_url = hero_primary_url|default(url_for('patient_tools')) %}
+{% set hero_secondary_label = hero_secondary_label|default('View dashboard') %}
+{% set hero_secondary_url = hero_secondary_url|default(url_for('dashboard')) %}
+{% set hero_stats = hero_stats|default([]) %}
+{% set hero_timestamp = hero_timestamp|default('Always available') %}
+
+<section class="hero fade-in-section" aria-labelledby="page-title">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-8">
+            <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill bg-white border mb-3">
+                <i class="fas fa-heart text-primary"></i>
+                <span class="small fw-semibold text-primary">{{ hero_eyebrow }}</span>
+            </div>
+            <h1 id="page-title" class="display-5 fw-bold mb-3">{{ hero_title }}</h1>
+            <p class="lead text-muted mb-4">{{ hero_subtitle }}</p>
+            <div class="d-flex flex-wrap gap-3">
+                <a href="{{ hero_primary_url }}" class="btn btn-primary btn-lg shadow-sm"><i class="fas fa-arrow-right me-2"></i>{{ hero_primary_label }}</a>
+                <a href="{{ hero_secondary_url }}" class="btn btn-outline-primary btn-lg"><i class="fas fa-compass me-2"></i>{{ hero_secondary_label }}</a>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card-soft p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="badge bg-primary-soft text-primary">At a glance</span>
+                    <span class="small text-muted">{{ hero_timestamp }}</span>
+                </div>
+                {% if hero_stats %}
+                <div class="d-grid gap-2">
+                    {% for item in hero_stats %}
+                    <div class="d-flex justify-content-between align-items-center rounded-3 bg-white px-3 py-2 border">
+                        <span class="fw-semibold">{{ item.label }}</span>
+                        <span class="text-primary fw-bold">{{ item.value }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">Everything you need to stay informed, prepared, and connected to care.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>

@@ -30,6 +30,8 @@ app.config['HEALTH_RECORD_UPLOAD_FOLDER'] = os.path.join(app.instance_path, 'upl
 os.makedirs(app.config['HEALTH_RECORD_UPLOAD_FOLDER'], exist_ok=True)
 app.config['CHAT_UPLOAD_FOLDER'] = os.path.join(app.instance_path, 'uploads', 'chat_attachments')
 os.makedirs(app.config['CHAT_UPLOAD_FOLDER'], exist_ok=True)
+app.config['PROFILE_PICTURE_UPLOAD_FOLDER'] = os.path.join(app.instance_path, 'uploads', 'profile_pictures')
+os.makedirs(app.config['PROFILE_PICTURE_UPLOAD_FOLDER'], exist_ok=True)
 
 _translation_cache = {}
 
@@ -118,6 +120,24 @@ def flash(message, category='message'):
 
 # Ensure the gettext function is available inside Jinja templates as a global
 app.jinja_env.globals.update(_=_)
+
+
+def get_or_create_doctor_profile(user=None):
+    if not user:
+        user = current_user
+    if not user or user.role != 'doctor':
+        return None
+
+    doctor = Doctor.query.filter_by(user_id=user.id).first()
+    if doctor is None:
+        doctor = Doctor(user_id=user.id, specialty='General', consultation_time=15, consultation_fee=500.0)
+        db.session.add(doctor)
+        try:
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            doctor = Doctor.query.filter_by(user_id=user.id).first()
+    return doctor
 
 
 @app.context_processor
@@ -298,6 +318,10 @@ def get_blood_donor_matches(blood_group, city=None):
 
 def allowed_health_record_file(filename):
     allowed_extensions = {'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx'}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
+
+def allowed_profile_image(filename):
+    allowed_extensions = {'png', 'jpg', 'jpeg', 'gif'}
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
 def appointment_checkin_message(appointment):
@@ -645,6 +669,8 @@ def register():
         role = request.form['role']
         name = request.form['name']
         phone_number = request.form.get('phone_number')
+        profile_picture_file = request.files.get('profile_picture')
+        profile_picture_filename = None
         
         if User.query.filter_by(username=username).first():
             flash('Username already exists')
@@ -652,8 +678,25 @@ def register():
         if User.query.filter_by(email=email).first():
             flash('Email already exists')
             return redirect(url_for('register'))
+
+        if profile_picture_file and profile_picture_file.filename:
+            if not allowed_profile_image(profile_picture_file.filename):
+                flash('Please upload a valid image file for the profile picture.')
+                return redirect(url_for('register'))
+            safe_name = secure_filename(profile_picture_file.filename)
+            unique_name = f"{uuid4().hex}_{safe_name}"
+            save_path = os.path.join(app.config['PROFILE_PICTURE_UPLOAD_FOLDER'], unique_name)
+            profile_picture_file.save(save_path)
+            profile_picture_filename = unique_name
         
-        user = User(username=username, email=email, role=role, name=name, phone_number=phone_number)
+        user = User(
+            username=username,
+            email=email,
+            role=role,
+            name=name,
+            phone_number=phone_number,
+            profile_picture=profile_picture_filename
+        )
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
@@ -661,13 +704,23 @@ def register():
         if role == 'doctor':
             specialty = request.form['specialty']
             consultation_time = int(request.form.get('consultation_time', 15))
-            doctor = Doctor(user_id=user.id, specialty=specialty, consultation_time=consultation_time)
+            allows_telemedicine = request.form.get('allows_telemedicine') == 'on'
+            doctor = Doctor(
+                user_id=user.id,
+                specialty=specialty,
+                consultation_time=consultation_time,
+                allows_telemedicine=allows_telemedicine
+            )
             db.session.add(doctor)
             db.session.commit()
         
         flash('Registration successful')
         return redirect(url_for('login'))
     return render_template('register.html')
+
+@app.route('/uploads/profile_pictures/<filename>')
+def profile_picture(filename):
+    return send_from_directory(app.config['PROFILE_PICTURE_UPLOAD_FOLDER'], filename)
 
 @app.route('/ai_chat', methods=['POST'])
 @login_required
@@ -1673,14 +1726,15 @@ def view_chat_consultation(consultation_id):
     if current_user.role == 'patient' and consultation.patient_id != current_user.id:
         return redirect(url_for('dashboard'))
     if current_user.role == 'doctor':
-        if not hasattr(current_user, 'doctor') or not current_user.doctor:
+        doctor = get_or_create_doctor_profile()
+        if not doctor:
             return redirect(url_for('dashboard'))
         if consultation.doctor_id is None and consultation.status == 'waiting_response':
-            consultation.doctor_id = current_user.doctor.id
+            consultation.doctor_id = doctor.id
             consultation.status = 'active'
             consultation.updated_at = datetime.utcnow()
             db.session.commit()
-        elif consultation.doctor_id != current_user.doctor.id:
+        elif consultation.doctor_id is not None and consultation.doctor_id != doctor.id:
             return redirect(url_for('dashboard'))
     if current_user.role not in ('patient', 'doctor'):
         return redirect(url_for('dashboard'))
@@ -1765,8 +1819,10 @@ def download_chat_attachment(message_id):
     # permission check
     if current_user.role == 'patient' and consultation.patient_id != current_user.id:
         return redirect(url_for('dashboard'))
-    if current_user.role == 'doctor' and consultation.doctor_id != current_user.doctor.id:
-        return redirect(url_for('dashboard'))
+    if current_user.role == 'doctor':
+        doctor = get_or_create_doctor_profile()
+        if not doctor or consultation.doctor_id != doctor.id:
+            return redirect(url_for('dashboard'))
     if not msg.attachment_filename:
         flash('No attachment found.')
         return redirect(url_for('view_chat_consultation', consultation_id=consultation.id))
@@ -2205,6 +2261,7 @@ def admin_add_doctor():
         photo_url = request.form.get('photo_url') or None
         bio = request.form.get('bio') or None
         contributions = request.form.get('contributions') or None
+        allows_telemedicine = request.form.get('allows_telemedicine') == 'on'
 
         if User.query.filter_by(username=username).first():
             flash('Username already exists')
@@ -2224,7 +2281,8 @@ def admin_add_doctor():
             consultation_time=consultation_time,
             photo_url=photo_url,
             bio=bio,
-            contributions=contributions
+            contributions=contributions,
+            allows_telemedicine=allows_telemedicine
         )
         db.session.add(doctor)
         db.session.commit()
@@ -2651,7 +2709,8 @@ def upgrade_database():
                 'blood_group': 'VARCHAR(10)',
                 'allergies': 'TEXT',
                 'medical_conditions': 'TEXT',
-                'emergency_contact': 'VARCHAR(150)'
+                'emergency_contact': 'VARCHAR(150)',
+                'profile_picture': 'VARCHAR(250)'
             }
             for column_name, column_type in user_columns.items():
                 if column_name not in columns:

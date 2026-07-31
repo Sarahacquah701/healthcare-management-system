@@ -43,7 +43,7 @@
                                         <input type="file" name="attachment" class="form-control">
                                     </div>
                                     <div class="d-flex gap-2">
-                                        <button id="sendRealtime" type="button" class="btn btn-primary">Send (Realtime)</button>
+                                        <button id="sendRealtime" type="button" class="btn btn-primary">Send</button>
                                         <button id="sendFallback" type="submit" class="btn btn-outline-secondary">Send (Fallback)</button>
                                         <a href="{{ url_for('chat_consultation') }}" class="btn btn-outline-secondary ms-2">Back</a>
                                     </div>
@@ -56,14 +56,16 @@
 {% endblock %}
 
             {% block scripts %}
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.2/socket.io.min.js" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            <script src="https://cdn.socket.io/4.1.2/socket.io.min.js"></script>
             <script>
                 (function(){
                     const consultationId = {{ consultation.id }};
                     const userId = {{ current_user.id if current_user.is_authenticated else 'null' }};
                     const messagesContainer = document.getElementById('messagesContainer');
                     const sendBtn = document.getElementById('sendRealtime');
+                    const form = document.getElementById('realtimeChatForm');
                     const messageInput = document.getElementById('realtimeMessage');
+                    let socket = null;
 
                     function appendMessage(data, isOwn){
                         const wrapper = document.createElement('div');
@@ -75,19 +77,27 @@
                     }
 
                     if (typeof io !== 'undefined'){
-                        const socket = io();
+                        socket = io();
                         socket.emit('join_consultation', {consultation_id: consultationId});
                         socket.on('new_consultation_message', function(data){
                             appendMessage(data, data.sender_id == userId);
                         });
+                    }
 
-                        sendBtn.addEventListener('click', function(){
-                            const text = messageInput.value.trim();
-                            if (!text) return;
+                    sendBtn.addEventListener('click', function(event){
+                        event.preventDefault();
+                        const text = messageInput.value.trim();
+                        if (!text) return;
+
+                        if (socket && socket.connected) {
                             socket.emit('send_consultation_message', {consultation_id: consultationId, sender_id: userId, message: text});
                             messageInput.value = '';
-                        });
+                        } else {
+                            form.submit();
+                        }
+                    });
 
+                    if (socket) {
                         window.addEventListener('beforeunload', function(){
                             socket.emit('leave_consultation', {consultation_id: consultationId});
                         });
