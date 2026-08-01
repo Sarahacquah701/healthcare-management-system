@@ -27,8 +27,11 @@ try:
 except Exception:
     socketio_available = False
 
-app = Flask(__name__, instance_relative_config=True)
-os.makedirs(app.instance_path, exist_ok=True)
+app = Flask(__name__)
+
+UPLOAD_BASE = "/tmp/uploads"
+
+os.makedirs(UPLOAD_BASE, exist_ok=True)
 app.config['SECRET_KEY'] = 'your_secret_key_here'
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', app.config['SECRET_KEY'])
 app.config['JWT_ACCESS_TOKEN_EXPIRES_MINUTES'] = int(os.environ.get('JWT_ACCESS_TOKEN_EXPIRES_MINUTES', '60'))
@@ -43,15 +46,13 @@ app.config['BABEL_DEFAULT_LOCALE'] = 'en'
 app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'fr', 'es', 'hi', 'zh', 'ko', 'tw', 'ha']
 app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
 app.config['TRANSLATION_FILES_DIR'] = os.path.join(app.root_path, 'static', 'i18n')
-db_path = os.path.join(app.instance_path, 'hospital_queue.db')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path.replace('\\', '/')
+db_path = "/tmp/hospital_queue.db"
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['HEALTH_RECORD_UPLOAD_FOLDER'] = os.path.join(app.instance_path, 'uploads', 'health_records')
+app.config['HEALTH_RECORD_UPLOAD_FOLDER'] = os.path.join(UPLOAD_BASE, 'uploads', 'health_records')
 os.makedirs(app.config['HEALTH_RECORD_UPLOAD_FOLDER'], exist_ok=True)
-app.config['CHAT_UPLOAD_FOLDER'] = os.path.join(app.instance_path, 'uploads', 'chat_attachments')
+app.config['CHAT_UPLOAD_FOLDER'] = os.path.join(UPLOAD_BASE, 'uploads', 'chat_attachments')
 os.makedirs(app.config['CHAT_UPLOAD_FOLDER'], exist_ok=True)
-app.config['PROFILE_PICTURE_UPLOAD_FOLDER'] = os.path.join(app.instance_path, 'uploads', 'profile_pictures')
-os.makedirs(app.config['PROFILE_PICTURE_UPLOAD_FOLDER'], exist_ok=True)
 
 _translation_cache = {}
 
@@ -340,6 +341,8 @@ def set_language(lang):
     return response
 
 db.init_app(app)
+with app.app_context():
+    db.create_all()
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
