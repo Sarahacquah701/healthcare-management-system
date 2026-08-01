@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Medication Reminders') }}{% endblock %}
+{% block content %}
+<div class="page-card mb-4">
+    <div class="card-body">
+        <div class="section-heading">
+            <h2>{{ _('Medication Reminders') }}</h2>
+            <span class="info-badge"><i class="fas fa-pills"></i> {{ _('Stay on schedule') }}</span>
+        </div>
+        <form class="row g-3" method="post">
+            <div class="col-md-4">
+                <label class="form-label">{{ _('Medication name') }}</label>
+                <input class="form-control" name="medication_name" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">{{ _('Dosage instructions') }}</label>
+                <input class="form-control" name="dosage_instructions" placeholder="{{ _('e.g. Take after dinner') }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">{{ _('Reminder time') }}</label>
+                <input class="form-control" type="datetime-local" name="reminder_time" required>
+            </div>
+            <div class="col-12">
+                <label class="form-label">{{ _('Notes') }}</label>
+                <textarea class="form-control" name="notes" rows="3"></textarea>
+            </div>
+            <div class="col-12">
+                <button class="btn btn-primary" type="submit">{{ _('Save reminder') }}</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="page-card">
+    <div class="card-body">
+        <h4 class="mb-3">{{ _('Upcoming reminders') }}</h4>
+        {% if reminders %}
+        <div class="row g-3">
+            {% for reminder in reminders %}
+            <div class="col-md-6 col-xl-4">
+                <div class="metric-card h-100">
+                    <h5 class="mb-1">{{ reminder.medication_name }}</h5>
+                    <div class="text-muted small mb-2">{{ reminder.reminder_time.strftime('%b %d, %Y %I:%M %p') }}</div>
+                    <p class="mb-0">{{ reminder.dosage_instructions or _('No dosage instructions provided.') }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">{{ _('No medication reminders are scheduled yet.') }}</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

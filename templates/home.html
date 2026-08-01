@@ -1,164 +1,190 @@
 {% extends 'base.html' %}
-{% block title %}Hospital Queue Management System{% endblock %}
+{% block title %}{{ _('HealthFlow | Modern Healthcare Platform') }}{% endblock %}
 {% block content %}
-<!-- Hero Section -->
-<section class="hero-bg text-white rounded-4 p-5 mb-5 fade-in-section">
-    <div class="row align-items-center">
-        <div class="col-lg-8">
-            <h1 class="display-4 fw-bold mb-3">Book Your Appointment Easily</h1>
-            <p class="lead mb-4">Experience seamless healthcare booking with our modern digital platform. Schedule appointments, join queues, and get the care you need when you need it.</p>
-            <a href="{{ url_for('book_appointment') }}" class="btn btn-light btn-lg btn-modern px-4 py-3">Book Now <i class="fas fa-arrow-right ms-2"></i></a>
+<section class="hero-panel fade-in-section">
+    <div class="row align-items-center g-5">
+        <div class="col-lg-7">
+            <span class="eyebrow">{{ _('Trusted digital care for modern hospitals') }}</span>
+            <h1 class="display-4 fw-bold mt-3">{{ _('A cleaner way to book care, manage health, and stay connected') }}</h1>
+            <p class="lead mt-3">{{ _('Appointments, queues, telemedicine, pharmacy, lab tests, records, reminders, and family care in one multilingual platform.') }}</p>
+            <div class="d-flex flex-wrap gap-3 mt-4">
+                <a class="btn btn-primary btn-lg px-4" href="{{ url_for('register') }}">{{ _('Create account') }}</a>
+                <a class="btn btn-outline-light btn-lg px-4" href="{{ url_for('book_appointment') }}">{{ _('Book appointment') }}</a>
+                <a class="btn btn-outline-light btn-lg px-4" href="{{ url_for('doctors_directory') }}">{{ _('Find a doctor') }}</a>
+            </div>
+            <div class="row g-3 mt-4 small-stat-grid">
+                <div class="col-6 col-md-3"><div class="small-stat"><strong>24/7</strong><span>{{ _('Support') }}</span></div></div>
+                <div class="col-6 col-md-3"><div class="small-stat"><strong>8+</strong><span>{{ _('Languages') }}</span></div></div>
+                <div class="col-6 col-md-3"><div class="small-stat"><strong>100%</strong><span>{{ _('Responsive') }}</span></div></div>
+                <div class="col-6 col-md-3"><div class="small-stat"><strong>AI</strong><span>{{ _('Assistance') }}</span></div></div>
+            </div>
         </div>
-        <div class="col-lg-4 text-center mt-4 mt-lg-0">
-            <img src="https://images.unsplash.com/photo-1551190822-a9333d879b1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Healthcare professional" class="img-fluid rounded-4 shadow-lg img-hover">
+        <div class="col-lg-5">
+            <div class="glass-card p-4 shadow-lg">
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div>
+                        <div class="text-uppercase small text-muted">{{ _('Today at a glance') }}</div>
+                        <h3 class="mb-0">{{ _('Your care, organized') }}</h3>
+                    </div>
+                    <span class="badge rounded-pill bg-success">{{ _('Live') }}</span>
+                </div>
+                <div class="timeline-list">
+                    <div class="timeline-item">
+                        <strong>{{ _('Book appointments') }}</strong>
+                        <p class="mb-0 text-muted">{{ _('Choose a doctor, virtual or in-person visit, and a time that works for you.') }}</p>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>{{ _('Track queues and reminders') }}</strong>
+                        <p class="mb-0 text-muted">{{ _('Follow real-time queue status, payment alerts, and appointment reminders.') }}</p>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>{{ _('Review care history') }}</strong>
+                        <p class="mb-0 text-muted">{{ _('Keep records, vaccination history, prescriptions, and invoices in one place.') }}</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
-<!-- Services Section -->
-<section class="mb-5 fade-in-section">
-    <div class="text-center mb-5">
-        <h2 class="section-title text-primary">Our Services</h2>
-        <p class="section-subtitle">Comprehensive healthcare solutions designed for your convenience</p>
+<section class="section-block fade-in-section">
+    <div class="section-heading">
+        <h2>{{ _('Featured healthcare services') }}</h2>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-sm btn-outline-primary">{{ _('Open dashboard') }}</a>
     </div>
     <div class="row g-4">
-        <div class="col-md-4">
-            <a href="{{ url_for('book_appointment') }}" class="text-decoration-none text-dark">
-                <div class="card card-modern h-100 text-center service-card">
-                    <div class="card-body">
-                        <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Appointment booking" class="img-fluid rounded-3 mb-3 img-hover">
-                        <h5 class="card-title">Appointment Booking</h5>
-                        <p class="card-text">Schedule appointments with your preferred doctors at your convenience.</p>
-                    </div>
+        {% set services = [
+            ('Appointment booking', 'book_appointment', 'fas fa-calendar-check', _('Schedule in-person or virtual visits with smart availability.')),
+            ('Real-time queue tracking', 'dashboard', 'fas fa-stream', _('See wait status, priorities, and queue movement instantly.')),
+            ('Online consultation', 'chat_consultation', 'fas fa-video', _('Start doctor chats and telemedicine sessions securely.')),
+            ('Pharmacy ordering', 'pharmacy', 'fas fa-pills', _('Order medications and attach prescriptions with delivery details.')),
+            ('Laboratory test booking', 'lab_tests', 'fas fa-vials', _('Request lab work and keep bookings organized.')),
+            ('Medical records', 'health_records', 'fas fa-file-medical', _('Store reports, prescriptions, and visit files securely.'))
+        ] %}
+        {% for title, route, icon, copy in services %}
+        <div class="col-md-6 col-xl-4">
+            <a class="text-decoration-none" href="{{ url_for(route) }}">
+                <div class="feature-tile h-100">
+                    <div class="feature-icon"><i class="{{ icon }}"></i></div>
+                    <h3>{{ _(title) }}</h3>
+                    <p class="mb-0">{{ copy }}</p>
                 </div>
             </a>
         </div>
-        <div class="col-md-4">
-            <a href="{{ url_for('book_appointment') }}?consultation_type=virtual" class="text-decoration-none text-dark">
-                <div class="card card-modern h-100 text-center service-card">
-                    <div class="card-body">
-                        <img src="https://images.unsplash.com/photo-1580281658628-9f0a0a8c8b0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Virtual consultation" class="img-fluid rounded-3 mb-3 img-hover">
-                        <h5 class="card-title">Virtual Consultation</h5>
-                        <p class="card-text">Book an online consultation with doctors who support telemedicine.</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-4">
-            <a href="{{ url_for('join_queue') }}" class="text-decoration-none text-dark">
-                <div class="card card-modern h-100 text-center service-card">
-                    <div class="card-body">
-                        <img src="https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Queue management" class="img-fluid rounded-3 mb-3 img-hover">
-                        <h5 class="card-title">Queue Management</h5>
-                        <p class="card-text">Efficient queue system with real-time updates and wait time estimation.</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-4">
-            <a href="{{ url_for('book_appointment') }}?emergency=1" class="text-decoration-none text-dark">
-                <div class="card card-modern h-100 text-center service-card">
-                    <div class="card-body">
-                        <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Emergency care" class="img-fluid rounded-3 mb-3 img-hover">
-                        <h5 class="card-title">Emergency Care</h5>
-                        <p class="card-text">Request an urgent appointment that is prioritized in the queue.</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-4">
-            <a href="{{ url_for('symptom_checker') }}" class="text-decoration-none text-dark">
-                <div class="card card-modern h-100 text-center service-card">
-                    <div class="card-body">
-                        <img src="https://images.unsplash.com/photo-1584634731339-2520f0f5b5b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Symptom checker" class="img-fluid rounded-3 mb-3 img-hover">
-                        <h5 class="card-title">AI Symptom Checker</h5>
-                        <p class="card-text">Get guided next-step advice based on your symptoms before booking.</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-4">
-            <a href="{{ url_for('support') }}" class="text-decoration-none text-dark">
-                <div class="card card-modern h-100 text-center service-card">
-                    <div class="card-body">
-                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Support chat" class="img-fluid rounded-3 mb-3 img-hover">
-                        <h5 class="card-title">24/7 Support Chat</h5>
-                        <p class="card-text">Ask about bookings, billing, reminders, and hospital services anytime.</p>
-                    </div>
-                </div>
-            </a>
-        </div>
+        {% endfor %}
     </div>
 </section>
 
-<!-- Doctors Section -->
-<section id="doctors" class="mb-5 fade-in-section">
-    <div class="text-center mb-5">
-        <h2 class="section-title text-primary">Find a Doctor</h2>
-        <p class="section-subtitle">Search our doctor directory to book the right specialist for your needs</p>
-        <a href="{{ url_for('doctors_directory') }}" class="btn btn-primary btn-lg mt-3">Find a Doctor</a>
+<section class="section-block fade-in-section">
+    <div class="section-heading">
+        <h2>{{ _('How the platform works') }}</h2>
     </div>
     <div class="row g-4">
+        {% for step_title, step_copy in [
+            (_('Create your account'), _('Register, verify your email, and choose your preferred language.')),
+            (_('Book and manage care'), _('Find doctors, join queues, book services, and pay securely.')),
+            (_('Stay connected'), _('Receive reminders, notifications, announcements, and health recommendations.'))
+        ] %}
         <div class="col-md-4">
-            <div class="card card-modern text-center doctor-card h-100">
-                <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=600&auto=format&fit=crop" class="card-img-top rounded-top img-hover" alt="Dr. Sarah Johnson">
-                <div class="card-body">
-                    <h5 class="card-title">Dr. Sarah Johnson</h5>
-                    <p class="card-text text-muted">Cardiologist</p>
-                    <p class="card-text"><strong>Work:</strong> Heart health, blood pressure care, and cardiac checkups.</p>
-                    <p class="card-text">Provides clear, preventive care plans for patients managing long-term heart conditions.</p>
-                </div>
+            <div class="process-card h-100">
+                <div class="process-number">{{ loop.index }}</div>
+                <h3>{{ step_title }}</h3>
+                <p class="mb-0">{{ step_copy }}</p>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card card-modern text-center doctor-card h-100">
-                <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=600&auto=format&fit=crop" class="card-img-top rounded-top img-hover" alt="Dr. Michael Chen">
-                <div class="card-body">
-                    <h5 class="card-title">Dr. Michael Chen</h5>
-                    <p class="card-text text-muted">Neurologist</p>
-                    <p class="card-text"><strong>Work:</strong> Headache care, nerve conditions, and brain health assessments.</p>
-                    <p class="card-text">Focuses on accurate diagnosis and calm guidance for patients with neurological symptoms.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card card-modern text-center doctor-card h-100">
-                <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=600&auto=format&fit=crop" class="card-img-top rounded-top img-hover" alt="Dr. Emily Rodriguez">
-                <div class="card-body">
-                    <h5 class="card-title">Dr. Emily Rodriguez</h5>
-                    <p class="card-text text-muted">Pediatrician</p>
-                    <p class="card-text"><strong>Work:</strong> Child wellness visits, immunizations, and growth monitoring.</p>
-                    <p class="card-text">Supports families with friendly, practical care from infancy through adolescence.</p>
-                </div>
-            </div>
-        </div>
+        {% endfor %}
     </div>
 </section>
 
-<!-- About Section -->
-<section class="mb-5 fade-in-section">
+<section class="section-block fade-in-section why-section">
     <div class="row align-items-center g-5">
         <div class="col-lg-6">
-            <img src="https://images.unsplash.com/photo-1551190822-a9333d879b1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Modern hospital facility" class="img-fluid rounded-4 shadow-lg img-hover">
+            <h2>{{ _('Why choose our platform') }}</h2>
+            <p class="lead">{{ _('Built for patients, doctors, and administrators who need a modern and reliable healthcare workflow.') }}</p>
+            <div class="row g-3 mt-3">
+                {% for item in [
+                    _('Secure authentication and email verification'),
+                    _('Multi-language support across every page'),
+                    _('Responsive design for mobile and desktop'),
+                    _('AI symptom checker and assistant chatbot')
+                ] %}
+                <div class="col-md-6"><div class="check-card"><i class="fas fa-circle-check"></i>{{ item }}</div></div>
+                {% endfor %}
+            </div>
         </div>
         <div class="col-lg-6">
-            <h2 class="section-title text-primary mb-4">About HealthFlow</h2>
-            <p class="lead mb-3">Revolutionizing healthcare management with technology</p>
-            <p>HealthFlow is a comprehensive hospital queue and appointment management system designed to streamline healthcare operations. Our platform connects patients, doctors, and administrators in a seamless digital ecosystem that prioritizes efficiency, accessibility, and patient care.</p>
-            <p>With features like real-time queue updates, appointment scheduling, and integrated walk-in management, we ensure that every patient receives timely care while optimizing hospital resources.</p>
-            <div class="mt-4">
-                <div class="row g-3">
-                    <div class="col-6">
-                        <div class="text-center">
-                            <h4 class="text-primary fw-bold">10,000+</h4>
-                            <p class="text-muted mb-0">Patients Served</p>
-                        </div>
+            <div class="testimonial-carousel">
+                <div class="testimonial-slide active">
+                    <p>{{ _('\"The platform removed the confusion from care access. Everything I need is in one place.\"') }}</p>
+                    <strong>Maria G.</strong>
+                </div>
+                <div class="testimonial-slide">
+                    <p>{{ _('\"Queue tracking and telemedicine make our daily workflow much smoother.\"') }}</p>
+                    <strong>Dr. A. Mensah</strong>
+                </div>
+                <div class="testimonial-slide">
+                    <p>{{ _('\"The multilingual pages make it easy for our family to use the app together.\"') }}</p>
+                    <strong>James O.</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block fade-in-section">
+    <div class="section-heading">
+        <h2>{{ _('Health tips carousel') }}</h2>
+    </div>
+    <div class="tips-strip">
+        {% for tip in [
+            _('Drink water regularly and keep a simple daily activity routine.'),
+            _('Use reminders for medications, follow-ups, and vaccination dates.'),
+            _('Review your lab results and records before every consultation.'),
+            _('If symptoms feel urgent, use the symptom checker or emergency flow.')
+        ] %}
+        <div class="tip-card">{{ tip }}</div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section-block fade-in-section">
+    <div class="row g-4 align-items-stretch">
+        <div class="col-lg-8">
+            <div class="page-card h-100">
+                <div class="card-body">
+                    <div class="section-heading">
+                        <h2>{{ _('Frequently Asked Questions') }}</h2>
                     </div>
-                    <div class="col-6">
-                        <div class="text-center">
-                            <h4 class="text-primary fw-bold">50+</h4>
-                            <p class="text-muted mb-0">Expert Doctors</p>
+                    <div class="accordion accordion-flush" id="faqAccordion">
+                        {% for question, answer in [
+                            (_('How do I get started?'), _('Create an account, verify your email, and choose your preferred language from the header.')),
+                            (_('Can I book virtual visits?'), _('Yes. Select a doctor who supports telemedicine when booking an appointment.')),
+                            (_('Is my language applied everywhere?'), _('Yes. The translation layer is applied to templates, text nodes, placeholders, and shared UI content.')),
+                            (_('How do I access payment history?'), _('Open Billing to review receipts, invoices, and payment status for appointments.'))
+                        ] %}
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="faqHeading{{ loop.index }}">
+                                <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse{{ loop.index }}" aria-expanded="{{ 'true' if loop.first else 'false' }}" aria-controls="faqCollapse{{ loop.index }}">{{ question }}</button>
+                            </h3>
+                            <div id="faqCollapse{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">{{ answer }}</div>
+                            </div>
                         </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="page-card h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <h2>{{ _('Download mobile app') }}</h2>
+                        <p class="text-muted">{{ _('Use the mobile experience to stay connected to your appointments, reminders, and care team.') }}</p>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-dark"><i class="fab fa-apple me-2"></i>{{ _('App Store') }}</a>
+                        <a href="#" class="btn btn-outline-dark"><i class="fab fa-google-play me-2"></i>{{ _('Google Play') }}</a>
                     </div>
                 </div>
             </div>
@@ -166,97 +192,28 @@
     </div>
 </section>
 
-<!-- Testimonials Section -->
-<section class="mb-5 fade-in-section">
-    <div class="text-center mb-5">
-        <h2 class="section-title text-primary">What Our Patients Say</h2>
-        <p class="section-subtitle">Real experiences from our valued patients</p>
+<section class="section-block fade-in-section">
+    <div class="section-heading">
+        <h2>{{ _('Contact information') }}</h2>
     </div>
     <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card card-modern">
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-3">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="John Smith" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-                        <div>
-                            <h6 class="mb-0">John Smith</h6>
-                            <small class="text-muted">Patient</small>
-                        </div>
-                    </div>
-                    <p class="card-text">"The appointment booking system is incredibly user-friendly. I was able to schedule my visit in minutes and the queue updates kept me informed throughout my wait."</p>
-                    <div class="text-warning">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card card-modern">
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-3">
-                      <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?q=80&w=100&auto=format&fit=crop&w=100&q=80"alt="John Smith" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-                        <div>
-                            <h6 class="mb-0">Maria Garcia</h6>
-                            <small class="text-muted">Patient</small>
-                        </div>
-                    </div>
-                    <p class="card-text">"As a busy professional, the ability to book appointments online and track my position in the queue has saved me so much time. Excellent service!"</p>
-                    <div class="text-warning">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card card-modern">
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-3">
-                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="David Wilson" class="rounded-circle me-3" style="width: 50px; height: 50px;">
-                        <div>
-                            <h6 class="mb-0">David Wilson</h6>
-                            <small class="text-muted">Patient</small>
-                        </div>
-                    </div>
-                    <p class="card-text">"The doctors are amazing and the system makes everything so smooth. No more long waits or confusion. Highly recommend HealthFlow!"</p>
-                    <div class="text-warning">
-                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div class="col-md-4"><div class="contact-card"><i class="fas fa-phone"></i><strong>{{ _('Phone') }}</strong><span>(555) 123-4567</span></div></div>
+        <div class="col-md-4"><div class="contact-card"><i class="fas fa-envelope"></i><strong>{{ _('Email') }}</strong><span>support@healthflow.com</span></div></div>
+        <div class="col-md-4"><div class="contact-card"><i class="fas fa-location-dot"></i><strong>{{ _('Location') }}</strong><span>{{ _('Main hospital campus and connected clinics') }}</span></div></div>
     </div>
 </section>
 
-<!-- Contact Section -->
-<section id="contact" class="fade-in-section">
-    <div class="text-center mb-5">
-        <h2 class="section-title text-primary">Get In Touch</h2>
-        <p class="section-subtitle">We're here to help with any questions or concerns</p>
-    </div>
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card card-modern">
-                <div class="card-body text-center">
-                    <div class="row g-4">
-                        <div class="col-md-4">
-                            <i class="fas fa-phone fa-2x text-primary mb-3"></i>
-                            <h5>Call Us</h5>
-                            <p class="mb-0">(555) 123-4567</p>
-                        </div>
-                        <div class="col-md-4">
-                            <i class="fas fa-envelope fa-2x text-primary mb-3"></i>
-                            <h5>Email Us</h5>
-                            <p class="mb-0"><a href="mailto:support@healthflow.com" class="text-decoration-none">support@healthflow.com</a></p>
-                        </div>
-                        <div class="col-md-4">
-                            <i class="fas fa-clock fa-2x text-primary mb-3"></i>
-                            <h5>Hours</h5>
-                            <p class="mb-0">Mon-Fri: 8AM-8PM<br>Sat-Sun: 9AM-5PM</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<section class="section-block fade-in-section">
+    <div class="newsletter-card">
+        <div>
+            <h2>{{ _('Newsletter subscription') }}</h2>
+            <p class="mb-0">{{ _('Get care updates, health tips, and platform announcements by email.') }}</p>
         </div>
+        <form class="newsletter-form needs-loading" method="post" action="{{ url_for('newsletter_subscribe') }}">
+            <input class="form-control" type="email" name="email" placeholder="{{ _('Enter your email') }}" required>
+            <input class="form-control" type="text" name="name" placeholder="{{ _('Your name') }}">
+            <button class="btn btn-primary" type="submit">{{ _('Subscribe') }}</button>
+        </form>
     </div>
 </section>
 {% endblock %}

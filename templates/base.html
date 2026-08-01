@@ -16,20 +16,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --bg: #eff7f1;
+            --bg: #eef5f7;
             --surface: #ffffff;
-            --surface-soft: #f3fbf5;
-            --text: #1f2937;
-            --muted: #6b7280;
-            --primary: #1d6fa5;
-            --primary-soft: #d9eef8;
-            --success: #1f8b69;
-            --border: #dbe7e1;
+            --surface-soft: #f3f8fa;
+            --text: #10212d;
+            --muted: #607080;
+            --primary: #0f5f8a;
+            --primary-soft: #d9ebf4;
+            --success: #157a63;
+            --border: #d6e1e8;
         }
         * { box-sizing: border-box; }
         body {
             margin: 0;
-            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg);
             color: var(--text);
         }
@@ -65,6 +65,143 @@
         .hero .display-5 { color: #0f172a; }
         .section-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 1rem; }
         .section-subtitle { color: var(--muted); }
+        .hero-panel {
+            background: linear-gradient(135deg, rgba(15,95,138,.96), rgba(21,122,99,.92));
+            color: #fff;
+            border-radius: 32px;
+            padding: 3rem;
+            box-shadow: 0 30px 70px rgba(7, 39, 58, 0.18);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-panel::after {
+            content: '';
+            position: absolute;
+            inset: auto -8rem -8rem auto;
+            width: 18rem;
+            height: 18rem;
+            border-radius: 50%;
+            background: rgba(255,255,255,.08);
+        }
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .45rem .8rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,.14);
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            font-size: .75rem;
+            font-weight: 700;
+        }
+        .glass-card, .feature-tile, .process-card, .check-card, .contact-card, .newsletter-card, .page-card {
+            background: rgba(255,255,255,.88);
+            border: 1px solid rgba(16,33,45,.08);
+            border-radius: 26px;
+            backdrop-filter: blur(12px);
+        }
+        .feature-tile, .process-card, .check-card, .contact-card {
+            padding: 1.4rem;
+            box-shadow: 0 14px 34px rgba(15, 39, 58, 0.05);
+            transition: transform .25s ease, box-shadow .25s ease;
+            color: var(--text);
+        }
+        .feature-tile:hover, .process-card:hover, .check-card:hover, .contact-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 42px rgba(15, 39, 58, 0.10);
+        }
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 18px;
+            display: grid;
+            place-items: center;
+            font-size: 1.35rem;
+            color: var(--primary);
+            background: var(--primary-soft);
+            margin-bottom: 1rem;
+        }
+        .section-block { margin-bottom: 4rem; }
+        .small-stat-grid { margin-top: 0.5rem; }
+        .small-stat {
+            background: rgba(255,255,255,.12);
+            border: 1px solid rgba(255,255,255,.12);
+            padding: 1rem;
+            border-radius: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: .25rem;
+        }
+        .small-stat strong { font-size: 1.2rem; }
+        .timeline-list { display: grid; gap: 1rem; }
+        .timeline-item {
+            position: relative;
+            padding-left: 1.2rem;
+            border-left: 2px solid rgba(255,255,255,.20);
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -0.35rem;
+            top: .1rem;
+            width: .7rem;
+            height: .7rem;
+            border-radius: 999px;
+            background: #fff;
+        }
+        .process-number {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+            color: var(--primary);
+            background: var(--primary-soft);
+            margin-bottom: 1rem;
+        }
+        .check-card, .contact-card {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+        }
+        .check-card i, .contact-card i { color: var(--success); }
+        .testimonial-carousel {
+            position: relative;
+            min-height: 240px;
+            border-radius: 28px;
+            padding: 2rem;
+            background: linear-gradient(135deg, #fff, #f2f8fb);
+            box-shadow: 0 16px 40px rgba(15, 39, 58, 0.08);
+        }
+        .testimonial-slide { display: none; }
+        .testimonial-slide.active { display: block; animation: fadeInUp .5s ease both; }
+        .tips-strip {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 1rem;
+        }
+        .tip-card {
+            padding: 1.1rem;
+            border-radius: 20px;
+            background: #fff;
+            border: 1px solid var(--border);
+            min-height: 120px;
+        }
+        .newsletter-card {
+            display: flex;
+            justify-content: space-between;
+            gap: 1.5rem;
+            align-items: center;
+            padding: 1.4rem;
+        }
+        .newsletter-form {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+            gap: .75rem;
+            width: min(100%, 700px);
+        }
         .card-soft { background: var(--surface-soft); border: 1px solid rgba(34, 112, 98, 0.08); border-radius: 24px; }
         .card-soft .card-body { padding: 2rem; }
         .page-shell { display: flex; flex-direction: column; gap: 1.5rem; }
@@ -98,6 +235,15 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 767px) { .hero { padding: 2rem 1.25rem; } .card-soft .card-body { padding: 1.5rem; } }
+        @media (max-width: 991px) {
+            .hero-panel { padding: 2rem 1.25rem; }
+            .tips-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .newsletter-card { flex-direction: column; align-items: stretch; }
+            .newsletter-form { grid-template-columns: 1fr; width: 100%; }
+        }
+        @media (max-width: 575px) {
+            .tips-strip { grid-template-columns: 1fr; }
+        }
         /* Homepage specific styles */
         .hero-bg { background: linear-gradient(135deg, rgba(29,111,165,0.8), rgba(34,124,185,0.8)), url('https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80') center/cover no-repeat; }
         .card-modern { border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: transform 0.3s ease, box-shadow 0.3s ease; }
@@ -292,24 +438,26 @@
                     </button>
                     <div class="collapse d-lg-none" id="servicesMenu">
                         <div class="mobile-submenu">
-                            <a href="{{ url_for('pharmacy') }}">Online Pharmacy</a>
-                            <a href="{{ url_for('lab_tests') }}">Lab Tests</a>
-                            <a href="{{ url_for('blood_donation') }}">Blood Donation</a>
-                            <a href="{{ url_for('vaccinations') }}">Vaccination</a>
-                            <a href="{{ url_for('insurance') }}">Insurance</a>
-                            <a href="{{ url_for('billing') }}">Billing</a>
-                            <a href="{{ url_for('symptom_checker') }}">Symptom Checker</a>
+                            <a href="{{ url_for('pharmacy') }}">{{ _('Online Pharmacy') }}</a>
+                            <a href="{{ url_for('lab_tests') }}">{{ _('Lab Tests') }}</a>
+                            <a href="{{ url_for('blood_donation') }}">{{ _('Blood Donation') }}</a>
+                            <a href="{{ url_for('vaccinations') }}">{{ _('Vaccination') }}</a>
+                            <a href="{{ url_for('insurance') }}">{{ _('Insurance') }}</a>
+                            <a href="{{ url_for('billing') }}">{{ _('Billing') }}</a>
+                            <a href="{{ url_for('symptom_checker') }}">{{ _('Symptom Checker') }}</a>
                         </div>
                     </div>
                     <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
-                        <li><h6 class="dropdown-header">Care services</h6></li>
-                        <li><a class="dropdown-item" href="{{ url_for('pharmacy') }}">Online Pharmacy</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('lab_tests') }}">Lab Tests</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('blood_donation') }}">Blood Donation</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('vaccinations') }}">Vaccination</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('insurance') }}">Insurance</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('billing') }}">Billing</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('symptom_checker') }}">Symptom Checker</a></li>
+                        <li><h6 class="dropdown-header">{{ _('Care services') }}</h6></li>
+                        <li><a class="dropdown-item" href="{{ url_for('pharmacy') }}">{{ _('Online Pharmacy') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('lab_tests') }}">{{ _('Lab Tests') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('blood_donation') }}">{{ _('Blood Donation') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('vaccinations') }}">{{ _('Vaccination') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('insurance') }}">{{ _('Insurance') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('billing') }}">{{ _('Billing') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('communications_center') }}">{{ _('Communications Center') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('ai_hub') }}">{{ _('AI Hub') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('symptom_checker') }}">{{ _('Symptom Checker') }}</a></li>
                     </ul>
                 </li>
 
@@ -320,24 +468,24 @@
                     </button>
                     <div class="collapse d-lg-none" id="portalMenu">
                         <div class="mobile-submenu">
-                            <a href="{{ url_for('health_records') }}">Health Records</a>
-                            <a href="{{ url_for('medical_history') }}">Medical History</a>
-                            <a href="{{ url_for('reminders') }}">Reminders</a>
-                            <a href="{{ url_for('wellness_dashboard') }}">Wellness Dashboard</a>
-                            <a href="{{ url_for('family_members') }}">Family Members</a>
-                            <a href="{{ url_for('wearables') }}">Wearables</a>
-                            <a href="{{ url_for('language_support') }}">Language Support</a>
+                            <a href="{{ url_for('health_records') }}">{{ _('Health Records') }}</a>
+                            <a href="{{ url_for('medical_history') }}">{{ _('Medical History') }}</a>
+                            <a href="{{ url_for('reminders') }}">{{ _('Reminders') }}</a>
+                            <a href="{{ url_for('wellness_dashboard') }}">{{ _('Wellness Dashboard') }}</a>
+                            <a href="{{ url_for('family_members') }}">{{ _('Family Members') }}</a>
+                            <a href="{{ url_for('wearables') }}">{{ _('Wearables') }}</a>
+                            <a href="{{ url_for('language_support') }}">{{ _('Language Support') }}</a>
                         </div>
                     </div>
                     <ul class="dropdown-menu" aria-labelledby="portalDropdown">
-                        <li><h6 class="dropdown-header">Portal tools</h6></li>
-                        <li><a class="dropdown-item" href="{{ url_for('health_records') }}">Health Records</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('medical_history') }}">Medical History</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('reminders') }}">Reminders</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('wellness_dashboard') }}">Wellness Dashboard</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('family_members') }}">Family Members</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('wearables') }}">Wearables</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('language_support') }}">Language Support</a></li>
+                        <li><h6 class="dropdown-header">{{ _('Portal tools') }}</h6></li>
+                        <li><a class="dropdown-item" href="{{ url_for('health_records') }}">{{ _('Health Records') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('medical_history') }}">{{ _('Medical History') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('reminders') }}">{{ _('Reminders') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('wellness_dashboard') }}">{{ _('Wellness Dashboard') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('family_members') }}">{{ _('Family Members') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('wearables') }}">{{ _('Wearables') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('language_support') }}">{{ _('Language Support') }}</a></li>
                     </ul>
                 </li>
 
@@ -348,16 +496,16 @@
                     </button>
                     <div class="collapse d-lg-none" id="communityMenu">
                         <div class="mobile-submenu">
-                            <a href="{{ url_for('chat_consultation') }}">Chat Consultation</a>
-                            <a href="{{ url_for('forum') }}">Community Forum</a>
-                            <a href="{{ url_for('emergency_sos') }}">Emergency SOS</a>
+                            <a href="{{ url_for('chat_consultation') }}">{{ _('Chat Consultation') }}</a>
+                            <a href="{{ url_for('forum') }}">{{ _('Community Forum') }}</a>
+                            <a href="{{ url_for('emergency_sos') }}">{{ _('Emergency SOS') }}</a>
                         </div>
                     </div>
                     <ul class="dropdown-menu" aria-labelledby="communityDropdown">
-                        <li><h6 class="dropdown-header">Community</h6></li>
-                        <li><a class="dropdown-item" href="{{ url_for('chat_consultation') }}">Chat Consultation</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('forum') }}">Community Forum</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('emergency_sos') }}">Emergency SOS</a></li>
+                        <li><h6 class="dropdown-header">{{ _('Community') }}</h6></li>
+                        <li><a class="dropdown-item" href="{{ url_for('chat_consultation') }}">{{ _('Chat Consultation') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('forum') }}">{{ _('Community Forum') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('emergency_sos') }}">{{ _('Emergency SOS') }}</a></li>
                     </ul>
                 </li>
 
@@ -368,16 +516,16 @@
                     </button>
                     <div class="collapse d-lg-none" id="supportMenu">
                         <div class="mobile-submenu">
-                            <a href="{{ url_for('support') }}">Help Center</a>
-                            <a href="{{ url_for('support') }}">FAQs</a>
-                            <a href="{{ url_for('home') }}#contact">Contact Us</a>
+                            <a href="{{ url_for('support') }}">{{ _('Help Center') }}</a>
+                            <a href="{{ url_for('support') }}">{{ _('FAQs') }}</a>
+                            <a href="{{ url_for('home') }}#contact">{{ _('Contact Us') }}</a>
                         </div>
                     </div>
                     <ul class="dropdown-menu" aria-labelledby="supportDropdown">
-                        <li><h6 class="dropdown-header">Support</h6></li>
-                        <li><a class="dropdown-item" href="{{ url_for('support') }}">Help Center</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('support') }}">FAQs</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('home') }}#contact">Contact Us</a></li>
+                        <li><h6 class="dropdown-header">{{ _('Support') }}</h6></li>
+                        <li><a class="dropdown-item" href="{{ url_for('support') }}">{{ _('Help Center') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('support') }}">{{ _('FAQs') }}</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('home') }}#contact">{{ _('Contact Us') }}</a></li>
                     </ul>
                 </li>
 
@@ -400,6 +548,7 @@
                 </li>
                 {% if current_user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link nav-cta" data-i18n="nav.dashboard" href="{{ url_for('dashboard') }}">{{ _('Dashboard') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('notifications_view') }}">{{ _('Notifications') }}</a></li>
                     <li class="nav-item"><a class="nav-link" data-i18n="nav.logout" href="{{ url_for('logout') }}">{{ _('Logout') }}</a></li>
                 {% else %}
                     <li class="nav-item"><a class="nav-link nav-cta" data-i18n="nav.login" href="{{ url_for('login') }}">{{ _('Login') }}</a></li>
@@ -459,9 +608,17 @@
     </div>
 </div>
 
+<div id="healthflow-runtime" hidden
+     data-chat-endpoint="{{ chat_endpoint }}"
+     data-service-worker-url="{{ url_for('static', filename='service-worker.js') }}"
+     data-supported-locales='{{ supported_locales | tojson }}'
+     data-current-lang="{{ current_lang }}"
+     data-unavailable-message='{{ _("Sorry, the assistant is unavailable right now. Please try again in a moment.") | tojson }}'>
+</div>
+
 <footer class="footer bg-white border-top py-4 mt-5">
     <div class="container text-center">
-        <p class="mb-1" data-i18n="footer.tag">{{ _('HealthFlow — modern hospital booking and queue management') }}</p>
+        <p class="mb-1" data-i18n="footer.tag">{{ _('HealthFlow | modern healthcare platform') }}</p>
         <p class="mb-0 text-muted" data-i18n="footer.help">{{ _('Need help? Call us at (555) 123-4567 or email support@healthflow.com') }}</p>
     </div>
 </footer>
@@ -549,6 +706,10 @@
         const chatForm = document.getElementById('chatForm');
         const chatInput = document.getElementById('chatInput');
         const chatMessages = document.getElementById('chatMessages');
+        const runtime = document.getElementById('healthflow-runtime');
+        const chatEndpoint = runtime ? runtime.getAttribute('data-chat-endpoint') : '';
+        const serviceWorkerUrl = runtime ? runtime.getAttribute('data-service-worker-url') : '';
+        const unavailableMessage = runtime ? JSON.parse(runtime.getAttribute('data-unavailable-message') || '""') : '';
 
         if (chatWidget && openChatBtn && closeChatBtn && chatForm && chatInput && chatMessages) {
             openChatBtn.addEventListener('click', function () {
@@ -580,7 +741,7 @@
                 chatInput.value = '';
                 chatInput.disabled = true;
 
-                fetch('{{ chat_endpoint }}', {
+                fetch(chatEndpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -606,7 +767,6 @@
                 .catch(() => {
                     const errorBubble = document.createElement('div');
                     errorBubble.className = 'chat-message assistant';
-                    const unavailableMessage = {{ _('Sorry, the assistant is unavailable right now. Please try again in a moment.')|tojson }};
                     errorBubble.innerHTML = `<div class="message-bubble">${unavailableMessage}</div>`;
                     chatMessages.appendChild(errorBubble);
                 })
@@ -622,7 +782,7 @@
     });
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('{{ url_for('static', filename='service-worker.js') }}')
+            navigator.serviceWorker.register(serviceWorkerUrl)
                 .then(() => console.log('Service Worker registered.'))
                 .catch(err => console.warn('Service Worker registration failed:', err));
         });
@@ -631,8 +791,9 @@
 <script>
     // Client-side i18n: load translations and apply to elements with data-i18n or exact text nodes
     (function(){
-        const supported = {{ supported_locales | tojson }};
-        let current = "{{ current_lang }}";
+        const runtime = document.getElementById('healthflow-runtime');
+        const supported = runtime ? JSON.parse(runtime.getAttribute('data-supported-locales') || '[]') : [];
+        let current = runtime ? runtime.getAttribute('data-current-lang') : 'en';
         let currentTranslations = {};
         const savedLang = localStorage.getItem('lang');
         if (savedLang && supported.includes(savedLang) && savedLang !== current) {
@@ -689,6 +850,12 @@
                         node.nodeValue = original.replace(trimmed, trans[trimmed]);
                     }
                 });
+            document.querySelectorAll('input[placeholder], textarea[placeholder]').forEach(el => {
+                const placeholder = el.getAttribute('placeholder');
+                if (placeholder && trans[placeholder]) {
+                    el.setAttribute('placeholder', trans[placeholder]);
+                }
+            });
         }
 
         function loadAndApply(lang){

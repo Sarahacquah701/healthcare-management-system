@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Doctor Reviews') }}{% endblock %}
+{% block content %}
+<div class="page-card">
+    <div class="card-body">
+        <div class="section-heading">
+            <h2>{{ _('Doctor Reviews') }} - Dr. {{ doctor.user.name }}</h2>
+            <span class="info-badge"><i class="fas fa-star"></i> {{ review_summary.rating if review_summary.rating is not none else _('No ratings yet') }}</span>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="page-card h-100">
+                    <div class="card-body">
+                        <h4 class="mb-3">{{ _('Share your experience') }}</h4>
+                        <form method="post">
+                            <div class="mb-3">
+                                <label class="form-label">{{ _('Rating') }}</label>
+                                <select class="form-select" name="rating" required>
+                                    <option value="">{{ _('Choose a rating') }}</option>
+                                    {% for value in range(5, 0, -1) %}
+                                    <option value="{{ value }}">{{ value }} {{ _('stars') }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">{{ _('Review') }}</label>
+                                <textarea class="form-control" name="review" rows="5" placeholder="{{ _('Tell others what helped or could be better') }}"></textarea>
+                            </div>
+                            <button class="btn btn-primary" type="submit">{{ _('Submit review') }}</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="page-card h-100">
+                    <div class="card-body">
+                        <h4 class="mb-3">{{ _('Recent reviews') }}</h4>
+                        {% if review_summary.reviews %}
+                        <div class="timeline-list">
+                            {% for review in review_summary.reviews %}
+                            <div class="timeline-item">
+                                <div class="d-flex justify-content-between align-items-start gap-3">
+                                    <div>
+                                        <strong>{{ review.patient.name }}</strong>
+                                        <div class="text-warning">{{ '★' * review.rating }}</div>
+                                        <p class="mb-0 text-muted">{{ review.review or _('No written review provided.') }}</p>
+                                    </div>
+                                    <small class="text-muted">{{ review.created_at.strftime('%b %d, %Y') }}</small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="empty-state">{{ _('Be the first patient to leave a review for this doctor.') }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

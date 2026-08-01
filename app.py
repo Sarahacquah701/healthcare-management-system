@@ -341,8 +341,6 @@ def set_language(lang):
     return response
 
 db.init_app(app)
-with app.app_context():
-    db.create_all()
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -3233,26 +3231,33 @@ def upgrade_database():
                 db.session.execute(text("ALTER TABLE doctor ADD COLUMN consultation_fee FLOAT DEFAULT 500.0"))
                 db.session.commit()
 
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        upgrade_database()
-        # Legacy accounts predate the email verification flow and need to remain usable.
-        legacy_users = User.query.filter((User.email_verified.is_(None)) | (User.email_verified.is_(False))).all()
-        for user in legacy_users:
-            user.email_verified = True
-            if not user.email_verified_at:
-                user.email_verified_at = datetime.utcnow()
+def initialize_application_data():
+    db.create_all()
+    upgrade_database()
+    # Legacy accounts predate the email verification flow and need to remain usable.
+    legacy_accounts = User.query.filter((User.email_verified.is_(None)) | (User.email_verified.is_(False))).all()
+    for legacy_account in legacy_accounts:
+        legacy_account.email_verified = True
+        if not legacy_account.email_verified_at:
+            legacy_account.email_verified_at = datetime.utcnow()
+    db.session.commit()
+    # Create admin if not exists
+    if not User.query.filter_by(username='admin').first():
+        admin = User(username='admin', email='admin@hospital.com', role='admin', name='Admin')
+        admin.set_password('admin123')
+        admin.email_verified = True
+        admin.email_verified_at = datetime.utcnow()
+        db.session.add(admin)
         db.session.commit()
-        # Create admin if not exists
-        if not User.query.filter_by(username='admin').first():
-            admin = User(username='admin', email='admin@hospital.com', role='admin', name='Admin')
-            admin.set_password('admin123')
-            admin.email_verified = True
-            admin.email_verified_at = datetime.utcnow()
-            db.session.add(admin)
-            db.session.commit()
+
+
+if __name__ == '__main__':
+    debug_mode = True
+    should_initialize = (not debug_mode) or (os.environ.get('WERKZEUG_RUN_MAIN') == 'true')
+    if should_initialize:
+        with app.app_context():
+            initialize_application_data()
     if socketio_available:
-        socketio.run(app, host='0.0.0.0', debug=True, allow_unsafe_werkzeug=True)
+        socketio.run(app, host='0.0.0.0', debug=debug_mode, allow_unsafe_werkzeug=True)
     else:
-        app.run(host='0.0.0.0', debug=True)
+        app.run(host='0.0.0.0', debug=debug_mode)

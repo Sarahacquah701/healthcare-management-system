@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% block title %}AI Hub{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-11">
+            <section class="hero-panel mb-4 fade-in-section">
+                <div class="row align-items-center g-4">
+                    <div class="col-lg-8">
+                        <span class="eyebrow">{{ _('AI powered care') }}</span>
+                        <h1 class="display-5 fw-bold mt-3 mb-3">{{ _('Your healthcare assistant, triage guide, and care planner in one place') }}</h1>
+                        <p class="lead mb-0">{{ _('Use the assistant for quick questions, check symptoms for guided next steps, review personalized recommendations, and preview doctor wait times.') }}</p>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="glass-card p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <strong>{{ _('AI Tools') }}</strong>
+                                <span class="badge rounded-pill bg-light text-dark">{{ _('Ready') }}</span>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <a class="btn btn-light" href="{{ url_for('symptom_checker') }}">{{ _('Symptom Checker') }}</a>
+                                <a class="btn btn-light" href="{{ url_for('recommendations') }}">{{ _('Health Recommendations') }}</a>
+                                <a class="btn btn-light" href="{{ url_for('doctor_availability_predictor') }}">{{ _('Doctor Availability Predictor') }}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section-block fade-in-section">
+                <div class="section-heading">
+                    <h2>{{ _('Core AI features') }}</h2>
+                </div>
+                <div class="row g-4">
+                    <div class="col-md-6 col-xl-3">
+                        <div class="feature-tile h-100">
+                            <div class="feature-icon"><i class="fas fa-comments"></i></div>
+                            <h3>{{ _('Assistant chat') }}</h3>
+                            <p class="mb-3">{{ _('Ask about appointments, doctors, billing, telemedicine, or next steps.') }}</p>
+                            <a class="btn btn-outline-primary btn-sm" href="#assistant">{{ _('Use assistant') }}</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-3">
+                        <div class="feature-tile h-100">
+                            <div class="feature-icon"><i class="fas fa-stethoscope"></i></div>
+                            <h3>{{ _('Symptom triage') }}</h3>
+                            <p class="mb-3">{{ _('Describe symptoms and get an urgency level plus suggested specialty.') }}</p>
+                            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('symptom_checker') }}">{{ _('Open checker') }}</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-3">
+                        <div class="feature-tile h-100">
+                            <div class="feature-icon"><i class="fas fa-heart-pulse"></i></div>
+                            <h3>{{ _('Smart recommendations') }}</h3>
+                            <p class="mb-3">{{ _('See wellness advice based on your latest saved health data.') }}</p>
+                            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('recommendations') }}">{{ _('View tips') }}</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-3">
+                        <div class="feature-tile h-100">
+                            <div class="feature-icon"><i class="fas fa-calendar-days"></i></div>
+                            <h3>{{ _('Doctor prediction') }}</h3>
+                            <p class="mb-3">{{ _('Preview estimated wait times and next available slots.') }}</p>
+                            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('doctor_availability_predictor') }}">{{ _('View predictor') }}</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="assistant" class="section-block fade-in-section">
+                <div class="section-heading">
+                    <h2>{{ _('Assistant preview') }}</h2>
+                    <span class="info-badge"><i class="fas fa-robot"></i>{{ _('Available from the floating chat button too') }}</span>
+                </div>
+                <div class="page-card">
+                    <div class="card-body">
+                        <p class="text-muted mb-3">{{ _('The assistant is already active across the app. Use the quick prompts below to start with common healthcare questions.') }}</p>
+                        <div class="pill-list mb-3">
+                            <span class="quick-chip">{{ _('Book an appointment') }}</span>
+                            <span class="quick-chip">{{ _('Find a doctor') }}</span>
+                            <span class="quick-chip">{{ _('Telemedicine') }}</span>
+                            <span class="quick-chip">{{ _('Payment help') }}</span>
+                            <span class="quick-chip">{{ _('Emergency booking') }}</span>
+                        </div>
+                        <p class="mb-0">{{ _('Open the floating assistant button in the bottom corner to chat directly.') }}</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="row g-4">
+                <div class="col-lg-7">
+                    <section class="section-block fade-in-section">
+                        <div class="section-heading">
+                            <h2>{{ _('Personalized recommendations') }}</h2>
+                        </div>
+                        <div class="page-card">
+                            <div class="card-body">
+                                {% if recommendations %}
+                                    <div class="d-grid gap-3">
+                                        {% for recommendation in recommendations %}
+                                            <div class="metric-card">{{ recommendation }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="empty-state">{{ _('No personalized recommendations are available yet. Add wellness data to unlock this feature.') }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <div class="col-lg-5">
+                    <section class="section-block fade-in-section">
+                        <div class="section-heading">
+                            <h2>{{ _('Current insights') }}</h2>
+                        </div>
+                        <div class="page-card mb-4">
+                            <div class="card-body">
+                                {% if latest_metric %}
+                                    <div class="metric-card mb-3">
+                                        <strong>{{ _('Latest BMI') }}</strong>
+                                        <div>{{ latest_metric.bmi or _('N/A') }}</div>
+                                    </div>
+                                    <div class="metric-card mb-3">
+                                        <strong>{{ _('Blood pressure') }}</strong>
+                                        <div>{{ latest_metric.blood_pressure_systolic or _('N/A') }}/{{ latest_metric.blood_pressure_diastolic or _('N/A') }}</div>
+                                    </div>
+                                    <div class="metric-card">
+                                        <strong>{{ _('Blood sugar') }}</strong>
+                                        <div>{{ latest_metric.blood_sugar_mg_dl or _('N/A') }}</div>
+                                    </div>
+                                {% else %}
+                                    <div class="empty-state">{{ _('No wellness snapshot is available yet.') }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="page-card">
+                            <div class="card-body">
+                                <a class="btn btn-primary w-100 mb-2" href="{{ url_for('symptom_checker') }}">{{ _('Check symptoms now') }}</a>
+                                <a class="btn btn-outline-primary w-100" href="{{ url_for('book_appointment') }}">{{ _('Book care') }}</a>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <section class="section-block fade-in-section">
+                <div class="section-heading">
+                    <h2>{{ _('Doctor availability preview') }}</h2>
+                </div>
+                <div class="page-card">
+                    <div class="card-body">
+                        {% if doctor_predictions %}
+                            <div class="row g-3">
+                                {% for item in doctor_predictions %}
+                                    <div class="col-md-6 col-xl-4">
+                                        <div class="metric-card h-100">
+                                            <strong>{{ item.doctor.user.name }}</strong>
+                                            <div class="text-muted small">{{ item.doctor.specialty }}</div>
+                                            <div class="mt-2">{{ _('Estimated wait') }}: {{ item.estimated_wait }} {{ _('min') }}</div>
+                                            <div class="small text-muted">{{ _('Next slot') }}: {{ item.next_slot }}</div>
+                                            <div class="small text-muted">{{ _('Telemedicine') }}: {{ _('Yes') if item.telemedicine else _('No') }}</div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state">{{ _('Doctor availability predictions are shown for patient accounts.') }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <section class="section-block fade-in-section">
+                <div class="section-heading">
+                    <h2>{{ _('My queue activity') }}</h2>
+                </div>
+                <div class="page-card">
+                    <div class="card-body">
+                        {% if queue_records %}
+                            <div class="row g-3">
+                                {% for record in queue_records[:6] %}
+                                    <div class="col-md-6 col-xl-4">
+                                        <div class="metric-card h-100">
+                                            <strong>{{ record.doctor_rel.user.name }}</strong>
+                                            <div class="text-muted small">{{ record.doctor_rel.specialty }}</div>
+                                            <div class="mt-2">{{ _('Queue number') }}: {{ record.queue_number }}</div>
+                                            <div class="small text-muted">{{ _('Status') }}: {{ record.status }}</div>
+                                            <div class="small text-muted">{{ _('Estimated wait') }}: {{ record.estimated_wait }} {{ _('min') }}</div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state">{{ _('Your queue activity will appear here after you join or book care.') }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}

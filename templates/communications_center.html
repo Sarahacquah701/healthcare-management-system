@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Communications Center') }}{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-11">
+            <section class="hero-panel mb-4 fade-in-section">
+                <div class="row align-items-center g-4">
+                    <div class="col-lg-8">
+                        <span class="eyebrow">{{ _('Stay connected') }}</span>
+                        <h1 class="display-5 fw-bold mt-3 mb-3">{{ _('One place for messages, alerts, chat, and support') }}</h1>
+                        <p class="lead mb-0">{{ _('Review notifications, read announcements, continue consultation threads, and jump into support or AI help without leaving the platform.') }}</p>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="glass-card p-4">
+                            <div class="d-grid gap-2">
+                                <a class="btn btn-light" href="{{ url_for('notifications_view') }}">{{ _('Notifications') }}</a>
+                                <a class="btn btn-light" href="{{ url_for('support') }}">{{ _('Support Chat') }}</a>
+                                <a class="btn btn-light" href="{{ url_for('chat_consultation') }}">{{ _('Chat Consultation') }}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <section class="section-block fade-in-section">
+                        <div class="section-heading">
+                            <h2>{{ _('Notifications') }}</h2>
+                        </div>
+                        <div class="page-card">
+                            <div class="card-body">
+                                {% if notifications %}
+                                    <div class="timeline-list">
+                                        {% for notification in notifications[:5] %}
+                                            <div class="timeline-item">
+                                                <strong>{{ notification.title }}</strong>
+                                                <p class="mb-1 text-muted">{{ notification.message }}</p>
+                                                <small class="text-muted">{{ notification.created_at.strftime('%b %d, %Y %I:%M %p') }}</small>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="mt-3"><a class="btn btn-outline-primary btn-sm" href="{{ url_for('notifications_view') }}">{{ _('Open notifications') }}</a></div>
+                                {% else %}
+                                    <div class="empty-state">{{ _('You do not have any notifications right now.') }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <div class="col-lg-4">
+                    <section class="section-block fade-in-section">
+                        <div class="section-heading">
+                            <h2>{{ _('Announcements') }}</h2>
+                        </div>
+                        <div class="page-card">
+                            <div class="card-body">
+                                {% if announcements %}
+                                    <div class="timeline-list">
+                                        {% for item in announcements %}
+                                            <div class="timeline-item">
+                                                <strong>{{ item.title }}</strong>
+                                                <p class="mb-1 text-muted">{{ item.message }}</p>
+                                                <small class="text-muted">{{ item.created_at.strftime('%b %d, %Y') }}</small>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="mt-3"><a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin_announcements') }}">{{ _('View announcements') }}</a></div>
+                                {% else %}
+                                    <div class="empty-state">{{ _('No announcements have been published yet.') }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <div class="col-lg-4">
+                    <section class="section-block fade-in-section">
+                        <div class="section-heading">
+                            <h2>{{ _('Recent consultations') }}</h2>
+                        </div>
+                        <div class="page-card">
+                            <div class="card-body">
+                                {% if chat_consultations %}
+                                    <div class="d-grid gap-2">
+                                        {% for consultation in chat_consultations %}
+                                            <a href="{{ url_for('view_chat_consultation', consultation_id=consultation.id) }}" class="border rounded-4 p-3 bg-light text-decoration-none text-dark">
+                                                <strong>{{ consultation.topic }}</strong>
+                                                <div class="small text-muted">{{ consultation.created_at.strftime('%d %b %Y %I:%M %p') }}</div>
+                                                <div class="small text-muted">{{ consultation.status.replace('_', ' ').title() }}</div>
+                                            </a>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="mt-3"><a class="btn btn-outline-primary btn-sm" href="{{ url_for('chat_consultation') }}">{{ _('Open chat consultations') }}</a></div>
+                                {% else %}
+                                    <div class="empty-state">{{ _('No chat consultations yet.') }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <section class="section-block fade-in-section">
+                        <div class="section-heading">
+                            <h2>{{ _('Support history') }}</h2>
+                        </div>
+                        <div class="page-card">
+                            <div class="card-body">
+                                {% if support_history %}
+                                    <div class="d-grid gap-2">
+                                        {% for item in support_history %}
+                                            <div class="metric-card">
+                                                <strong>{{ item.user }}</strong>
+                                                <div class="text-muted mt-1">{{ item.assistant }}</div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="empty-state">{{ _('No recent support conversations.') }}</div>
+                                {% endif %}
+                                <div class="mt-3"><a class="btn btn-outline-primary btn-sm" href="{{ url_for('support') }}">{{ _('Open support chat') }}</a></div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <div class="col-lg-6">
+                    <section class="section-block fade-in-section">
+                        <div class="section-heading">
+                            <h2>{{ _('AI assistant history') }}</h2>
+                        </div>
+                        <div class="page-card">
+                            <div class="card-body">
+                                {% if ai_history %}
+                                    <div class="d-grid gap-2">
+                                        {% for item in ai_history %}
+                                            <div class="metric-card">
+                                                <strong>{{ item.user }}</strong>
+                                                <div class="text-muted mt-1">{{ item.assistant }}</div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="empty-state">{{ _('No recent AI assistant conversations.') }}</div>
+                                {% endif %}
+                                <div class="mt-3"><a class="btn btn-outline-primary btn-sm" href="{{ url_for('ai_hub') }}">{{ _('Open AI hub') }}</a></div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
