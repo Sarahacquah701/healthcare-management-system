@@ -19,6 +19,10 @@ app = Flask(__name__)
 
 UPLOAD_BASE = "/tmp/uploads"
 
+
+def is_serverless_environment():
+    return bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME") or os.environ.get("AWS_EXECUTION_ENV"))
+
 os.makedirs(UPLOAD_BASE, exist_ok=True)
 app.config['SECRET_KEY'] = 'your_secret_key_here'
 # Supported locales for the app and JSON-backed translations.
@@ -26,8 +30,17 @@ app.config['BABEL_DEFAULT_LOCALE'] = 'en'
 app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'fr', 'es', 'hi', 'zh', 'ko', 'tw', 'ha']
 app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
 app.config['TRANSLATION_FILES_DIR'] = os.path.join(app.root_path, 'static', 'i18n')
-db_path = "/tmp/hospital_queue.db"
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+else:
+    if is_serverless_environment():
+        db_path = "/tmp/hospital_queue.db"
+    else:
+        db_path = os.path.join(os.path.dirname(__file__), "hospital_queue.db")
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['HEALTH_RECORD_UPLOAD_FOLDER'] = os.path.join(UPLOAD_BASE, 'uploads', 'health_records')
 os.makedirs(app.config['HEALTH_RECORD_UPLOAD_FOLDER'], exist_ok=True)
@@ -177,8 +190,6 @@ def set_language(lang):
     return response
 
 db.init_app(app)
-with app.app_context():
-    db.create_all()
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -2735,16 +2746,19 @@ def upgrade_database():
                 db.session.execute(text("ALTER TABLE doctor ADD COLUMN consultation_fee FLOAT DEFAULT 500.0"))
                 db.session.commit()
 
-if __name__ == '__main__':
+def initialize_database():
     with app.app_context():
         db.create_all()
         upgrade_database()
-        # Create admin if not exists
         if not User.query.filter_by(username='admin').first():
             admin = User(username='admin', email='admin@hospital.com', role='admin', name='Admin')
             admin.set_password('admin123')
             db.session.add(admin)
             db.session.commit()
+
+
+if __name__ == '__main__':
+    initialize_database()
     if socketio_available:
         socketio.run(app, host='0.0.0.0', debug=True, allow_unsafe_werkzeug=True)
     else:
