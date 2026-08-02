@@ -46,8 +46,16 @@ app.config['BABEL_DEFAULT_LOCALE'] = 'en'
 app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'fr', 'es', 'hi', 'zh', 'ko', 'tw', 'ha']
 app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
 app.config['TRANSLATION_FILES_DIR'] = os.path.join(app.root_path, 'static', 'i18n')
-db_path = "/tmp/hospital_queue.db"
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if DATABASE_URL:
+    # Supabase/PostgreSQL
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+else:
+    # Local development
+    db_path = "hospital_queue.db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['HEALTH_RECORD_UPLOAD_FOLDER'] = os.path.join(UPLOAD_BASE, 'uploads', 'health_records')
 os.makedirs(app.config['HEALTH_RECORD_UPLOAD_FOLDER'], exist_ok=True)
