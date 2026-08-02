@@ -51,19 +51,7 @@ app.config['BABEL_DEFAULT_LOCALE'] = 'en'
 app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'fr', 'es', 'hi', 'zh', 'ko', 'tw', 'ha']
 app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
 app.config['TRANSLATION_FILES_DIR'] = os.path.join(app.root_path, 'static', 'i18n')
-<<<<<<< HEAD
-DATABASE_URL = os.environ.get("DATABASE_URL")
 
-if DATABASE_URL:
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
-else:
-    if is_serverless_environment():
-        db_path = "/tmp/hospital_queue.db"
-    else:
-        db_path = os.path.join(os.path.dirname(__file__), "hospital_queue.db")
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_path
-=======
 def get_database_uri():
     database_url = os.environ.get("DATABASE_URL")
     if database_url:
@@ -79,7 +67,7 @@ def get_database_uri():
 
 
 app.config["SQLALCHEMY_DATABASE_URI"] = get_database_uri()
->>>>>>> 7afb9a39ffff175c9c7fa0f18b8467fd7e2dd989
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['APP_INITIALIZED'] = False
 app.config['HEALTH_RECORD_UPLOAD_FOLDER'] = os.path.join(UPLOAD_BASE, 'uploads', 'health_records')
