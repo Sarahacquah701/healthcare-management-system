@@ -63,6 +63,7 @@ def get_database_uri():
 
 app.config["SQLALCHEMY_DATABASE_URI"] = get_database_uri()
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['APP_INITIALIZED'] = False
 app.config['HEALTH_RECORD_UPLOAD_FOLDER'] = os.path.join(UPLOAD_BASE, 'uploads', 'health_records')
 os.makedirs(app.config['HEALTH_RECORD_UPLOAD_FOLDER'], exist_ok=True)
 app.config['CHAT_UPLOAD_FOLDER'] = os.path.join(UPLOAD_BASE, 'uploads', 'chat_attachments')
@@ -3247,35 +3248,40 @@ def upgrade_database():
                 db.session.commit()
 
 def initialize_application_data():
-    db.create_all()
-    upgrade_database()
-    # Legacy accounts predate the email verification flow and need to remain usable.
-    legacy_accounts = User.query.filter((User.email_verified.is_(None)) | (User.email_verified.is_(False))).all()
-    for legacy_account in legacy_accounts:
-        legacy_account.email_verified = True
-        if not legacy_account.email_verified_at:
-            legacy_account.email_verified_at = datetime.utcnow()
-    db.session.commit()
-    # Create admin if not exists
-    if not User.query.filter_by(username='admin').first():
-        admin = User(username='admin', email='admin@hospital.com', role='admin', name='Admin')
-        admin.set_password('admin123')
-        admin.email_verified = True
-        admin.email_verified_at = datetime.utcnow()
-        db.session.add(admin)
+    if app.config.get('APP_INITIALIZED'):
+        return
+    with app.app_context():
+        db.create_all()
+        upgrade_database()
+        # Legacy accounts predate the email verification flow and need to remain usable.
+        legacy_accounts = User.query.filter((User.email_verified.is_(None)) | (User.email_verified.is_(False))).all()
+        for legacy_account in legacy_accounts:
+            legacy_account.email_verified = True
+            if not legacy_account.email_verified_at:
+                legacy_account.email_verified_at = datetime.utcnow()
         db.session.commit()
+        # Create admin if not exists
+        if not User.query.filter_by(username='admin').first():
+            admin = User(username='admin', email='admin@hospital.com', role='admin', name='Admin')
+            admin.set_password('admin123')
+            admin.email_verified = True
+            admin.email_verified_at = datetime.utcnow()
+            db.session.add(admin)
+            db.session.commit()
+    app.config['APP_INITIALIZED'] = True
 
 
-with app.app_context():
-    initialize_application_data()
+@app.before_request
+def ensure_application_data_initialized():
+    if not app.config.get('APP_INITIALIZED'):
+        initialize_application_data()
 
 
 if __name__ == '__main__':
     debug_mode = True
     should_initialize = (not debug_mode) or (os.environ.get('WERKZEUG_RUN_MAIN') == 'true')
     if should_initialize:
-        with app.app_context():
-            initialize_application_data()
+        initialize_application_data()
     if socketio_available:
         socketio.run(app, host='0.0.0.0', debug=debug_mode, allow_unsafe_werkzeug=True)
     else:
