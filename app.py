@@ -32,6 +32,10 @@ app = Flask(__name__)
 
 UPLOAD_BASE = "/tmp/uploads"
 
+
+def is_serverless_environment():
+    return bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME") or os.environ.get("AWS_EXECUTION_ENV"))
+
 os.makedirs(UPLOAD_BASE, exist_ok=True)
 app.config['SECRET_KEY'] = 'your_secret_key_here'
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', app.config['SECRET_KEY'])
@@ -47,6 +51,19 @@ app.config['BABEL_DEFAULT_LOCALE'] = 'en'
 app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'fr', 'es', 'hi', 'zh', 'ko', 'tw', 'ha']
 app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
 app.config['TRANSLATION_FILES_DIR'] = os.path.join(app.root_path, 'static', 'i18n')
+<<<<<<< HEAD
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+else:
+    if is_serverless_environment():
+        db_path = "/tmp/hospital_queue.db"
+    else:
+        db_path = os.path.join(os.path.dirname(__file__), "hospital_queue.db")
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_path
+=======
 def get_database_uri():
     database_url = os.environ.get("DATABASE_URL")
     if database_url:
@@ -62,6 +79,7 @@ def get_database_uri():
 
 
 app.config["SQLALCHEMY_DATABASE_URI"] = get_database_uri()
+>>>>>>> 7afb9a39ffff175c9c7fa0f18b8467fd7e2dd989
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['APP_INITIALIZED'] = False
 app.config['HEALTH_RECORD_UPLOAD_FOLDER'] = os.path.join(UPLOAD_BASE, 'uploads', 'health_records')
@@ -3247,6 +3265,12 @@ def upgrade_database():
                 db.session.execute(text("ALTER TABLE doctor ADD COLUMN consultation_fee FLOAT DEFAULT 500.0"))
                 db.session.commit()
 
+<<<<<<< HEAD
+def initialize_database():
+    with app.app_context():
+        db.create_all()
+        upgrade_database()
+=======
 def initialize_application_data():
     if app.config.get('APP_INITIALIZED'):
         return
@@ -3261,6 +3285,7 @@ def initialize_application_data():
                 legacy_account.email_verified_at = datetime.utcnow()
         db.session.commit()
         # Create admin if not exists
+>>>>>>> 7afb9a39ffff175c9c7fa0f18b8467fd7e2dd989
         if not User.query.filter_by(username='admin').first():
             admin = User(username='admin', email='admin@hospital.com', role='admin', name='Admin')
             admin.set_password('admin123')
@@ -3268,6 +3293,12 @@ def initialize_application_data():
             admin.email_verified_at = datetime.utcnow()
             db.session.add(admin)
             db.session.commit()
+<<<<<<< HEAD
+
+
+if __name__ == '__main__':
+    initialize_database()
+=======
     app.config['APP_INITIALIZED'] = True
 
 
@@ -3282,6 +3313,7 @@ if __name__ == '__main__':
     should_initialize = (not debug_mode) or (os.environ.get('WERKZEUG_RUN_MAIN') == 'true')
     if should_initialize:
         initialize_application_data()
+>>>>>>> 7afb9a39ffff175c9c7fa0f18b8467fd7e2dd989
     if socketio_available:
         socketio.run(app, host='0.0.0.0', debug=debug_mode, allow_unsafe_werkzeug=True)
     else:
