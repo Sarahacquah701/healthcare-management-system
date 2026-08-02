@@ -3253,56 +3253,30 @@ def upgrade_database():
                 db.session.execute(text("ALTER TABLE doctor ADD COLUMN consultation_fee FLOAT DEFAULT 500.0"))
                 db.session.commit()
 
-<<<<<<< HEAD
-def initialize_database():
-    with app.app_context():
-        db.create_all()
-        upgrade_database()
-=======
-def initialize_application_data():
-    if app.config.get('APP_INITIALIZED'):
-        return
-    with app.app_context():
-        db.create_all()
-        upgrade_database()
-        # Legacy accounts predate the email verification flow and need to remain usable.
-        legacy_accounts = User.query.filter((User.email_verified.is_(None)) | (User.email_verified.is_(False))).all()
-        for legacy_account in legacy_accounts:
-            legacy_account.email_verified = True
-            if not legacy_account.email_verified_at:
-                legacy_account.email_verified_at = datetime.utcnow()
-        db.session.commit()
-        # Create admin if not exists
->>>>>>> 7afb9a39ffff175c9c7fa0f18b8467fd7e2dd989
-        if not User.query.filter_by(username='admin').first():
-            admin = User(username='admin', email='admin@hospital.com', role='admin', name='Admin')
-            admin.set_password('admin123')
-            admin.email_verified = True
-            admin.email_verified_at = datetime.utcnow()
-            db.session.add(admin)
-            db.session.commit()
-<<<<<<< HEAD
+app.config['APP_INITIALIZED'] = True
 
 
-if __name__ == '__main__':
-    initialize_database()
-=======
-    app.config['APP_INITIALIZED'] = True
 
 
 @app.before_request
 def ensure_application_data_initialized():
     if not app.config.get('APP_INITIALIZED'):
-        initialize_application_data()
+        initialize_database()
+        app.config['APP_INITIALIZED'] = True
 
 
 if __name__ == '__main__':
     debug_mode = True
-    should_initialize = (not debug_mode) or (os.environ.get('WERKZEUG_RUN_MAIN') == 'true')
-    if should_initialize:
-        initialize_application_data()
->>>>>>> 7afb9a39ffff175c9c7fa0f18b8467fd7e2dd989
+
     if socketio_available:
-        socketio.run(app, host='0.0.0.0', debug=debug_mode, allow_unsafe_werkzeug=True)
+        socketio.run(
+            app,
+            host='0.0.0.0',
+            debug=debug_mode,
+            allow_unsafe_werkzeug=True
+        )
     else:
-        app.run(host='0.0.0.0', debug=debug_mode)
+        app.run(
+            host='0.0.0.0',
+            debug=debug_mode
+        )
