@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 import os
 import smtplib
+from pathlib import Path
 
 try:
     import jwt
@@ -46,16 +47,21 @@ app.config['BABEL_DEFAULT_LOCALE'] = 'en'
 app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'fr', 'es', 'hi', 'zh', 'ko', 'tw', 'ha']
 app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
 app.config['TRANSLATION_FILES_DIR'] = os.path.join(app.root_path, 'static', 'i18n')
-DATABASE_URL = os.environ.get("DATABASE_URL")
+def get_database_uri():
+    database_url = os.environ.get("DATABASE_URL")
+    if database_url:
+        return database_url.replace("postgres://", "postgresql://", 1)
 
-if DATABASE_URL:
-    # Supabase/PostgreSQL
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
-else:
-    # Local development
-    db_path = "hospital_queue.db"
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_path
+    is_serverless = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME") or os.environ.get("AWS_EXECUTION_ENV"))
+    if is_serverless:
+        db_path = "/tmp/hospital_queue.db"
+    else:
+        project_root = Path(__file__).resolve().parent
+        db_path = str(project_root / "hospital_queue.db")
+    return "sqlite:///" + db_path
+
+
+app.config["SQLALCHEMY_DATABASE_URI"] = get_database_uri()
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['HEALTH_RECORD_UPLOAD_FOLDER'] = os.path.join(UPLOAD_BASE, 'uploads', 'health_records')
 os.makedirs(app.config['HEALTH_RECORD_UPLOAD_FOLDER'], exist_ok=True)
@@ -3257,6 +3263,10 @@ def initialize_application_data():
         admin.email_verified_at = datetime.utcnow()
         db.session.add(admin)
         db.session.commit()
+
+
+with app.app_context():
+    initialize_application_data()
 
 
 if __name__ == '__main__':
