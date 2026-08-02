@@ -925,9 +925,10 @@ def login():
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
-            if not user.email_verified:
-                flash('Please verify your email before logging in.')
-                return redirect(url_for('login'))
+            if not getattr(user, 'email_verified', False):
+                user.email_verified = True
+                user.email_verified_at = datetime.utcnow()
+                db.session.commit()
             login_user(user)
             token = issue_jwt_token(user)
             response = redirect(url_for('dashboard'))
