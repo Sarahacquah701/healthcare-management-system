@@ -3253,7 +3253,10 @@ def upgrade_database():
                 db.session.execute(text("ALTER TABLE doctor ADD COLUMN consultation_fee FLOAT DEFAULT 500.0"))
                 db.session.commit()
 
-app.config['APP_INITIALIZED'] = True
+def initialize_database():
+    with app.app_context():
+        db.create_all()
+    app.config['APP_INITIALIZED'] = True
 
 
 
@@ -3262,7 +3265,6 @@ app.config['APP_INITIALIZED'] = True
 def ensure_application_data_initialized():
     if not app.config.get('APP_INITIALIZED'):
         initialize_database()
-        app.config['APP_INITIALIZED'] = True
 
 
 if __name__ == '__main__':
