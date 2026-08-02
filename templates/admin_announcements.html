@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Announcements') }}{% endblock %}
+{% block content %}
+<div class="page-card mb-4">
+    <div class="card-body">
+        <div class="section-heading">
+            <h2>{{ _('Announcements') }}</h2>
+            <span class="info-badge"><i class="fas fa-bullhorn"></i> {{ _('Admin broadcast') }}</span>
+        </div>
+        <form method="post" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">{{ _('Title') }}</label>
+                <input class="form-control" name="title" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">{{ _('Audience') }}</label>
+                <select class="form-select" name="audience">
+                    <option value="all">{{ _('All users') }}</option>
+                    <option value="patient">{{ _('Patients') }}</option>
+                    <option value="doctor">{{ _('Doctors') }}</option>
+                    <option value="admin">{{ _('Admins') }}</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <label class="form-label">{{ _('Message') }}</label>
+                <textarea class="form-control" name="message" rows="4" required></textarea>
+            </div>
+            <div class="col-12">
+                <button class="btn btn-primary" type="submit">{{ _('Publish announcement') }}</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="page-card">
+    <div class="card-body">
+        <h4 class="mb-3">{{ _('Published announcements') }}</h4>
+        {% if announcements %}
+        <div class="timeline-list">
+            {% for item in announcements %}
+            <div class="timeline-item">
+                <div class="d-flex justify-content-between flex-wrap gap-2">
+                    <div>
+                        <strong>{{ item.title }}</strong>
+                        <p class="mb-0 text-muted">{{ item.message }}</p>
+                    </div>
+                    <small class="text-muted">{{ item.created_at.strftime('%b %d, %Y') }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">{{ _('No announcements have been published yet.') }}</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

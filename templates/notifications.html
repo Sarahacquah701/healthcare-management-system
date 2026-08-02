@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Notifications') }}{% endblock %}
+{% block content %}
+<div class="page-card">
+    <div class="card-body">
+        <div class="section-heading">
+            <h2>{{ _('Notifications') }}</h2>
+            <span class="info-badge"><i class="fas fa-bell"></i> {{ _('Live updates') }}</span>
+        </div>
+        {% if notifications %}
+        <div class="timeline-list">
+            {% for notification in notifications %}
+            <div class="timeline-item">
+                <div class="d-flex justify-content-between gap-3 flex-wrap align-items-center">
+                    <div>
+                        <h5 class="mb-1">{{ notification.title }}</h5>
+                        <p class="mb-1 text-muted">{{ notification.message }}</p>
+                        <small class="text-muted">{{ notification.created_at.strftime('%b %d, %Y %I:%M %p') }}</small>
+                    </div>
+                    {% if not notification.is_read %}
+                    <form method="post" action="{{ url_for('mark_notification_read', notification_id=notification.id) }}">
+                        <button class="btn btn-sm btn-outline-primary" type="submit">{{ _('Mark as read') }}</button>
+                    </form>
+                    {% else %}
+                    <span class="badge bg-success">{{ _('Read') }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">{{ _('You do not have any notifications right now.') }}</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

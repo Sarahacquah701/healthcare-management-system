@@ -20,6 +20,9 @@ class User(UserMixin, db.Model):
     allergies = db.Column(db.Text, nullable=True)
     medical_conditions = db.Column(db.Text, nullable=True)
     emergency_contact = db.Column(db.String(150), nullable=True)
+    email_verified = db.Column(db.Boolean, default=False)
+    email_verification_token = db.Column(db.String(255), nullable=True)
+    email_verified_at = db.Column(db.DateTime, nullable=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -306,3 +309,60 @@ class ChatMessage(db.Model):
 
     consultation = db.relationship('ChatConsultation', backref=db.backref('messages', lazy=True, cascade='all, delete-orphan'))
     sender = db.relationship('User', backref=db.backref('chat_messages', lazy=True))
+
+
+class DoctorReview(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'), nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
+    review = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    patient = db.relationship('User', backref=db.backref('doctor_reviews', lazy=True, cascade='all, delete-orphan'))
+    doctor = db.relationship('Doctor', backref=db.backref('reviews', lazy=True, cascade='all, delete-orphan'))
+
+
+class NewsletterSubscriber(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=True)
+    email = db.Column(db.String(150), nullable=False, unique=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    recipient_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    title = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    category = db.Column(db.String(50), default='general')
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    recipient = db.relationship('User', backref=db.backref('notifications', lazy=True, cascade='all, delete-orphan'))
+
+
+class MedicationReminder(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    medication_name = db.Column(db.String(200), nullable=False)
+    dosage_instructions = db.Column(db.String(255), nullable=True)
+    reminder_time = db.Column(db.DateTime, nullable=False)
+    status = db.Column(db.String(50), default='active')
+    notes = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    patient = db.relationship('User', backref=db.backref('medication_reminders', lazy=True, cascade='all, delete-orphan'))
+
+
+class Announcement(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    audience = db.Column(db.String(50), default='all')
+    is_active = db.Column(db.Boolean, default=True)
+    created_by_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    creator = db.relationship('User', backref=db.backref('announcements_created', lazy=True))

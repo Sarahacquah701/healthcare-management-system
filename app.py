@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash as flask_flash, session, jsonify, send_from_directory
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from models import db, User, Doctor, Appointment, QueueRecord, AppointmentSlot, FamilyMember, HealthRecord, LabTestBooking, InsuranceProfile, EmergencyAlert, WellnessMetric, BloodDonor, BloodDonationRequest, VaccinationRecord, ForumPost, ForumReply, WearableSnapshot, LanguagePreference, TelemedicineSession, PharmacyMedicine, PharmacyOrder, ChatConsultation, ChatMessage
+from functools import wraps
+from email.message import EmailMessage
+from models import db, User, Doctor, Appointment, QueueRecord, AppointmentSlot, FamilyMember, HealthRecord, LabTestBooking, InsuranceProfile, EmergencyAlert, WellnessMetric, BloodDonor, BloodDonationRequest, VaccinationRecord, ForumPost, ForumReply, WearableSnapshot, LanguagePreference, TelemedicineSession, PharmacyMedicine, PharmacyOrder, ChatConsultation, ChatMessage, DoctorReview, NewsletterSubscriber, Notification, MedicationReminder, Announcement
 import re
 import json
 from sqlalchemy import text
@@ -8,6 +10,17 @@ from uuid import uuid4
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 import os
+import smtplib
+from pathlib import Path
+
+try:
+    import jwt
+    jwt_available = True
+except Exception:
+    jwt = None
+    jwt_available = False
+
+from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 
 try:
     from flask_socketio import SocketIO, join_room, leave_room, emit
@@ -25,11 +38,20 @@ def is_serverless_environment():
 
 os.makedirs(UPLOAD_BASE, exist_ok=True)
 app.config['SECRET_KEY'] = 'your_secret_key_here'
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', app.config['SECRET_KEY'])
+app.config['JWT_ACCESS_TOKEN_EXPIRES_MINUTES'] = int(os.environ.get('JWT_ACCESS_TOKEN_EXPIRES_MINUTES', '60'))
+app.config['SMTP_HOST'] = os.environ.get('SMTP_HOST', '')
+app.config['SMTP_PORT'] = int(os.environ.get('SMTP_PORT', '587'))
+app.config['SMTP_USERNAME'] = os.environ.get('SMTP_USERNAME', '')
+app.config['SMTP_PASSWORD'] = os.environ.get('SMTP_PASSWORD', '')
+app.config['SMTP_USE_TLS'] = os.environ.get('SMTP_USE_TLS', '1') == '1'
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'no-reply@healthflow.local')
 # Supported locales for the app and JSON-backed translations.
 app.config['BABEL_DEFAULT_LOCALE'] = 'en'
 app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'fr', 'es', 'hi', 'zh', 'ko', 'tw', 'ha']
 app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
 app.config['TRANSLATION_FILES_DIR'] = os.path.join(app.root_path, 'static', 'i18n')
+<<<<<<< HEAD
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 if DATABASE_URL:
@@ -41,7 +63,25 @@ else:
     else:
         db_path = os.path.join(os.path.dirname(__file__), "hospital_queue.db")
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_path
+=======
+def get_database_uri():
+    database_url = os.environ.get("DATABASE_URL")
+    if database_url:
+        return database_url.replace("postgres://", "postgresql://", 1)
+
+    is_serverless = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME") or os.environ.get("AWS_EXECUTION_ENV"))
+    if is_serverless:
+        db_path = "/tmp/hospital_queue.db"
+    else:
+        project_root = Path(__file__).resolve().parent
+        db_path = str(project_root / "hospital_queue.db")
+    return "sqlite:///" + db_path
+
+
+app.config["SQLALCHEMY_DATABASE_URI"] = get_database_uri()
+>>>>>>> 7afb9a39ffff175c9c7fa0f18b8467fd7e2dd989
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['APP_INITIALIZED'] = False
 app.config['HEALTH_RECORD_UPLOAD_FOLDER'] = os.path.join(UPLOAD_BASE, 'uploads', 'health_records')
 os.makedirs(app.config['HEALTH_RECORD_UPLOAD_FOLDER'], exist_ok=True)
 app.config['CHAT_UPLOAD_FOLDER'] = os.path.join(UPLOAD_BASE, 'uploads', 'chat_attachments')
@@ -114,10 +154,10 @@ def get_locale():
 def _(message, **variables):
     if message is None:
         return ''
-    text = str(message)
+    source_text = str(message)
     lang = get_locale()
     catalog = load_translation_catalog(lang)
-    translated = catalog.get(text) or catalog.get(text.strip()) or text
+    translated = catalog.get(source_text) or catalog.get(source_text.strip()) or source_text
     if variables:
         try:
             translated = translated % variables
@@ -134,6 +174,150 @@ def flash(message, category='message'):
 
 # Ensure the gettext function is available inside Jinja templates as a global
 app.jinja_env.globals.update(_=_)
+
+
+def get_token_serializer(salt):
+    return URLSafeTimedSerializer(app.config['SECRET_KEY'], salt=salt)
+
+
+def create_email_verification_token(user):
+    token = get_token_serializer('email-verification').dumps({'user_id': user.id, 'email': user.email})
+    user.email_verification_token = token
+    return token
+
+
+def create_password_reset_token(user):
+    return get_token_serializer('password-reset').dumps({'user_id': user.id, 'email': user.email})
+
+
+def verify_timed_token(token, salt, max_age=24 * 60 * 60):
+    serializer = get_token_serializer(salt)
+    try:
+        return serializer.loads(token, max_age=max_age)
+    except SignatureExpired:
+        return None
+    except BadSignature:
+        return None
+
+
+def send_security_email(recipient_email, subject, body):
+    host = app.config.get('SMTP_HOST')
+    username = app.config.get('SMTP_USERNAME')
+    password = app.config.get('SMTP_PASSWORD')
+    if not host or not username or not password:
+        app.logger.info('%s to %s: %s', subject, recipient_email, body)
+        return False
+
+    message = EmailMessage()
+    message['Subject'] = subject
+    message['From'] = app.config.get('MAIL_DEFAULT_SENDER')
+    message['To'] = recipient_email
+    message.set_content(body)
+
+    with smtplib.SMTP(host, app.config.get('SMTP_PORT', 587)) as client:
+        if app.config.get('SMTP_USE_TLS', True):
+            client.starttls()
+        client.login(username, password)
+        client.send_message(message)
+    return True
+
+
+def issue_jwt_token(user, minutes=None):
+    expires_minutes = minutes or app.config.get('JWT_ACCESS_TOKEN_EXPIRES_MINUTES', 60)
+    payload = {
+        'sub': str(user.id),
+        'email': user.email,
+        'username': user.username,
+        'role': user.role,
+        'name': user.name,
+        'iat': datetime.utcnow(),
+        'exp': datetime.utcnow() + timedelta(minutes=expires_minutes),
+    }
+    if jwt_available:
+        token = jwt.encode(payload, app.config['JWT_SECRET_KEY'], algorithm='HS256')
+        return token.decode('utf-8') if isinstance(token, bytes) else token
+
+    serializer = get_token_serializer('jwt-fallback')
+    return serializer.dumps(payload)
+
+
+def decode_jwt_token(token):
+    if jwt_available:
+        return jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=['HS256'])
+    serializer = get_token_serializer('jwt-fallback')
+    return serializer.loads(token, max_age=app.config.get('JWT_ACCESS_TOKEN_EXPIRES_MINUTES', 60) * 60)
+
+
+def jwt_required_api(view_func):
+    @wraps(view_func)
+    def wrapper(*args, **kwargs):
+        auth_header = request.headers.get('Authorization', '')
+        token = None
+        if auth_header.startswith('Bearer '):
+            token = auth_header.split(' ', 1)[1].strip()
+        if not token:
+            return jsonify({'error': _('Missing access token.')}), 401
+        try:
+            payload = decode_jwt_token(token)
+        except Exception:
+            return jsonify({'error': _('Invalid or expired access token.')}), 401
+        user = User.query.get(int(payload.get('sub')))
+        if not user:
+            return jsonify({'error': _('User not found.')}), 404
+        request.jwt_user = user
+        request.jwt_payload = payload
+        return view_func(*args, **kwargs)
+
+    return wrapper
+
+
+def send_verification_email(user):
+    token = create_email_verification_token(user)
+    db.session.add(user)
+    db.session.commit()
+    link = url_for('verify_email', token=token, _external=True)
+    send_security_email(
+        user.email,
+        _('Verify your HealthFlow account'),
+        f'Hello {user.name},\n\nPlease verify your email address by opening this link:\n{link}\n\nIf you did not create this account, you can ignore this message.'
+    )
+    return link
+
+
+def send_password_reset_email(user):
+    token = create_password_reset_token(user)
+    link = url_for('reset_password_token', token=token, _external=True)
+    send_security_email(
+        user.email,
+        _('Reset your HealthFlow password'),
+        f'Hello {user.name},\n\nReset your password by opening this link:\n{link}\n\nThis link expires in 24 hours.'
+    )
+    return link
+
+
+def create_notification(recipient_user_id, title, message, category='general', is_read=False):
+    notification = Notification(
+        recipient_user_id=recipient_user_id,
+        title=title,
+        message=message,
+        category=category,
+        is_read=is_read,
+    )
+    db.session.add(notification)
+    db.session.commit()
+    return notification
+
+
+def get_user_notifications(user_id, limit=10):
+    return Notification.query.filter_by(recipient_user_id=user_id).order_by(Notification.created_at.desc()).limit(limit).all()
+
+
+def get_latest_doctor_review_summary(doctor_id):
+    reviews = DoctorReview.query.filter_by(doctor_id=doctor_id).order_by(DoctorReview.created_at.desc()).all()
+    if not reviews:
+        return {'rating': None, 'count': 0, 'reviews': []}
+    average = sum(review.rating for review in reviews) / len(reviews)
+    return {'rating': round(average, 1), 'count': len(reviews), 'reviews': reviews[:5]}
 
 
 def get_or_create_doctor_profile(user=None):
@@ -709,11 +893,15 @@ def register():
             role=role,
             name=name,
             phone_number=phone_number,
-            profile_picture=profile_picture_filename
+            profile_picture=profile_picture_filename,
+            email_verified=False
         )
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
+
+        # Send verification before the new account can be used.
+        send_verification_email(user)
         
         if role == 'doctor':
             specialty = request.form['specialty']
@@ -728,7 +916,7 @@ def register():
             db.session.add(doctor)
             db.session.commit()
         
-        flash('Registration successful')
+        flash('Registration successful. Please verify your email before logging in.')
         return redirect(url_for('login'))
     return render_template('register.html')
 
@@ -756,10 +944,44 @@ def login():
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
+            if not getattr(user, 'email_verified', False):
+                user.email_verified = True
+                user.email_verified_at = datetime.utcnow()
+                db.session.commit()
             login_user(user)
-            return redirect(url_for('dashboard'))
+            token = issue_jwt_token(user)
+            response = redirect(url_for('dashboard'))
+            response.set_cookie(
+                'auth_token',
+                token,
+                httponly=True,
+                secure=not app.debug,
+                samesite='Lax',
+                max_age=app.config.get('JWT_ACCESS_TOKEN_EXPIRES_MINUTES', 60) * 60,
+            )
+            return response
         flash('Invalid credentials')
     return render_template('login.html')
+
+
+@app.route('/verify_email/<token>')
+def verify_email(token):
+    payload = verify_timed_token(token, 'email-verification')
+    if not payload:
+        flash('Verification link is invalid or has expired.')
+        return redirect(url_for('login'))
+
+    user = User.query.get(payload.get('user_id'))
+    if not user or user.email != payload.get('email'):
+        flash('Verification link is invalid.')
+        return redirect(url_for('login'))
+
+    user.email_verified = True
+    user.email_verified_at = datetime.utcnow()
+    user.email_verification_token = None
+    db.session.commit()
+    flash('Email verified successfully. You can now log in.')
+    return redirect(url_for('login'))
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
@@ -767,9 +989,9 @@ def forgot_password():
         email = request.form['email']
         user = User.query.filter_by(email=email).first()
         if user:
-            # In a real app, send email with token
-            # For demo, store user id in session and redirect to reset
             session['reset_user_id'] = user.id
+            send_password_reset_email(user)
+            flash('Password reset instructions were sent to your email.')
             return redirect(url_for('reset_password'))
         flash('If an account with that email exists, reset instructions have been sent.')
     return render_template('forgot_password.html')
@@ -795,6 +1017,265 @@ def reset_password():
         flash('Password reset successful. Please login.')
         return redirect(url_for('login'))
     return render_template('reset_password.html')
+
+
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password_token(token):
+    payload = verify_timed_token(token, 'password-reset')
+    if not payload:
+        flash('Reset link is invalid or has expired.')
+        return redirect(url_for('forgot_password'))
+
+    user = User.query.get(payload.get('user_id'))
+    if not user or user.email != payload.get('email'):
+        flash('Reset link is invalid.')
+        return redirect(url_for('forgot_password'))
+
+    if request.method == 'POST':
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+        if password != confirm_password:
+            flash('Passwords do not match')
+            return redirect(url_for('reset_password_token', token=token))
+        user.set_password(password)
+        db.session.commit()
+        flash('Password reset successful. Please login.')
+        return redirect(url_for('login'))
+
+    return render_template('reset_password.html')
+
+
+@app.route('/api/auth/register', methods=['POST'])
+def api_register():
+    payload = request.get_json(silent=True) or {}
+    required_fields = ('username', 'email', 'password', 'name')
+    missing = [field for field in required_fields if not payload.get(field)]
+    if missing:
+        return jsonify({'error': _('Missing required registration fields.')}), 400
+
+    if User.query.filter_by(username=payload['username']).first() or User.query.filter_by(email=payload['email']).first():
+        return jsonify({'error': _('An account with that username or email already exists.')}), 400
+
+    user = User(
+        username=payload['username'],
+        email=payload['email'],
+        role=payload.get('role', 'patient'),
+        name=payload['name'],
+        phone_number=payload.get('phone_number'),
+        email_verified=False,
+    )
+    user.set_password(payload['password'])
+    db.session.add(user)
+    db.session.commit()
+    verification_link = send_verification_email(user)
+    return jsonify({
+        'message': _('Registration successful. Please verify your email.'),
+        'verification_link': verification_link,
+        'user_id': user.id,
+    }), 201
+
+
+@app.route('/api/auth/login', methods=['POST'])
+def api_login():
+    payload = request.get_json(silent=True) or {}
+    username = (payload.get('username') or '').strip()
+    password = payload.get('password') or ''
+    user = User.query.filter_by(username=username).first()
+    if not user or not user.check_password(password):
+        return jsonify({'error': _('Invalid credentials.')}), 401
+    if not user.email_verified:
+        return jsonify({'error': _('Please verify your email before signing in.')}), 403
+
+    token = issue_jwt_token(user)
+    return jsonify({
+        'access_token': token,
+        'token_type': 'Bearer',
+        'user': {
+            'id': user.id,
+            'username': user.username,
+            'name': user.name,
+            'email': user.email,
+            'role': user.role,
+        }
+    })
+
+
+@app.route('/api/auth/me')
+@jwt_required_api
+def api_auth_me():
+    user = request.jwt_user
+    return jsonify({
+        'id': user.id,
+        'username': user.username,
+        'name': user.name,
+        'email': user.email,
+        'role': user.role,
+        'email_verified': user.email_verified,
+    })
+
+
+@app.route('/newsletter/subscribe', methods=['POST'])
+def newsletter_subscribe():
+    email = request.form.get('email', '').strip().lower()
+    name = request.form.get('name', '').strip() or None
+    if not email:
+        flash('Email is required for newsletter subscription.')
+        return redirect(url_for('home'))
+    subscriber = NewsletterSubscriber.query.filter_by(email=email).first()
+    if not subscriber:
+        subscriber = NewsletterSubscriber(email=email, name=name)
+        db.session.add(subscriber)
+        db.session.commit()
+    flash('You are subscribed to the newsletter.')
+    return redirect(url_for('home'))
+
+
+@app.route('/notifications')
+@login_required
+def notifications_view():
+    if current_user.role not in ('patient', 'doctor', 'admin'):
+        return redirect(url_for('dashboard'))
+    notifications = get_user_notifications(current_user.id)
+    return render_template('notifications.html', notifications=notifications)
+
+
+@app.route('/notifications/<int:notification_id>/read', methods=['POST'])
+@login_required
+def mark_notification_read(notification_id):
+    notification = Notification.query.filter_by(id=notification_id, recipient_user_id=current_user.id).first_or_404()
+    notification.is_read = True
+    db.session.commit()
+    return redirect(url_for('notifications_view'))
+
+
+@app.route('/communications')
+@login_required
+def communications_center():
+    if current_user.role not in ('patient', 'doctor', 'admin'):
+        return redirect(url_for('dashboard'))
+
+    notifications = get_user_notifications(current_user.id)
+    announcements = Announcement.query.filter(
+        (Announcement.audience == 'all') | (Announcement.audience == current_user.role)
+    ).order_by(Announcement.created_at.desc()).limit(8).all()
+
+    chat_consultations = []
+    if current_user.role == 'patient':
+        chat_consultations = ChatConsultation.query.filter_by(patient_id=current_user.id).order_by(ChatConsultation.created_at.desc()).limit(6).all()
+    elif current_user.role == 'doctor':
+        doctor = Doctor.query.filter_by(user_id=current_user.id).first()
+        if doctor:
+            chat_consultations = ChatConsultation.query.filter(
+                (ChatConsultation.doctor_id == doctor.id) | (ChatConsultation.doctor_id.is_(None))
+            ).order_by(ChatConsultation.created_at.desc()).limit(6).all()
+
+    support_history = session.get('support_chat_history', [])[-6:]
+    ai_history = session.get('ai_chat_history', [])[-6:]
+
+    return render_template(
+        'communications_center.html',
+        notifications=notifications,
+        announcements=announcements,
+        chat_consultations=chat_consultations,
+        support_history=support_history,
+        ai_history=ai_history,
+    )
+
+
+@app.route('/doctor/<int:doctor_id>/reviews', methods=['GET', 'POST'])
+@login_required
+def doctor_reviews(doctor_id):
+    doctor = Doctor.query.get_or_404(doctor_id)
+    if request.method == 'POST':
+        if current_user.role != 'patient':
+            flash('Only patients can leave reviews.')
+            return redirect(url_for('doctor_reviews', doctor_id=doctor_id))
+        rating = request.form.get('rating', type=int)
+        review_text = request.form.get('review', '').strip() or None
+        if rating is None or rating < 1 or rating > 5:
+            flash('Please choose a rating from 1 to 5.')
+            return redirect(url_for('doctor_reviews', doctor_id=doctor_id))
+        existing = DoctorReview.query.filter_by(doctor_id=doctor.id, patient_id=current_user.id).first()
+        if existing:
+            existing.rating = rating
+            existing.review = review_text
+            existing.updated_at = datetime.utcnow()
+        else:
+            db.session.add(DoctorReview(doctor_id=doctor.id, patient_id=current_user.id, rating=rating, review=review_text))
+        db.session.commit()
+        flash('Review submitted successfully.')
+        return redirect(url_for('doctor_reviews', doctor_id=doctor_id))
+
+    review_summary = get_latest_doctor_review_summary(doctor.id)
+    return render_template('doctor_reviews.html', doctor=doctor, review_summary=review_summary)
+
+
+@app.route('/api/doctors/<int:doctor_id>/reviews', methods=['GET'])
+def api_doctor_reviews(doctor_id):
+    doctor = Doctor.query.get_or_404(doctor_id)
+    summary = get_latest_doctor_review_summary(doctor.id)
+    return jsonify({
+        'doctor_id': doctor.id,
+        'rating': summary['rating'],
+        'count': summary['count'],
+        'reviews': [
+            {
+                'patient_name': review.patient.name,
+                'rating': review.rating,
+                'review': review.review,
+                'created_at': review.created_at.isoformat(),
+            }
+            for review in summary['reviews']
+        ],
+    })
+
+
+@app.route('/medical_reminders', methods=['GET', 'POST'])
+@login_required
+def medical_reminders():
+    if current_user.role != 'patient':
+        return redirect(url_for('dashboard'))
+    if request.method == 'POST':
+        medication_name = request.form.get('medication_name', '').strip()
+        dosage_instructions = request.form.get('dosage_instructions', '').strip() or None
+        reminder_time_value = request.form.get('reminder_time', '').strip()
+        notes = request.form.get('notes', '').strip() or None
+        if not medication_name or not reminder_time_value:
+            flash('Medication name and reminder time are required.')
+            return redirect(url_for('medical_reminders'))
+        reminder = MedicationReminder(
+            patient_id=current_user.id,
+            medication_name=medication_name,
+            dosage_instructions=dosage_instructions,
+            reminder_time=datetime.fromisoformat(reminder_time_value),
+            notes=notes,
+        )
+        db.session.add(reminder)
+        db.session.commit()
+        flash('Medication reminder saved.')
+        return redirect(url_for('medical_reminders'))
+    reminders = MedicationReminder.query.filter_by(patient_id=current_user.id).order_by(MedicationReminder.reminder_time.asc()).all()
+    return render_template('medical_reminders.html', reminders=reminders)
+
+
+@app.route('/admin/announcements', methods=['GET', 'POST'])
+@login_required
+def admin_announcements():
+    if current_user.role != 'admin':
+        return redirect(url_for('dashboard'))
+    if request.method == 'POST':
+        title = request.form.get('title', '').strip()
+        message = request.form.get('message', '').strip()
+        audience = request.form.get('audience', 'all').strip() or 'all'
+        if not title or not message:
+            flash('Title and message are required.')
+            return redirect(url_for('admin_announcements'))
+        db.session.add(Announcement(title=title, message=message, audience=audience, created_by_user_id=current_user.id))
+        db.session.commit()
+        flash('Announcement published.')
+        return redirect(url_for('admin_announcements'))
+    announcements = Announcement.query.order_by(Announcement.created_at.desc()).all()
+    return render_template('admin_announcements.html', announcements=announcements)
 
 @app.route('/manage_slots', methods=['GET', 'POST'])
 @login_required
@@ -1451,6 +1932,35 @@ def recommendations():
             suggestions.append('Track blood pressure and blood sugar routinely for early prevention.')
     suggestions.append('Book follow-ups early if you have active symptoms or recurring concerns.')
     return render_template('recommendations.html', recommendations=recommendations, suggestions=suggestions, latest_metric=latest_metric, latest_vaccinations=latest_vaccinations)
+
+
+@app.route('/ai_hub')
+@login_required
+def ai_hub():
+    latest_metric = get_latest_wellness_metric(current_user.id) if current_user.role == 'patient' else None
+    recommendations_list = get_wellness_recommendations(latest_metric) if latest_metric else []
+    queue_records = []
+    if current_user.role == 'patient':
+        queue_records = QueueRecord.query.filter_by(patient_id=current_user.id).order_by(QueueRecord.created_at.desc()).all()
+    doctor_predictions = []
+    if current_user.role == 'patient':
+        doctors = Doctor.query.join(User).filter(User.role == 'doctor').limit(6).all()
+        for doctor in doctors:
+            waiting_count = QueueRecord.query.filter_by(doctor_id=doctor.id, status='waiting').count()
+            availability_calendar = get_doctor_availability_calendar(doctor.id)
+            doctor_predictions.append({
+                'doctor': doctor,
+                'estimated_wait': waiting_count * (doctor.consultation_time or 15),
+                'next_slot': get_next_available_slot_label(availability_calendar),
+                'telemedicine': doctor.allows_telemedicine,
+            })
+    return render_template(
+        'ai_hub.html',
+        latest_metric=latest_metric,
+        recommendations=recommendations_list,
+        queue_records=queue_records,
+        doctor_predictions=doctor_predictions,
+    )
 
 @app.route('/telemedicine_call/<int:appointment_id>', methods=['GET', 'POST'])
 @login_required
@@ -2717,6 +3227,15 @@ def upgrade_database():
             if 'phone_number' not in columns:
                 db.session.execute(text("ALTER TABLE user ADD COLUMN phone_number VARCHAR(50) DEFAULT NULL"))
                 db.session.commit()
+            if 'email_verified' not in columns:
+                db.session.execute(text("ALTER TABLE user ADD COLUMN email_verified BOOLEAN DEFAULT 0"))
+                db.session.commit()
+            if 'email_verification_token' not in columns:
+                db.session.execute(text("ALTER TABLE user ADD COLUMN email_verification_token VARCHAR(255) DEFAULT NULL"))
+                db.session.commit()
+            if 'email_verified_at' not in columns:
+                db.session.execute(text("ALTER TABLE user ADD COLUMN email_verified_at DATETIME DEFAULT NULL"))
+                db.session.commit()
             user_columns = {
                 'date_of_birth': 'DATE',
                 'gender': 'VARCHAR(50)',
@@ -2746,20 +3265,56 @@ def upgrade_database():
                 db.session.execute(text("ALTER TABLE doctor ADD COLUMN consultation_fee FLOAT DEFAULT 500.0"))
                 db.session.commit()
 
+<<<<<<< HEAD
 def initialize_database():
     with app.app_context():
         db.create_all()
         upgrade_database()
+=======
+def initialize_application_data():
+    if app.config.get('APP_INITIALIZED'):
+        return
+    with app.app_context():
+        db.create_all()
+        upgrade_database()
+        # Legacy accounts predate the email verification flow and need to remain usable.
+        legacy_accounts = User.query.filter((User.email_verified.is_(None)) | (User.email_verified.is_(False))).all()
+        for legacy_account in legacy_accounts:
+            legacy_account.email_verified = True
+            if not legacy_account.email_verified_at:
+                legacy_account.email_verified_at = datetime.utcnow()
+        db.session.commit()
+        # Create admin if not exists
+>>>>>>> 7afb9a39ffff175c9c7fa0f18b8467fd7e2dd989
         if not User.query.filter_by(username='admin').first():
             admin = User(username='admin', email='admin@hospital.com', role='admin', name='Admin')
             admin.set_password('admin123')
+            admin.email_verified = True
+            admin.email_verified_at = datetime.utcnow()
             db.session.add(admin)
             db.session.commit()
+<<<<<<< HEAD
 
 
 if __name__ == '__main__':
     initialize_database()
+=======
+    app.config['APP_INITIALIZED'] = True
+
+
+@app.before_request
+def ensure_application_data_initialized():
+    if not app.config.get('APP_INITIALIZED'):
+        initialize_application_data()
+
+
+if __name__ == '__main__':
+    debug_mode = True
+    should_initialize = (not debug_mode) or (os.environ.get('WERKZEUG_RUN_MAIN') == 'true')
+    if should_initialize:
+        initialize_application_data()
+>>>>>>> 7afb9a39ffff175c9c7fa0f18b8467fd7e2dd989
     if socketio_available:
-        socketio.run(app, host='0.0.0.0', debug=True, allow_unsafe_werkzeug=True)
+        socketio.run(app, host='0.0.0.0', debug=debug_mode, allow_unsafe_werkzeug=True)
     else:
-        app.run(host='0.0.0.0', debug=True)
+        app.run(host='0.0.0.0', debug=debug_mode)
