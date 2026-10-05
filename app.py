@@ -3171,6 +3171,16 @@ def logout():
 def qr_checkin():
     return render_template('qr_checkin.html')
 
+
+@app.route("/robots.txt")
+def robots_txt():
+    return send_from_directory(".", "robots.txt", mimetype="text/plain")
+
+
+@app.route("/sitemap.xml")
+def sitemap_xml():
+    return send_from_directory(".", "sitemap.xml", mimetype="application/xml")
+
 def upgrade_database():
     if db.engine.dialect.name == 'sqlite':
         result = db.session.execute(text("SELECT name FROM sqlite_master WHERE type='table' AND name='queue_record'"))
@@ -3302,6 +3312,8 @@ def initialize_database():
         db.create_all()
         ensure_legacy_user_schema_compatibility()
     app.config['APP_INITIALIZED'] = True
+
+  
 
 
 @app.before_request

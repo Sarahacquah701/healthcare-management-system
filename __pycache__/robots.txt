@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://healthcare-management-system-eosin.vercel.app/sitemap.xml
