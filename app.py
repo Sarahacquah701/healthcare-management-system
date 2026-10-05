@@ -842,6 +842,11 @@ def recalculate_wait_times(doctor_id):
         q.estimated_wait = i * doctor.consultation_time
     db.session.commit()
 
+@app.route('/googlef6a8424dace90f2d.html')
+def google_site_verification():
+    return send_from_directory(app.root_path, 'googlef6a8424dace90f2d.html', mimetype='text/html')
+
+
 @app.route('/')
 def home():
     return render_template('home_new.html')
@@ -3253,12 +3258,50 @@ def upgrade_database():
                 db.session.execute(text("ALTER TABLE doctor ADD COLUMN consultation_fee FLOAT DEFAULT 500.0"))
                 db.session.commit()
 
+def ensure_legacy_user_schema_compatibility():
+    with app.app_context():
+        inspector = db.inspect(db.engine)
+        if not inspector.has_table('user'):
+            return
+
+        password_hash_column = next((column for column in inspector.get_columns('user') if column['name'] == 'password_hash'), None)
+        if password_hash_column is None:
+            return
+
+        column_type = str(password_hash_column.get('type', '')).lower()
+        if '128' not in column_type and '255' not in column_type and 'text' not in column_type:
+            return
+
+        dialect_name = db.engine.dialect.name
+
+        if dialect_name == 'postgresql':
+            db.session.execute(text('ALTER TABLE "user" ALTER COLUMN password_hash TYPE VARCHAR(255)'))
+            db.session.commit()
+            return
+
+        if dialect_name == 'sqlite':
+            columns = [column['name'] for column in inspector.get_columns('user')]
+            if 'password_hash' not in columns:
+                return
+
+            legacy_table = '_user_legacy_compat'
+            db.session.execute(text(f'ALTER TABLE "user" RENAME TO "{legacy_table}"'))
+            db.session.commit()
+
+            User.__table__.create(bind=db.engine, checkfirst=True)
+
+            column_names = ', '.join(f'"{column}"' for column in User.__table__.columns.keys())
+            select_columns = ', '.join(f'"{column}"' for column in User.__table__.columns.keys())
+            db.session.execute(text(f'INSERT INTO "user" ({column_names}) SELECT {select_columns} FROM "{legacy_table}"'))
+            db.session.execute(text(f'DROP TABLE "{legacy_table}"'))
+            db.session.commit()
+
+
 def initialize_database():
     with app.app_context():
         db.create_all()
+        ensure_legacy_user_schema_compatibility()
     app.config['APP_INITIALIZED'] = True
-
-
 
 
 @app.before_request
